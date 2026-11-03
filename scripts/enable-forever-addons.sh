@@ -11,6 +11,8 @@ ADDONS=(
   ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
   CouchDictateRoute
+  # QoL install set (Forever-tagged); staged addons intentionally omitted
+  Syndicator Baganator Leatrix_Plus Plater
 )
 
 if [[ ! -d "$WTF" ]]; then
