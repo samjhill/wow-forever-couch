@@ -71,7 +71,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 
-**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type) and waits for your controller **Enter** to send. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)). In-game sticky is **unverified** until you test in Forever.
+**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type). **Left grip again** sends (no keyboard). Right grip cancels. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)). In-game sticky is **unverified** until you test in Forever.
 
 ```bash
 DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh          # clipboard only

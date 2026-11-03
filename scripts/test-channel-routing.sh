@@ -69,6 +69,19 @@ else
   fail "Lua policy markers missing"
 fi
 
+echo "=== draft confirm helper present ==="
+if [[ -x "${REPO_ROOT}/scripts/confirm-wow-chat.sh" ]]; then
+  pass "confirm-wow-chat.sh present"
+else
+  fail "confirm-wow-chat.sh missing"
+fi
+if grep -q 'pending_draft' "${REPO_ROOT}/scripts/dictate-daemon.py" \
+  && grep -q 'fire_confirm' "${REPO_ROOT}/scripts/dictate-daemon.py"; then
+  pass "daemon second-grip confirm path present"
+else
+  fail "daemon missing draft-confirm path"
+fi
+
 echo
 if [[ "$FAILS" -gt 0 ]]; then
   echo "Channel routing tests: $FAILS failure(s)." >&2

@@ -37,7 +37,7 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
 Two cooperating pieces:
 
 1. **`CouchDictateRoute` addon** — observes `GROUP_ROSTER_UPDATE` / login and sets each chat edit box `chatType` + `stickyType` via `SetAttribute` + `ChatEdit_UpdateHeader`. When Enter opens chat, Blizzard uses that sticky type. The addon **never** calls `SendChatMessage`.
-2. **Host inject** — still only simulates keys from your grip-triggered pipeline. Default mode is **draft** (no final Enter); you confirm with controller Enter.
+2. **Host inject** — still only simulates keys from your grip-triggered pipeline. Default mode is **draft** (no final Enter); **left grip again** confirms send (no keyboard Enter needed). Right grip (or FIFO `cancel`) presses Esc to discard.
 
 ### API / ToS notes
 
@@ -68,10 +68,13 @@ Steam Input: left grip → **F20** — see [`config/steam-input/forever-left-gri
 ## Workflow (current default: draft)
 
 1. Forever focused; `CouchDictateRoute` loaded.
-2. Left grip (or `echo fire > config/dictate.trigger`).
+2. **Left grip** (or `echo fire > config/dictate.trigger`).
 3. Speak (~4s, `DICTATE_SECS`).
 4. Inject opens chat and types the transcript (**does not send**).
-5. Read the draft → **Enter** to send, **Esc** to cancel.
+5. Read the draft → **left grip again** to send (daemon presses Enter).
+6. Discard instead: **right grip**, or `echo cancel > config/dictate.trigger`, or Esc.
+
+Pending drafts expire after `DICTATE_DRAFT_TTL` seconds (default 60); the next left grip then starts a new dictation instead of confirming.
 
 Auto-send (after you trust routing in-game):
 
@@ -94,8 +97,9 @@ DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
 
 | Env | Default | Meaning |
 |-----|---------|---------|
-| `DICTATE_SEND_MODE` | `draft` | `draft` = type only; `send` = final Enter |
+| `DICTATE_SEND_MODE` | `draft` | `draft` = type only; `send` = final Enter immediately |
 | `DICTATE_CHANNEL` | `auto` | `auto` = bare text + addon sticky; `say`/`party`/`raid` = slash prefix |
+| `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable via second grip |
 | `DICTATE_NO_SEND` | unset | Skip inject entirely |
 | `DICTATE_WAV` | unset | Replay file instead of mic |
 
@@ -119,7 +123,8 @@ Covers solo / party-2 → say, party-3+ → party, raid → raid, overrides, and
 | Raid | Draft opens on **Raid** | Untested |
 | `/cdr party` then grip | Sticky/header shows Party | Untested |
 | `DICTATE_CHANNEL=say` override | Typed text prefixed `/say ` | Untested |
-| Draft confirm | Grip drafts; controller Enter sends | Untested |
+| Draft confirm | Grip drafts; **second left grip** sends | Untested |
+| Draft cancel | Right grip / FIFO `cancel` discards | Untested |
 | `DICTATE_SEND_MODE=send` | Full Esc→Enter→type→Enter | Untested |
 
 ## Limitations
@@ -127,8 +132,9 @@ Covers solo / party-2 → say, party-3+ → party, raid → raid, overrides, and
 - Sticky routing requires the addon enabled; without it, `DICTATE_CHANNEL=auto` uses whatever chat was last sticky (often Say).
 - ConsolePort may remapping Enter for UI focus — if draft never appears, try Desktop Mode once or open chat manually then retest.
 - Host cannot read group size without the addon or a slash override (no memory scraping).
-- Mis-hears still appear in the edit box in draft mode; confirm before Enter.
+- Mis-hears still appear in the edit box in draft mode; confirm with a second grip only when the text looks right.
 - Esc/Enter briefly steals input — avoid gripping mid-combat.
+- No physical Enter key needed: confirm is left grip → draft → left grip again.
 
 ## Services
 
