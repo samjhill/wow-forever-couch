@@ -109,9 +109,18 @@ Whisper capture/transcription is unchanged.
 
 ```bash
 ./scripts/test-channel-routing.sh
+./scripts/test-dictate-mock-wow.sh   # headless WoW chat mock (recommended)
 ```
 
-Covers solo / party-2 → say, party-3+ → party, raid → raid, overrides, and slash prefixes. **Does not** prove in-client sticky behavior.
+`test-dictate-mock-wow.sh` starts `mock-wow-chat.py`, points inject/confirm at it via `DICTATE_MOCK_FIFO`, and asserts:
+
+- draft text appears in the mock edit box
+- second confirm sends; cancel discards
+- sticky SAY for solo / party-of-2; PARTY for 3+; RAID for raid
+- `DICTATE_CHANNEL` slash overrides
+- optional Whisper WAV → draft → confirm when the model is installed
+
+No Forever client or display required. Production still uses ydotool when `DICTATE_MOCK_FIFO` is unset.
 
 ## Host E2E (2026-11-03, Bazzite)
 

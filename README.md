@@ -68,6 +68,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ./scripts/prefer-mic-source.sh             # default: built-in analog mic-in
 ./scripts/install-couch-dictate-route.sh   # sticky say/party/raid by group size
 ./scripts/test-channel-routing.sh          # offline channel policy tests
+./scripts/test-dictate-mock-wow.sh         # headless mock WoW chat (draft/confirm/channels)
 ./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 

@@ -5,6 +5,11 @@ config/last-dictation.txt
 config/dictate-status.json
 config/dictate-env
 config/dictate.trigger
+config/mock-wow-state.json
+config/mock-wow.fifo
+config/mock-wow.ready
+config/mock-wow-harness.log
+config/last-e2e-receipt.md
 config/*.bak
 
 # Large / regenerable caches

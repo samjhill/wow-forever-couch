@@ -7,18 +7,22 @@
 #   DICTATE_CHANNEL=auto|say|party|raid
 #                                  auto (default): bare text; CouchDictateRoute sticky picks channel
 #                                  otherwise prefix /say /p /raid as a manual override
+#   DICTATE_MOCK_FIFO=path         when set, drive mock-wow-chat.py instead of ydotool
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
-RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RUNTIME/.ydotool_socket}"
+EMIT="${REPO_ROOT}/scripts/emit-input-event.sh"
 
 SEND_MODE="${DICTATE_SEND_MODE:-draft}"
 CHANNEL="${DICTATE_CHANNEL:-auto}"
 
-if [[ ! -S "$YDOTOOL_SOCKET" ]]; then
-  echo "ydotoold socket missing: $YDOTOOL_SOCKET (systemctl --user start ydotoold)" >&2
-  exit 2
+if [[ -z "${DICTATE_MOCK_FIFO:-}" ]]; then
+  RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+  export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RUNTIME/.ydotool_socket}"
+  if [[ ! -S "$YDOTOOL_SOCKET" ]]; then
+    echo "ydotoold socket missing: $YDOTOOL_SOCKET (systemctl --user start ydotoold)" >&2
+    exit 2
+  fi
 fi
 
 if [[ $# -gt 0 ]]; then
@@ -51,20 +55,19 @@ esac
 
 PAYLOAD="${PREFIX}${TEXT}"
 
-# KEY_ESC=1 KEY_ENTER=28
-ydotool key 1:1 1:0
-sleep 0.15
-ydotool key 28:1 28:0
-sleep 0.25
-printf '%s' "$PAYLOAD" | ydotool type --file -
-sleep 0.12
+"$EMIT" key esc
+sleep 0.05
+"$EMIT" key enter
+sleep 0.05
+"$EMIT" type "$PAYLOAD"
+sleep 0.05
 
 case "$SEND_MODE_LC" in
   draft|confirm)
     echo "drafted ${#TEXT} chars (channel=${CHANNEL}, mode=draft) — left grip again to send, right grip / Esc to cancel"
     ;;
   send|auto)
-    ydotool key 28:1 28:0
+    "$EMIT" key enter
     echo "sent ${#TEXT} chars (channel=${CHANNEL}, mode=send)"
     ;;
   *)

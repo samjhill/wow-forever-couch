@@ -2,23 +2,27 @@
 # Confirm or cancel a drafted WoW chat line (no keyboard required).
 #   confirm (default): KEY_ENTER — send the open edit-box text
 #   cancel:            KEY_ESC  — discard / close chat
+#
+# Set DICTATE_MOCK_FIFO to drive mock-wow-chat.py instead of ydotool.
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
-RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RUNTIME/.ydotool_socket}"
+EMIT="${REPO_ROOT}/scripts/emit-input-event.sh"
 STATUS="${WOW_COUCH_CONFIG}/dictate-status.json"
 ACTION="${1:-confirm}"
 
-if [[ ! -S "$YDOTOOL_SOCKET" ]]; then
-  echo "ydotoold socket missing: $YDOTOOL_SOCKET (systemctl --user start ydotoold)" >&2
-  exit 2
+if [[ -z "${DICTATE_MOCK_FIFO:-}" ]]; then
+  RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+  export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RUNTIME/.ydotool_socket}"
+  if [[ ! -S "$YDOTOOL_SOCKET" ]]; then
+    echo "ydotoold socket missing: $YDOTOOL_SOCKET (systemctl --user start ydotoold)" >&2
+    exit 2
+  fi
 fi
 
 case "$ACTION" in
   confirm|send|enter)
-    # KEY_ENTER=28
-    ydotool key 28:1 28:0
+    "$EMIT" key enter
     python3 - "$STATUS" <<'PY'
 import json, sys, time
 path = sys.argv[1]
@@ -34,8 +38,7 @@ PY
     echo "confirmed chat send (Enter)"
     ;;
   cancel|esc|discard)
-    # KEY_ESC=1
-    ydotool key 1:1 1:0
+    "$EMIT" key esc
     python3 - "$STATUS" <<'PY'
 import json, sys, time
 path = sys.argv[1]
