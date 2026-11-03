@@ -1,0 +1,8 @@
+## Interface: 11509, 16001, 20506, 38010, 50500, 50504, 120100
+## Title: Couch Dictate Route
+## Notes: Sticky chat channel for couch voice dictation (say / party / raid by group size)
+## Author: wow-forever-couch
+## Version: 1.0.0
+## SavedVariables: CouchDictateRouteDB
+
+CouchDictateRoute.lua

@@ -17,7 +17,8 @@
 - No capture → `./scripts/prefer-mic-source.sh`; confirm jack is in **mic-in**, TX unmuted.
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
-- Garbage sends → lower mic gain / TV volume; use `DICTATE_NO_SEND=1` while tuning.
+- Garbage drafts → lower mic gain / TV volume; use `DICTATE_NO_SEND=1` while tuning; draft mode leaves text unsent until Enter.
+- Wrong chat channel → `/cdr status`; `/cdr say|party|raid` or `DICTATE_CHANNEL=...` override; ensure CouchDictateRoute is enabled.
 
 ## Controller
 

@@ -63,25 +63,28 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ### 5. Voice → chat (optional)
 
 ```bash
-./scripts/setup-whisper.sh              # whisper.cpp + base.en model
-./scripts/install-user-services.sh      # ydotoold + dictate daemon
-./scripts/prefer-mic-source.sh          # default: built-in analog mic-in
-./scripts/test-dictate-harness.sh       # offline checks (uses DICTATE_NO_SEND)
+./scripts/setup-whisper.sh                 # whisper.cpp + base.en model
+./scripts/install-user-services.sh         # ydotoold + dictate daemon
+./scripts/prefer-mic-source.sh             # default: built-in analog mic-in
+./scripts/install-couch-dictate-route.sh   # sticky say/party/raid by group size
+./scripts/test-channel-routing.sh          # offline channel policy tests
+./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 
-**Default behavior:** after Whisper, the script **auto-sends** into focused Forever chat (`Esc` → `Enter` → type → `Enter`). Mis-hears will send. Debug without sending:
+**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type) and waits for your controller **Enter** to send. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)). In-game sticky is **unverified** until you test in Forever.
 
 ```bash
-DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh
+DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh          # clipboard only
+DICTATE_SEND_MODE=send ./scripts/dictate-push-to-talk.sh     # auto final Enter
+DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh      # manual /p override
 ```
-
-Full notes: [`docs/voice-dictation.md`](docs/voice-dictation.md).
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
 | `scripts/` | Install, launch, addons, dictation |
+| `addons/CouchDictateRoute/` | Sticky chat channel for voice dictation |
 | `docs/` | Install, addons, controller, dictation, troubleshooting |
 | `config/steam-input/` | Steam Input bind notes (export your share codes here) |
 
@@ -102,7 +105,7 @@ Environment variables used by scripts (via `scripts/lib.sh`):
 ## Safety
 
 - Never commit Sunshine/RustDesk passwords or Battle.net credentials.
-- Auto-send chat is powerful; use `DICTATE_NO_SEND=1` while tuning the mic.
+- Draft mode is the default; use `DICTATE_NO_SEND=1` while tuning the mic, and only enable `DICTATE_SEND_MODE=send` after in-game channel checks.
 - Addon zips are downloaded by the install script (not vendored in git).
 
 ## License
