@@ -2,46 +2,133 @@
 
 ## Goal
 
-Controller left grip → speak → local Whisper → **auto open/type/send** into Forever chat (default Enter channel, usually `/say`).
+Controller left grip → speak → local Whisper → draft (or send) into Forever chat, with **group-aware channel routing**:
+
+| Group state | Default channel |
+|-------------|-----------------|
+| Solo, or party of 1–2 | `/say` |
+| Party of 3+ | `/party` |
+| Raid | `/raid` |
+
+Party-of-two uses `/say` on purpose: couch co-op in the same room does not need party spam.
+
+## Architecture
+
+```
+Steam grip / F20 / FIFO
+        │
+        ▼
+wow-dictate-daemon ──► dictate-push-to-talk.sh
+                              │
+                     Whisper (unchanged)
+                              │
+                              ▼
+                     inject-wow-chat.sh
+                     Esc → Enter → [optional /channel] type
+                     [Enter only if DICTATE_SEND_MODE=send]
+                              │
+                              ▼
+              Forever chat edit box (sticky type)
+                              │
+         CouchDictateRoute addon (in-client)
+         GROUP_ROSTER_UPDATE → sticky SAY|PARTY|RAID
+```
+
+Two cooperating pieces:
+
+1. **`CouchDictateRoute` addon** — observes `GROUP_ROSTER_UPDATE` / login and sets each chat edit box `chatType` + `stickyType` via `SetAttribute` + `ChatEdit_UpdateHeader`. When Enter opens chat, Blizzard uses that sticky type. The addon **never** calls `SendChatMessage`.
+2. **Host inject** — still only simulates keys from your grip-triggered pipeline. Default mode is **draft** (no final Enter); you confirm with controller Enter.
+
+### API / ToS notes
+
+| Approach | Used? | Notes |
+|----------|-------|-------|
+| `IsInGroup` / `IsInRaid` / `GetNumGroupMembers` | Yes (addon) | Standard roster APIs on Forever (Interface 11xxx–12xxxx family). |
+| `editBox:SetAttribute("chatType"\|"stickyType")` | Yes (addon) | Same path `ChatFrame_OpenChat` uses; not a protected/secure action; does not send. |
+| `SendChatMessage` from addon | **No** | Would bypass physical confirm. |
+| Memory read / client patch | **No** | Prohibited; also unnecessary. |
+| Slash prefix override from host | Yes (fallback) | `DICTATE_CHANNEL=say\|party\|raid` types `/say` `/p` `/raid` so routing works even if sticky fails. |
 
 ## Setup
 
 ```bash
 ./scripts/setup-whisper.sh
-./scripts/install-user-services.sh    # ydotoold + dictate daemon
-./scripts/prefer-mic-source.sh        # built-in analog mic-in
-./scripts/test-dictate-harness.sh     # offline checks
+./scripts/install-user-services.sh         # ydotoold + dictate daemon
+./scripts/prefer-mic-source.sh             # PC mic-in
+./scripts/install-couch-dictate-route.sh   # addon → Interface/AddOns
+./scripts/enable-forever-addons.sh         # includes CouchDictateRoute
+./scripts/test-channel-routing.sh          # offline policy tests
+./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 
-Steam Input (recommended): left grip → **F20** — see [`config/steam-input/forever-left-grip-f20.md`](../config/steam-input/forever-left-grip-f20.md). The daemon also listens for Steam Controller `BTN_GRIPL`.
+In-game: `/reload`, then `/cdr status`. Manual sticky override: `/cdr say|party|raid` or `/cdr auto`.
 
-This repo defaults to **PC mic-in** (3.5mm into the motherboard). USB audio from some wireless RX units is flaky; jack path is more reliable for STT.
+Steam Input: left grip → **F20** — see [`config/steam-input/forever-left-grip-f20.md`](../config/steam-input/forever-left-grip-f20.md).
 
-## Workflow
+## Workflow (current default: draft)
 
-1. Forever focused.
-2. Press left grip (or write `fire` to `config/dictate.trigger`).
-3. Speak (~4s default, `DICTATE_SECS`).
-4. Transcript is injected: Esc → Enter → type → Enter.
+1. Forever focused; `CouchDictateRoute` loaded.
+2. Left grip (or `echo fire > config/dictate.trigger`).
+3. Speak (~4s, `DICTATE_SECS`).
+4. Inject opens chat and types the transcript (**does not send**).
+5. Read the draft → **Enter** to send, **Esc** to cancel.
 
-Debug without sending:
+Auto-send (after you trust routing in-game):
+
+```bash
+DICTATE_SEND_MODE=send ./scripts/dictate-push-to-talk.sh
+# or export in the user unit / dictate-env sidecar
+```
+
+Clipboard-only (no inject):
 
 ```bash
 DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh
 ```
 
-Simulated speech (no mic):
+Manual channel override (host slash prefix; ignores sticky for that inject):
 
 ```bash
-./scripts/test-dictate-simulated.sh
+DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
 ```
 
-## Risks
+| Env | Default | Meaning |
+|-----|---------|---------|
+| `DICTATE_SEND_MODE` | `draft` | `draft` = type only; `send` = final Enter |
+| `DICTATE_CHANNEL` | `auto` | `auto` = bare text + addon sticky; `say`/`party`/`raid` = slash prefix |
+| `DICTATE_NO_SEND` | unset | Skip inject entirely |
+| `DICTATE_WAV` | unset | Replay file instead of mic |
 
-- Mis-hears **will send** to the default chat channel.
+Whisper capture/transcription is unchanged.
+
+## Offline tests
+
+```bash
+./scripts/test-channel-routing.sh
+```
+
+Covers solo / party-2 → say, party-3+ → party, raid → raid, overrides, and slash prefixes. **Does not** prove in-client sticky behavior.
+
+## In-game acceptance (do not check off until verified in Forever)
+
+| Condition | Expected | Result |
+|-----------|----------|--------|
+| Solo | Draft opens on **Say** | Untested |
+| Party of 2 | Draft opens on **Say** | Untested |
+| Party of 3+ | Draft opens on **Party** | Untested |
+| Raid | Draft opens on **Raid** | Untested |
+| `/cdr party` then grip | Sticky/header shows Party | Untested |
+| `DICTATE_CHANNEL=say` override | Typed text prefixed `/say ` | Untested |
+| Draft confirm | Grip drafts; controller Enter sends | Untested |
+| `DICTATE_SEND_MODE=send` | Full Esc→Enter→type→Enter | Untested |
+
+## Limitations
+
+- Sticky routing requires the addon enabled; without it, `DICTATE_CHANNEL=auto` uses whatever chat was last sticky (often Say).
+- ConsolePort may remapping Enter for UI focus — if draft never appears, try Desktop Mode once or open chat manually then retest.
+- Host cannot read group size without the addon or a slash override (no memory scraping).
+- Mis-hears still appear in the edit box in draft mode; confirm before Enter.
 - Esc/Enter briefly steals input — avoid gripping mid-combat.
-- Lower TV volume / lav positioning to reduce echo into Whisper.
-- Hot mic levels can clip; reduce TX gain if needed.
 
 ## Services
 

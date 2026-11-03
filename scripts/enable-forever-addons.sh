@@ -10,6 +10,7 @@ ADDONS=(
   Immersion ForeverVO
   ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
+  CouchDictateRoute
 )
 
 if [[ ! -d "$WTF" ]]; then

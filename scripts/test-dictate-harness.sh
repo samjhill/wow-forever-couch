@@ -106,7 +106,7 @@ else
   warn "ydotool/uinput unavailable — soft skip F20 inject"
 fi
 
-echo "=== F: ydotoold + auto-send path ==="
+echo "=== F: ydotoold + draft/no-send path ==="
 RUNTIME="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RUNTIME/.ydotool_socket}"
 if systemctl --user is-active --quiet ydotoold.service && [[ -S "$YDOTOOL_SOCKET" ]]; then
@@ -114,7 +114,6 @@ if systemctl --user is-active --quiet ydotoold.service && [[ -S "$YDOTOOL_SOCKET
 else
   fail "ydotoold not active"
 fi
-# Clipboard-only path still works
 if DICTATE_NO_SEND=1 DICTATE_WAV="${BASE}/config/sim-dictation/phrase2.wav" "${BASE}/scripts/dictate-push-to-talk.sh" >/tmp/harness-nosend.out 2>&1; then
   if grep -q DICTATE_NO_SEND /tmp/harness-nosend.out && grep -q '"state": "done"' "$STATUS"; then
     pass "DICTATE_NO_SEND skip-inject path"
@@ -129,15 +128,25 @@ if ! printf '  \n' | "${BASE}/scripts/inject-wow-chat.sh" >/tmp/inject-empty.out
 else
   fail "inject should refuse empty"
 fi
-echo "NOTE: live Esc/Enter/type/Enter into Forever requires game focus — verify once in-game."
 
-echo "=== G: manual couch checklist ==="
+echo "=== G: channel routing (offline) ==="
+if "${BASE}/scripts/test-channel-routing.sh"; then
+  pass "channel routing unit tests"
+else
+  fail "channel routing unit tests"
+fi
+
+echo "NOTE: live draft/send into Forever requires game focus — channel sticky untested until in-game."
+
+echo "=== H: manual couch checklist ==="
 
 cat <<'CHK'
 [ ] Gaming Mode → Battle.net (WoW Forever) → Steam Input on
 [ ] Left grip → F20 (see config/steam-input/forever-left-grip-f20.md)
-[ ] Forever focused; left grip → beep → speak → auto Esc/Enter/type/Enter into chat
-[ ] Message appears in default chat channel
+[ ] CouchDictateRoute enabled; /cdr status
+[ ] Forever focused; grip → draft in chat (no auto-send); Enter confirms
+[ ] Solo / party-of-2 → Say; party-of-3+ → Party; raid → Raid
+[ ] DICTATE_CHANNEL=party override types /p
 [ ] DICTATE_NO_SEND=1 still clipboard-only for debug
 CHK
 

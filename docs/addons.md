@@ -8,11 +8,13 @@
 | Immersion | Quest/gossip UI (**TTS off**) |
 | Forever Voiceover (`ForeverVO`) | Spoken quests/gossip (Forever-native VoiceOver) |
 | `ForeverVO_Data_*` packs | Classic + Forever voice audio |
+| `CouchDictateRoute` | Sticky say/party/raid for voice dictation by group size |
 
 Install:
 
 ```bash
 ./scripts/install-forever-addons.sh
+./scripts/install-couch-dictate-route.sh   # voice channel sticky
 ```
 
 Zips cache under `config/addons-staging/` (gitignored).
@@ -29,7 +31,7 @@ ForeverVO is for the Forever client. Classic “VoiceOver” by mrthinger does n
 
 ## In-game
 
-1. Character select → AddOns → enable ConsolePort*, Immersion, ForeverVO, ForeverVO_Data_*.
-2. `/consoleport`, `/immersion`, `/fvo`.
+1. Character select → AddOns → enable ConsolePort*, Immersion, ForeverVO, ForeverVO_Data_*, CouchDictateRoute.
+2. `/consoleport`, `/immersion`, `/fvo`, `/cdr status`.
 3. `/fvo status` should list packs.
 4. Missing Forever-only lines: play with ForeverVO on, then `/fvo export` and contribute upstream.

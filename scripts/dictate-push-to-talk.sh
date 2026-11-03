@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type/Enter).
+# Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type[/Enter]).
 # DICTATE_NO_SEND=1 skips chat inject. DICTATE_WAV=/path skips mic.
+# DICTATE_SEND_MODE=draft|send (default draft — confirm Enter in-game).
+# DICTATE_CHANNEL=auto|say|party|raid (manual override; auto uses CouchDictateRoute sticky).
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
@@ -15,6 +17,8 @@ START_SND="${WOW_COUCH_CONFIG}/sounds/dictate-start.wav"
 STOP_SND="${WOW_COUCH_CONFIG}/sounds/dictate-stop.wav"
 DONE_SND="${WOW_COUCH_CONFIG}/sounds/dictate-done.wav"
 INJECT="${REPO_ROOT}/scripts/inject-wow-chat.sh"
+SEND_MODE="${DICTATE_SEND_MODE:-draft}"
+CHANNEL="${DICTATE_CHANNEL:-auto}"
 mkdir -p "${WOW_COUCH_CONFIG}/sounds"
 
 if [[ ! -f "$START_SND" ]] && command -v ffmpeg >/dev/null; then
@@ -26,10 +30,16 @@ fi
 write_status() {
   local state="$1"
   local extra="${2:-}"
-  python3 - "$STATUS" "$state" "$TXT" "$extra" <<'PY'
+  python3 - "$STATUS" "$state" "$TXT" "$extra" "$SEND_MODE" "$CHANNEL" <<'PY'
 import json, sys, time
-path, state, txt, extra = sys.argv[1:5]
-data = {"state": state, "ts": time.time(), "transcript_path": txt}
+path, state, txt, extra, mode, channel = sys.argv[1:7]
+data = {
+    "state": state,
+    "ts": time.time(),
+    "transcript_path": txt,
+    "send_mode": mode,
+    "channel": channel,
+}
 if extra:
     data["detail"] = extra
 json.dump(data, open(path, "w"), indent=2)
@@ -128,9 +138,17 @@ if [[ "${DICTATE_NO_SEND:-0}" == "1" ]]; then
 fi
 
 write_status "injecting" "$TRIMMED"
+export DICTATE_SEND_MODE="$SEND_MODE"
+export DICTATE_CHANNEL="$CHANNEL"
 if "$INJECT" < "$TXT"; then
-  write_status "sent" "$TRIMMED"
-  echo "Sent to WoW chat (Esc → Enter → type → Enter)."
+  SEND_MODE_LC="$(printf '%s' "$SEND_MODE" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$SEND_MODE_LC" == "send" || "$SEND_MODE_LC" == "auto" ]]; then
+    write_status "sent" "$TRIMMED"
+    echo "Sent to WoW chat (Esc → Enter → type → Enter) channel=${CHANNEL}."
+  else
+    write_status "draft" "$TRIMMED"
+    echo "Draft in WoW chat (Esc → Enter → type; confirm with Enter) channel=${CHANNEL}."
+  fi
   beep "$DONE_SND"
 else
   write_status "inject_failed" "$TRIMMED"
