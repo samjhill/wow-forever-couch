@@ -37,12 +37,14 @@ export WOW_PREFIX="$HOME/Games/battlenet"   # default
 With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 
 ```bash
-./scripts/install-forever-addons.sh     # ConsolePort, Immersion, ForeverVO + voice packs
-./scripts/enable-forever-addons.sh      # after first login / WTF/Account exists
-./scripts/pin-voiceover-prefs.sh        # Immersion TTS off; ForeverVO plays voices
+./scripts/install-forever-addons.sh        # ConsolePort, Immersion, ForeverVO + voice packs
+./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
+./scripts/install-forever-qol-addons.sh    # Baganator/Syndicator/Leatrix/Plater; stages Questie/BW/…
+./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists
+./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
 ```
 
-In-game: enable those addons at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion.
+In-game: enable the install set at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
 
 Details: [`docs/addons.md`](docs/addons.md).
 
