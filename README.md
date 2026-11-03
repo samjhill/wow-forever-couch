@@ -1,0 +1,110 @@
+# WoW Forever couch gaming (Bazzite / SteamOS-like)
+
+Opinionated setup for playing **World of Warcraft: Forever** from the couch on **Bazzite** (or similar Steam Gaming Mode + Desktop Mode Linux boxes):
+
+- Battle.net under **GE-Proton**
+- Steam **Gaming Mode** non-Steam shortcut
+- **ConsolePort** + **Immersion** + **Forever Voiceover** (spoken quests)
+- Optional **voice → Whisper → auto-type into WoW chat** (mic + controller grip)
+
+Tested on Bazzite with an NVIDIA GPU, Steam Controller, and a RØDE Wireless GO II into the PC **mic-in** jack. Paths are configurable; defaults assume `~/Games/battlenet` for the Proton prefix.
+
+> Not affiliated with Blizzard. Forever addons and voice packs come from their upstream authors (ConsolePort/Immersion, Forever Voiceover on CurseForge/GitHub).
+
+## Quick start
+
+```bash
+git clone https://github.com/samjhill/wow-forever-couch.git
+cd wow-forever-couch
+```
+
+### 1. Proton + Battle.net (Desktop Mode)
+
+```bash
+./scripts/install-ge-proton.sh
+./scripts/install-battlenet-desktop.sh   # downloads installer if needed, runs under GE-Proton
+./scripts/launch-battlenet-proton.sh    # log in, install Forever (not Retail)
+```
+
+Override the prefix if you want:
+
+```bash
+export WOW_PREFIX="$HOME/Games/battlenet"   # default
+```
+
+### 2. Forever addons
+
+With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
+
+```bash
+./scripts/install-forever-addons.sh     # ConsolePort, Immersion, ForeverVO + voice packs
+./scripts/enable-forever-addons.sh      # after first login / WTF/Account exists
+./scripts/pin-voiceover-prefs.sh        # Immersion TTS off; ForeverVO plays voices
+```
+
+In-game: enable those addons at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion.
+
+Details: [`docs/addons.md`](docs/addons.md).
+
+### 3. Steam Gaming Mode shortcut
+
+See [`scripts/add-steam-shortcut.md`](scripts/add-steam-shortcut.md). Point a non-Steam game at:
+
+`…/wow-forever-couch/scripts/launch-battlenet-lutris.sh`
+
+Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the script already uses GE-Proton).
+
+### 4. Controller
+
+- ConsolePort handles in-game bars/UI.
+- Optional Steam Input: left grip → **F20** for dictation — [`config/steam-input/forever-left-grip-f20.md`](config/steam-input/forever-left-grip-f20.md).
+- Draft layouts: [`docs/controller-layout.md`](docs/controller-layout.md), bear/PvP notes under `docs/`.
+
+### 5. Voice → chat (optional)
+
+```bash
+./scripts/setup-whisper.sh              # whisper.cpp + base.en model
+./scripts/install-user-services.sh      # ydotoold + dictate daemon
+./scripts/prefer-mic-source.sh          # default: built-in analog mic-in
+./scripts/test-dictate-harness.sh       # offline checks (uses DICTATE_NO_SEND)
+```
+
+**Default behavior:** after Whisper, the script **auto-sends** into focused Forever chat (`Esc` → `Enter` → type → `Enter`). Mis-hears will send. Debug without sending:
+
+```bash
+DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh
+```
+
+Full notes: [`docs/voice-dictation.md`](docs/voice-dictation.md).
+
+## Layout
+
+| Path | Purpose |
+|------|---------|
+| `scripts/` | Install, launch, addons, dictation |
+| `docs/` | Install, addons, controller, dictation, troubleshooting |
+| `config/steam-input/` | Steam Input bind notes (export your share codes here) |
+
+Environment variables used by scripts (via `scripts/lib.sh`):
+
+| Variable | Default |
+|----------|---------|
+| `WOW_PREFIX` | `$HOME/Games/battlenet` |
+| `WOW_FOREVER` | `…/World of Warcraft/_forever_` under that prefix |
+| `REPO_ROOT` | Auto-detected from script location |
+
+## Requirements
+
+- Bazzite / SteamOS-like host with Desktop Mode + Gaming Mode
+- Steam, GE-Proton (script installs **GE-Proton11-12** by default)
+- For dictation: `ffmpeg`, `espeak-ng` (sim tests), `python3` + `evdev`, `ydotool`/`ydotoold`, PipeWire (`pw-record`)
+
+## Safety
+
+- Never commit Sunshine/RustDesk passwords or Battle.net credentials.
+- Auto-send chat is powerful; use `DICTATE_NO_SEND=1` while tuning the mic.
+- Addon zips are downloaded by the install script (not vendored in git).
+
+## License
+
+MIT — see [`LICENSE`](LICENSE). Third-party addons remain under their own licenses.

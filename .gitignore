@@ -1,0 +1,24 @@
+# Secrets and local runtime
+config/*password*
+config/**/credentials*
+config/last-dictation.txt
+config/dictate-status.json
+config/dictate-env
+config/dictate.trigger
+config/*.bak
+
+# Large / regenerable caches
+config/addons-staging/
+config/backup-*/
+config/sim-dictation/
+config/sounds/
+config/lutris/
+**/*.wav
+**/*.mp3
+**/__pycache__/
+*.pyc
+.DS_Store
+
+# Local Steam / Proton dumps
+*.vdf.bak
+shortcuts.vdf

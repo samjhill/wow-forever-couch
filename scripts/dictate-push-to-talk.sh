@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type/Enter).
+# DICTATE_NO_SEND=1 skips chat inject. DICTATE_WAV=/path skips mic.
+set -euo pipefail
+# shellcheck source=lib.sh
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
+WAV="/tmp/wow-dictate.wav"
+TXT="${WOW_COUCH_CONFIG}/last-dictation.txt"
+STATUS="${WOW_COUCH_CONFIG}/dictate-status.json"
+LOCK="/tmp/wow-dictate.lock"
+SECS="${DICTATE_SECS:-4}"
+WHISPER_BIN="${WHISPER_BIN:-$HOME/.local/bin/whisper-cli}"
+MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper/ggml-base.en.bin}"
+START_SND="${WOW_COUCH_CONFIG}/sounds/dictate-start.wav"
+STOP_SND="${WOW_COUCH_CONFIG}/sounds/dictate-stop.wav"
+DONE_SND="${WOW_COUCH_CONFIG}/sounds/dictate-done.wav"
+INJECT="${REPO_ROOT}/scripts/inject-wow-chat.sh"
+mkdir -p "${WOW_COUCH_CONFIG}/sounds"
+
+if [[ ! -f "$START_SND" ]] && command -v ffmpeg >/dev/null; then
+  ffmpeg -y -f lavfi -i "sine=f=880:d=0.12" -ar 44100 "$START_SND" 2>/dev/null || true
+  ffmpeg -y -f lavfi -i "sine=f=660:d=0.12" -ar 44100 "$STOP_SND" 2>/dev/null || true
+  ffmpeg -y -f lavfi -i "sine=f=1200:d=0.08" -ar 44100 "$DONE_SND" 2>/dev/null || true
+fi
+
+write_status() {
+  local state="$1"
+  local extra="${2:-}"
+  python3 - "$STATUS" "$state" "$TXT" "$extra" <<'PY'
+import json, sys, time
+path, state, txt, extra = sys.argv[1:5]
+data = {"state": state, "ts": time.time(), "transcript_path": txt}
+if extra:
+    data["detail"] = extra
+json.dump(data, open(path, "w"), indent=2)
+print(f"status={state}", flush=True)
+PY
+}
+
+beep() {
+  local f="$1"
+  [[ -f "$f" ]] || return 0
+  paplay "$f" >/dev/null 2>&1 || true
+}
+
+if [[ ! -x "$WHISPER_BIN" ]]; then
+  for c in "$HOME/.local/bin/whisper-cli" whisper-cli whisper-cpp; do
+    if command -v "$c" >/dev/null 2>&1; then
+      WHISPER_BIN=$(command -v "$c")
+      break
+    fi
+  done
+fi
+
+exec 9>"$LOCK"
+if ! flock -n 9; then
+  echo "Dictation already running; ignoring." >&2
+  write_status "busy" "lock held"
+  exit 0
+fi
+trap 'flock -u 9 2>/dev/null || true' EXIT
+
+write_status "recording"
+beep "$START_SND"
+
+if [[ -n "${DICTATE_WAV:-}" ]]; then
+  if [[ ! -s "$DICTATE_WAV" ]]; then
+    echo "DICTATE_WAV missing or empty: $DICTATE_WAV" >&2
+    write_status "error" "missing DICTATE_WAV"
+    exit 3
+  fi
+  echo "Using simulated/replay WAV: $DICTATE_WAV"
+  cp -f "$DICTATE_WAV" "$WAV"
+else
+  "${REPO_ROOT}/scripts/prefer-mic-source.sh" || true
+  echo "Recording ${SECS}s from default source..."
+  timeout "$SECS" pw-record --target @DEFAULT_SOURCE@ "$WAV" || true
+  beep "$STOP_SND"
+fi
+
+if [[ ! -s "$WAV" ]]; then
+  echo "No audio captured" >&2
+  write_status "error" "no audio"
+  exit 3
+fi
+
+CONV="/tmp/wow-dictate-16k.wav"
+ffmpeg -y -i "$WAV" -ar 16000 -ac 1 "$CONV" 2>/dev/null || CONV="$WAV"
+
+if [[ ! -f "$MODEL" ]]; then
+  echo "Model missing: $MODEL — run scripts/setup-whisper.sh" >&2
+  write_status "error" "missing model"
+  exit 2
+fi
+if [[ ! -e "$WHISPER_BIN" ]]; then
+  echo "whisper binary missing — run scripts/setup-whisper.sh" >&2
+  write_status "error" "missing whisper"
+  exit 2
+fi
+
+write_status "transcribing"
+"$WHISPER_BIN" -m "$MODEL" -f "$CONV" -nt 2>/dev/null > "$TXT" || true
+cat "$TXT"
+
+if command -v wl-copy >/dev/null; then
+  wl-copy < "$TXT" || true
+  echo "Copied to Wayland clipboard."
+elif command -v xclip >/dev/null; then
+  xclip -selection clipboard < "$TXT" || true
+  echo "Copied to X clipboard."
+else
+  echo "Clipboard tool missing; text in $TXT"
+fi
+
+TRIMMED="$(tr '\n\r\t' ' ' < "$TXT" | sed -E 's/  +/ /g; s/^ //; s/ $//')"
+if [[ -z "$TRIMMED" ]]; then
+  write_status "done" "empty transcript — not sent"
+  echo "Empty transcript; nothing sent to chat."
+  beep "$DONE_SND"
+  exit 0
+fi
+
+if [[ "${DICTATE_NO_SEND:-0}" == "1" ]]; then
+  write_status "done" "DICTATE_NO_SEND — clipboard only"
+  echo "DICTATE_NO_SEND=1 — skipped WoW chat inject."
+  beep "$DONE_SND"
+  exit 0
+fi
+
+write_status "injecting" "$TRIMMED"
+if "$INJECT" < "$TXT"; then
+  write_status "sent" "$TRIMMED"
+  echo "Sent to WoW chat (Esc → Enter → type → Enter)."
+  beep "$DONE_SND"
+else
+  write_status "inject_failed" "$TRIMMED"
+  echo "Chat inject failed — text left on clipboard / $TXT" >&2
+  beep "$DONE_SND"
+  exit 4
+fi
