@@ -61,7 +61,7 @@ sleep 0.12
 
 case "$SEND_MODE_LC" in
   draft|confirm)
-    echo "drafted ${#TEXT} chars (channel=${CHANNEL}, mode=draft) — confirm with Enter in-game, Esc to cancel"
+    echo "drafted ${#TEXT} chars (channel=${CHANNEL}, mode=draft) — left grip again to send, right grip / Esc to cancel"
     ;;
   send|auto)
     ydotool key 28:1 28:0

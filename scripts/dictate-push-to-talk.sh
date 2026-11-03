@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type[/Enter]).
 # DICTATE_NO_SEND=1 skips chat inject. DICTATE_WAV=/path skips mic.
-# DICTATE_SEND_MODE=draft|send (default draft — confirm Enter in-game).
+# DICTATE_SEND_MODE=draft|send (default draft — second left grip confirms send).
 # DICTATE_CHANNEL=auto|say|party|raid (manual override; auto uses CouchDictateRoute sticky).
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -147,7 +147,7 @@ if "$INJECT" < "$TXT"; then
     echo "Sent to WoW chat (Esc → Enter → type → Enter) channel=${CHANNEL}."
   else
     write_status "draft" "$TRIMMED"
-    echo "Draft in WoW chat (Esc → Enter → type; confirm with Enter) channel=${CHANNEL}."
+    echo "Draft in WoW chat (Esc → Enter → type; left grip again to send) channel=${CHANNEL}."
   fi
   beep "$DONE_SND"
 else
