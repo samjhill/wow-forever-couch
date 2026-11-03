@@ -136,6 +136,13 @@ else
   fail "channel routing unit tests"
 fi
 
+echo "=== G2: mock WoW chat harness ==="
+if "${BASE}/scripts/test-dictate-mock-wow.sh"; then
+  pass "mock WoW draft/confirm/channel harness"
+else
+  fail "mock WoW harness"
+fi
+
 echo "NOTE: live draft/send into Forever requires game focus — channel sticky untested until in-game."
 
 echo "=== H: manual couch checklist ==="
