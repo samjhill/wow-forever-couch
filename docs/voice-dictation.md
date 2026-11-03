@@ -113,19 +113,48 @@ Whisper capture/transcription is unchanged.
 
 Covers solo / party-2 → say, party-3+ → party, raid → raid, overrides, and slash prefixes. **Does not** prove in-client sticky behavior.
 
-## In-game acceptance (do not check off until verified in Forever)
+## Host E2E (2026-11-03, Bazzite)
+
+Verified without Forever focus (key inject + status machine):
+
+| Step | Result |
+|------|--------|
+| `ydotoold` + `wow-dictate-daemon` | Pass |
+| Offline channel policy unit tests | Pass |
+| Whisper (`DICTATE_WAV`) → `state=draft` | Pass |
+| Draft inject (no final Enter) | Pass |
+| FIFO `confirm` → `state=sent` (Enter) | Pass |
+| FIFO `cancel` → `state=cancelled` (Esc) | Pass |
+| `DICTATE_CHANNEL=say\|party\|raid` on inject process | Pass |
+
+Put env vars on the **inject/dictate** command, not on `printf` in a pipeline:
+
+```bash
+DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/inject-wow-chat.sh <<< 'hello'
+```
+
+## In-game acceptance (Forever client)
+
+**Not verified yet.** Do not treat channel sticky or on-screen drafts as working until these pass in-world.
 
 | Condition | Expected | Result |
 |-----------|----------|--------|
-| Solo | Draft opens on **Say** | Untested |
-| Party of 2 | Draft opens on **Say** | Untested |
-| Party of 3+ | Draft opens on **Party** | Untested |
-| Raid | Draft opens on **Raid** | Untested |
-| `/cdr party` then grip | Sticky/header shows Party | Untested |
-| `DICTATE_CHANNEL=say` override | Typed text prefixed `/say ` | Untested |
-| Draft confirm | Grip drafts; **second left grip** sends | Untested |
-| Draft cancel | Right grip / FIFO `cancel` discards | Untested |
-| `DICTATE_SEND_MODE=send` | Full Esc→Enter→type→Enter | Untested |
+| Solo | Draft opens on **Say** | Blocked — never entered world |
+| Party of 2 | Draft opens on **Say** | Blocked |
+| Party of 3+ | Draft opens on **Party** | Blocked |
+| Raid | Draft opens on **Raid** | Blocked |
+| `/cdr party` then grip | Sticky/header shows Party | Blocked |
+| `DICTATE_CHANNEL=say` override | Typed text prefixed `/say ` | Host inject Pass; in-game Blocked |
+| Draft confirm | Grip drafts; **second left grip** sends | Host Pass; on-screen Blocked |
+| Draft cancel | Right grip / FIFO `cancel` discards | Host Pass; on-screen Blocked |
+
+### Blockers observed 2026-11-03
+
+1. No character folders under `WTF/Account` — client has not entered the world on this install.
+2. Prior Forever login failed with `ERROR_GAME_UTILITY_SERVER_NO_SERVER (34200)` (realm utility unavailable).
+3. Moonlight not paired to Sunshine; cannot stream the TV/gamescope view from this Mac session yet.
+
+Once realms are up: Gaming Mode → Forever → `/reload` → `/cdr status` → left grip → read draft → left grip to send.
 
 ## Limitations
 
