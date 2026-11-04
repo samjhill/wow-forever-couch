@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix Plus/Plater/DialogKey/Lore Forever)
+# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/DialogKey/Lore Forever/Fishing Log)
 # and stage later-activation zips (Questie/BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
@@ -187,9 +187,12 @@ DK_ZIP="$FETCHED_NAME"
 # Lore Forever (large zip; includes LoreForever + Default/Alliance/Horde narrator packs)
 fetch_forever 1715510
 LORE_ZIP="$FETCHED_NAME"
+# The Fishing Log (Forever fishing tracker / matches)
+fetch_forever 1702832
+FISH_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP" "$LORE_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP" "$LORE_ZIP" "$FISH_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 
@@ -222,6 +225,7 @@ done
   echo "- $PLA_ZIP"
   echo "- $DK_ZIP"
   echo "- $LORE_ZIP"
+  echo "- $FISH_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"
