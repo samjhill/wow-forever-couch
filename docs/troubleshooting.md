@@ -14,7 +14,7 @@
 
 ## Dictation
 
-- No capture → `./scripts/prefer-mic-source.sh`; confirm jack is in **mic-in**, TX unmuted.
+- No capture → `./scripts/prefer-mic-source.sh` (uses Bluetooth mic if connected, else PC mic-in); confirm BT is paired/connected or jack is in **mic-in**, TX unmuted.
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
 - Garbage drafts → lower mic gain / TV volume; use `DICTATE_NO_SEND=1` while tuning; left grip again sends, right grip cancels.

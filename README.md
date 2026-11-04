@@ -67,7 +67,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ```bash
 ./scripts/setup-whisper.sh                 # whisper.cpp + base.en model
 ./scripts/install-user-services.sh         # ydotoold + dictate daemon
-./scripts/prefer-mic-source.sh             # default: built-in analog mic-in
+./scripts/prefer-mic-source.sh             # Bluetooth mic if connected, else built-in analog mic-in
 ./scripts/install-couch-dictate-route.sh   # sticky say/party/raid by group size
 ./scripts/test-channel-routing.sh          # offline channel policy tests
 ./scripts/test-dictate-mock-wow.sh         # headless mock WoW chat (draft/confirm/channels)

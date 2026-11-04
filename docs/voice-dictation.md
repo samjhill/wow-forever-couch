@@ -54,7 +54,7 @@ Two cooperating pieces:
 ```bash
 ./scripts/setup-whisper.sh
 ./scripts/install-user-services.sh         # ydotoold + dictate daemon
-./scripts/prefer-mic-source.sh             # PC mic-in
+./scripts/prefer-mic-source.sh             # Bluetooth mic if connected, else PC mic-in
 ./scripts/install-couch-dictate-route.sh   # addon → Interface/AddOns
 ./scripts/enable-forever-addons.sh         # includes CouchDictateRoute
 ./scripts/test-channel-routing.sh          # offline policy tests
