@@ -12,7 +12,7 @@ ADDONS=(
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
   CouchDictateRoute
   # QoL install set (Forever-tagged); staged addons intentionally omitted
-  Syndicator Baganator Leatrix_Plus Plater
+  Syndicator Baganator Leatrix_Plus Plater DialogKey_Numy
 )
 
 if [[ ! -d "$WTF" ]]; then
@@ -36,17 +36,27 @@ enable_file() {
 }
 
 shopt -s nullglob
-# Account-level and character-level AddOns.txt
+# Account-level and character-level AddOns.txt (skip WTF/Account/SavedVariables)
+is_account_tree() {
+  local p="$1"
+  [[ "$p" == *"/SavedVariables/"* || "$p" == *"/SavedVariables" ]] && return 1
+  return 0
+}
 for f in "$WTF"/*/AddOns.txt "$WTF"/*/*/AddOns.txt; do
+  is_account_tree "$f" || continue
   enable_file "$f"
 done
 # If only account dirs exist with no AddOns.txt yet, seed account-level
 for acct in "$WTF"/*/; do
   [[ -d "$acct" ]] || continue
+  base=$(basename "$acct")
+  [[ "$base" == "SavedVariables" ]] && continue
   if [[ ! -f "${acct}AddOns.txt" ]]; then
     enable_file "${acct}AddOns.txt"
   fi
 done
+# Remove mistaken enable file if we ever wrote under Account/SavedVariables
+rm -f "${WTF}/SavedVariables/AddOns.txt"
 
 "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh"
 echo "Done. Reload UI (/reload) or relog for addons to load."
