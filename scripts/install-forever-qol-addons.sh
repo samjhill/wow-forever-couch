@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix Plus/Plater/DialogKey)
+# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix Plus/Plater/DialogKey/Lore Forever)
 # and stage later-activation zips (Questie/BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
 # Does NOT enable staged addons. Does NOT overwrite SavedVariables/profiles.
+# Lore Forever: main zip includes male English narrator packs; do NOT install Quest Dialogue packs
+# (ForeverVO owns quest/gossip speech; Lore's questDialogue defaults off).
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
@@ -182,9 +184,12 @@ PLA_ZIP="$FETCHED_NAME"
 # DialogKey - Numy Edition (do not also install DialogKey Aeonzara / other forks)
 fetch_forever 1098587
 DK_ZIP="$FETCHED_NAME"
+# Lore Forever (large zip; includes LoreForever + Default/Alliance/Horde narrator packs)
+fetch_forever 1715510
+LORE_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP" "$LORE_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 
@@ -216,6 +221,7 @@ done
   echo "- $LEA_ZIP"
   echo "- $PLA_ZIP"
   echo "- $DK_ZIP"
+  echo "- $LORE_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"
