@@ -25,6 +25,9 @@
 ```bash
 ./scripts/enable-forever-addons.sh
 ./scripts/pin-voiceover-prefs.sh
+./scripts/install-curseforge.sh    # Flatpak CurseForge for updates (Desktop Mode first-run)
 ```
 
 Then character select → AddOns → enable ConsolePort*, Immersion, ForeverVO, and every `ForeverVO_Data_*`.
+
+Point CurseForge at `$WOW_FOREVER` (the folder with `Wow.exe`), not `Interface/AddOns`. See [`addons.md`](addons.md#curseforge-app-updates).

@@ -4,6 +4,25 @@ Flavor: **WoW Forever** client under `_forever_`, interface **`16001`** (game ve
 
 **None of the new QoL addons are claimed working in-game until tested in a live Forever session.**
 
+## CurseForge app (updates)
+
+Official Overwolf CurseForge is installed as a **user Flatpak** (`com.overwolf.curseforge`) with filesystem access to `$WOW_PREFIX` (default `~/Games/battlenet`).
+
+```bash
+./scripts/install-curseforge.sh   # install/update Flatpak + overrides + launcher
+curseforge-wow                    # ~/.local/bin wrapper → flatpak run …
+```
+
+First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
+
+1. `steamos-session-select desktop`
+2. `curseforge-wow`
+3. Add/scan the Forever client folder (contains `Wow.exe`) — path is written to `config/curseforge-forever-path.txt`. Do **not** select `Interface/AddOns`.
+4. Install/update only Forever / `1.60.x` files.
+5. `steamos-session-select gamescope` when done.
+
+Repo install scripts remain the reproducible baseline; CurseForge is for ongoing updates after that.
+
 ## Stack overview
 
 ### Preserve (already installed)

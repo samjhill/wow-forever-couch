@@ -10,6 +10,7 @@ config/mock-wow.fifo
 config/mock-wow.ready
 config/mock-wow-harness.log
 config/last-e2e-receipt.md
+config/curseforge-forever-path.txt
 config/*.bak
 
 # Large / regenerable caches
