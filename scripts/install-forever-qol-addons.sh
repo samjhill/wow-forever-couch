@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix Plus/Plater)
+# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix Plus/Plater/DialogKey)
 # and stage later-activation zips (Questie/BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
@@ -179,9 +179,12 @@ fetch_forever 94855 forever
 LEA_ZIP="$FETCHED_NAME"
 fetch_forever 100547
 PLA_ZIP="$FETCHED_NAME"
+# DialogKey - Numy Edition (do not also install DialogKey Aeonzara / other forks)
+fetch_forever 1098587
+DK_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 
@@ -212,6 +215,7 @@ done
   echo "- $BAG_ZIP"
   echo "- $LEA_ZIP"
   echo "- $PLA_ZIP"
+  echo "- $DK_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"

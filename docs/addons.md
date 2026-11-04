@@ -42,8 +42,11 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 | Baganator | 914482 | `Baganator-839.zip` (`## Version: 839`, Interface includes `16001`) | **Syndicator** | Bag/bank UI |
 | Leatrix Plus | 94855 | `Leatrix_Plus-1.60.25-forever.zip` (`## Interface: 16001`) | — | QoL toggles |
 | Plater | 100547 | `Plater-v662.zip` (`## Version: Plater-v662-Forever`, `## Interface: 16001`) | — | Tank nameplates |
+| DialogKey (Numy) | 1098587 | `DialogKey_Numy-v1.2.62.zip` (`## Version: v1.2.62`, Interface includes `16001`) | — | Space / number keys for gossip, quest, popup buttons |
 
 **Nameplate choice:** Plater (not Platynator). Plater Forever file exists and better matches bear-tank needs (threat colors, enemy casts, scripting). Do not install both.
+
+**DialogKey:** Install **Numy Edition** only. Do not enable DialogKey Aeonzara or other DialogKey forks alongside it. Works with Immersion (clicks Immersion/quest buttons); default bind is Space when a dialog is up. Tune with `/dialogkey`. Untested in live Forever until launch checklist.
 
 ### Staged only (zip on disk, **not** in `Interface/AddOns`, **not** enabled)
 
@@ -67,14 +70,14 @@ Forever already ships tools that replace common Classic addons:
 - **Combined bags** — optional; Baganator is an enhancement, not a requirement
 - **Controller / click-cast** — ConsolePort owns couch input (skip Clique)
 
-Do **not** install Storyline (overlaps Immersion), AdiBags/Bagnon/BetterBags (overlaps Baganator), or a second nameplate addon beside Plater.
+Do **not** install Storyline (overlaps Immersion), AdiBags/Bagnon/BetterBags (overlaps Baganator), a second nameplate addon beside Plater, or a second DialogKey fork beside DialogKey_Numy.
 
 ## Install commands
 
 ```bash
 ./scripts/install-forever-addons.sh          # ConsolePort / Immersion / ForeverVO
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Baganator stack + Plater + Leatrix; stages the rest
+./scripts/install-forever-qol-addons.sh      # Baganator stack + Plater + Leatrix + DialogKey; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ```
@@ -104,11 +107,12 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [ ] Character select → AddOns: ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater enabled
+- [ ] Character select → AddOns: ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, DialogKey_Numy enabled
 - [ ] Staged addons (Questie, BigWigs, GTFO, Talents Forever, Auctionator) **absent/disabled**
 - [ ] Open bags → Baganator UI; tooltip counts via Syndicator
 - [ ] `/leatrix` options open
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
+- [ ] DialogKey: Space advances Immersion/quest/popup; number keys pick options; `/dialogkey` opens settings
 - [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off
 - [ ] ConsolePort bars unchanged; no duplicate bag/quest dialogue UI
 - [ ] Built-in meter, Cooldown Manager, Edit Mode still usable
@@ -116,9 +120,9 @@ Exact Plater profile import is **untested** until Forever is playable.
 ## Compatibility evidence (research date 2026-11-03)
 
 - CurseForge files API: Forever candidates selected when `gameVersions` contains `1.60.x`
-- Installed TOC checks on box after unzip: Syndicator/Baganator include `16001`; Leatrix_Plus and Plater Forever builds are `16001`-only
+- Installed TOC checks on box after unzip: Syndicator/Baganator include `16001`; Leatrix_Plus and Plater Forever builds are `16001`-only; DialogKey_Numy v1.2.62 Interface list includes `16001`
 - Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files; Questie called out for remaining Forever quest bugs — hence staged
 
 ## In-game commands (after first login)
 
-`/consoleport`, `/immersion`, `/fvo`, `/fvo status`, `/cdr status`, `/leatrix`, Plater options (slash per Plater TOC), Baganator bag bind.
+`/consoleport`, `/immersion`, `/fvo`, `/fvo status`, `/cdr status`, `/leatrix`, `/dialogkey` (aliases `/dkey`, `/dk`), Plater options (slash per Plater TOC), Baganator bag bind.
