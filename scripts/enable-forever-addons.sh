@@ -14,6 +14,7 @@ ADDONS=(
   # QoL install set (Forever-tagged); staged addons intentionally omitted
   Syndicator Baganator Leatrix_Plus Plater DialogKey_Numy
   LoreForever LoreForever_Voice_Default LoreForever_Voice_Default_Alliance LoreForever_Voice_Default_Horde
+  TheFishingLog
 )
 
 if [[ ! -d "$WTF" ]]; then
