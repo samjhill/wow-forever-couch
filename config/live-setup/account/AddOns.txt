@@ -31,3 +31,6 @@ DialogKey_Aeonzara: disabled
 DialogKey: disabled
 NodeSight: enabled
 GatherRadar: enabled
+PlaterQuestPin: enabled
+SelfBuffs: enabled
+CouchBuffReminder: enabled
