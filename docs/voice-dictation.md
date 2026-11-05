@@ -29,7 +29,7 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
                               │
                               ▼
                      inject-wow-chat.sh
-                     Esc → Enter → [optional /channel] type → Enter
+                     Enter → [optional /channel] type → Enter
                      (omit final Enter only if DICTATE_SEND_MODE=draft)
                               │
                               ▼
