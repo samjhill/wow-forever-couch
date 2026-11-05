@@ -90,23 +90,27 @@ copy_if "$WTF/gamecontrollerdb.txt" "$DEST/wtf/gamecontrollerdb.txt"
 copy_if "$WTF/GamePadConfig_Addons.json" "$DEST/wtf/GamePadConfig_Addons.json"
 copy_if "$WTF/GamePadConfig_Default.json" "$DEST/wtf/GamePadConfig_Default.json"
 
-# Drop ForeverVO capture/crowdsource tables if present (chatty, not needed to restore prefs)
+# Drop ForeverVO capture tables; keep showPanel off (Immersion owns quest UI).
 python3 - "$DEST" <<'PY'
 import pathlib, re, sys
 root = pathlib.Path(sys.argv[1])
 for path in root.rglob("ForeverVO.lua"):
     text = path.read_text(encoding="utf-8", errors="replace")
     orig = text
-    # Strip capture DB blocks if co-saved
     text = re.sub(
         r"\nForeverVOCaptureDB\s*=\s*\{.*?\n\}\s*",
         "\n",
         text,
         flags=re.S,
     )
+    text = re.sub(
+        r'(\["showPanel"\]|showPanel)\s*=\s*[^,\n}]+',
+        r"\1 = false",
+        text,
+    )
     if text != orig:
         path.write_text(text, encoding="utf-8")
-        print(f"  sanitized capture DB from {path.relative_to(root)}")
+        print(f"  sanitized ForeverVO prefs in {path.relative_to(root)}")
 PY
 
 # Manifest for restore

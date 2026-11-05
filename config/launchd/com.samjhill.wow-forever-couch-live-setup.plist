@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.samjhill.wow-forever-couch-live-setup</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/samhilll/Documents/opensource/wow-forever-couch/scripts/auto-sync-live-setup.sh</string>
+  </array>
+  <!-- Every 4 hours while this Mac is awake -->
+  <key>StartInterval</key>
+  <integer>14400</integer>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/Users/samhilll/.cache/wow-forever-couch/live-setup-sync.stdout.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/samhilll/.cache/wow-forever-couch/live-setup-sync.stderr.log</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>
