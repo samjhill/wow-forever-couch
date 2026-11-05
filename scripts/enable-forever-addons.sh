@@ -17,6 +17,7 @@ ADDONS=(
   Syndicator Baganator Leatrix_Plus Plater
   LoreForever LoreForever_Voice_Default LoreForever_Voice_Default_Alliance LoreForever_Voice_Default_Horde
   TheFishingLog
+  ForeverLootSparkles
 )
 # Removed from couch stack (Immersion covers quest/gossip keys)
 DISABLE_ADDONS=(

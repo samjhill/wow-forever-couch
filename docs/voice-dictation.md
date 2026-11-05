@@ -73,11 +73,11 @@ Steam Input:
 - Steam Controller: left grip → **Insert** — [`forever-left-grip-insert.md`](../config/steam-input/forever-left-grip-insert.md)
 - Xbox: **R3** → **Insert** — [`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)
 
-## Workflow (current default: send)
+## Workflow (current default: hold-to-talk + send)
 
 1. Forever focused; `CouchDictateRoute` loaded.
-2. **Dictate bind once** — SC left grip / Xbox R3 (or `echo fire > config/dictate.trigger`).
-3. Wait for the **start beep**, speak (`DICTATE_SECS`, default 6). Extra presses during record/Whisper are ignored.
+2. **Hold** the dictate bind — SC left grip / Xbox R3 (or `echo start > config/dictate.trigger`).
+3. Wait for the **start beep**, speak while holding. **Release** to stop (`echo stop > config/dictate.trigger`). Caps at `DICTATE_MAX_SECS` (30).
 4. After stop/done beeps, chat opens, types the transcript, and **sends** (final Enter).
 
 Preview-before-send (optional):
@@ -106,7 +106,9 @@ DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh
 | `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable (draft mode only) |
 | `DICTATE_NO_SEND` | unset | Skip inject entirely |
 | `DICTATE_WAV` | unset | Replay file instead of mic |
-| `DICTATE_SECS` | `4` | Record length after start beep |
+| `DICTATE_HOLD` | `1` (daemon) | Hold-to-talk; set `0` + `DICTATE_SECS` for fixed-length CLI/harness |
+| `DICTATE_SECS` | `4` | Fixed record length when `DICTATE_HOLD=0` |
+| `DICTATE_MAX_SECS` | `30` | Safety cap while holding |
 | `DICTATE_RESTORE_A2DP_DEFER` | `45` | Seconds after capture before Bose returns to A2DP (`0` = stay on HFP) |
 | `DICTATE_WHISPER_THREADS` | `2` | Whisper CPU threads |
 | `WHISPER_MODEL` | `…/ggml-tiny.en.bin` | Use `ggml-base.en.bin` for more accuracy, slower |

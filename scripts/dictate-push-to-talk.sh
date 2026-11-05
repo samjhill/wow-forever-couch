@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type[/Enter]).
 # DICTATE_NO_SEND=1 skips chat inject. DICTATE_WAV=/path skips mic.
-# DICTATE_SEND_MODE=send|draft (default send — one R3/grip records and sends).
+# DICTATE_SEND_MODE=send|draft (default send — release R3/grip to finish + send).
+# DICTATE_HOLD=1 (daemon default): record until /tmp/wow-dictate.stop or DICTATE_MAX_SECS.
+# DICTATE_HOLD=0: fixed DICTATE_SECS capture (CLI / harness).
 # DICTATE_CHANNEL=auto|say|party|raid (manual override; auto uses CouchDictateRoute sticky).
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -10,7 +12,11 @@ WAV="/tmp/wow-dictate.wav"
 TXT="${WOW_COUCH_CONFIG}/last-dictation.txt"
 STATUS="${WOW_COUCH_CONFIG}/dictate-status.json"
 LOCK="/tmp/wow-dictate.lock"
+STOP_FILE="${DICTATE_STOP_FILE:-/tmp/wow-dictate.stop}"
+REC_PID_FILE="${DICTATE_REC_PID_FILE:-/tmp/wow-dictate.rec.pid}"
+HOLD="${DICTATE_HOLD:-0}"
 SECS="${DICTATE_SECS:-4}"
+MAX_SECS="${DICTATE_MAX_SECS:-30}"
 WHISPER_BIN="${WHISPER_BIN:-$HOME/.local/bin/whisper-cli}"
 # tiny.en ≈ 1.7s on this box vs base.en ≈ 4–6s
 MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper/ggml-tiny.en.bin}"
@@ -111,9 +117,40 @@ else
     write_status "error" "no mic source"
     exit 3
   fi
-  echo "Recording ${SECS}s from ${MIC_TARGET}..."
   # Record 16 kHz mono — Whisper-ready, skips ffmpeg convert
-  timeout "$SECS" pw-record --rate 16000 --channels 1 --format s16 --target "$MIC_TARGET" "$WAV" || true
+  if [[ "$HOLD" == "1" ]]; then
+    if [[ -f "$STOP_FILE" ]]; then
+      echo "Released before capture started — aborting."
+      write_status "done" "released before record"
+      beep "$STOP_SND"
+      exit 0
+    fi
+    echo "Hold-to-talk from ${MIC_TARGET} (release bind / max ${MAX_SECS}s)..."
+    rm -f "$REC_PID_FILE"
+    pw-record --rate 16000 --channels 1 --format s16 --target "$MIC_TARGET" "$WAV" &
+    REC_PID=$!
+    echo "$REC_PID" > "$REC_PID_FILE"
+    start_ts=$(date +%s)
+    while kill -0 "$REC_PID" 2>/dev/null; do
+      if [[ -f "$STOP_FILE" ]]; then
+        break
+      fi
+      now_ts=$(date +%s)
+      if (( now_ts - start_ts >= MAX_SECS )); then
+        echo "Max hold ${MAX_SECS}s reached."
+        break
+      fi
+      sleep 0.05
+    done
+    if kill -0 "$REC_PID" 2>/dev/null; then
+      kill -INT "$REC_PID" 2>/dev/null || kill "$REC_PID" 2>/dev/null || true
+      wait "$REC_PID" 2>/dev/null || true
+    fi
+    rm -f "$REC_PID_FILE" "$STOP_FILE"
+  else
+    echo "Recording ${SECS}s from ${MIC_TARGET}..."
+    timeout "$SECS" pw-record --rate 16000 --channels 1 --format s16 --target "$MIC_TARGET" "$WAV" || true
+  fi
   beep "$STOP_SND"
   if [[ "${RESTORE_A2DP_DEFER}" != "0" ]]; then
     "${REPO_ROOT}/scripts/restore-bt-a2dp.sh" --defer "$RESTORE_A2DP_DEFER" || true

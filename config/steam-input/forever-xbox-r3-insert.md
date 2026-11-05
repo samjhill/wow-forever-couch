@@ -7,15 +7,17 @@ Steam’s keyboard picker does **not** list F20. Bind **Insert** instead — the
 | Controller | Dictate + send | Notes |
 |------------|----------------|-------|
 | Steam Controller | Left grip → Insert / `BTN_GRIPL` | |
-| Xbox | **R3** → Insert / `BTN_THUMBR` | Default auto-sends after Whisper |
+| Xbox | **R3** → Insert / `BTN_THUMBR` | **Hold** to talk, **release** to Whisper + send |
 
 ## Apply
 
 1. Library → **Battle.net (WoW Forever)** → Controller → **Enable Steam Input**.
 2. Xbox layout for this shortcut.
 3. Edit Layout → **Right Stick Click** / **R3**.
-4. Bind → Keyboard → **Insert** (under Navigation / Editing keys). *Regular Press*.
+4. Bind → Keyboard → **Insert** (under Navigation / Editing keys). Use **Regular Press** (key stays down while R3 is held).
 5. Save.
+
+Hold R3 through your phrase; release to stop capture and send.
 
 ## Why Insert
 

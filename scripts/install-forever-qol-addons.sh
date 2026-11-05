@@ -187,9 +187,12 @@ LORE_ZIP="$FETCHED_NAME"
 # The Fishing Log (Forever fishing tracker / matches)
 fetch_forever 1702832
 FISH_ZIP="$FETCHED_NAME"
+# Forever Loot Sparkles — quest-item sparkles (+ optional herb/ore)
+fetch_forever 1729017
+SPARKLE_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 # Immersion already covers controller quest/gossip; do not install DialogKey forks.
@@ -224,6 +227,7 @@ done
   echo "- $PLA_ZIP"
   echo "- $LORE_ZIP"
   echo "- $FISH_ZIP"
+  echo "- $SPARKLE_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"

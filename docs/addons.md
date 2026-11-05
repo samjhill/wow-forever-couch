@@ -54,6 +54,8 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 
 **The Fishing Log:** Forever-only fishing tracker. No overlap with the couch stack (profession QoL). Optional Auctionator pricing stays available once Auctionator is activated from staging. Untested in live Forever until launch checklist.
 
+**Forever Loot Sparkles:** Keeps loot sparkles on quest items (graphics presets often turn them off). Optional herb/ore sparkles + gathering icon nearby. Options → AddOns → Forever Loot Sparkles.
+
 ### Staged only (zip on disk, **not** in `Interface/AddOns`, **not** enabled)
 
 Path: `config/addons-staging/staged/` (on the couch box under the project `config/`).
@@ -83,7 +85,7 @@ Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion al
 ```bash
 ./scripts/install-forever-addons.sh          # ConsolePort / Immersion / ForeverVO
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log; stages the rest
+./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
 ./scripts/install-consoleport-couch.sh       # Xbox recommended bindings helper (empty LB/RB/LT/RT)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
@@ -116,7 +118,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog (DialogKey removed)
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles (DialogKey removed)
 - [x] Staged addons (Questie, BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Baganator UI; tooltip counts via Syndicator
 - [ ] `/leatrix` options open
