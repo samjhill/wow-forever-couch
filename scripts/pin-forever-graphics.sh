@@ -41,6 +41,13 @@ pin_set GxApi D3D11
 pin_set vsync 1
 pin_set maxFPS 60
 
+# Gamepad: stop Menu/Start (Escape) from only flipping crosshair ↔ free mouse cursor.
+# ConsolePortCouch also pins these at login and binds PADFORWARD/PADSYSTEM → TOGGLEGAMEMENU.
+pin_set GamePadCursorAutoEnable 0
+pin_set GamePadCursorCenteredEmulation 0
+pin_set GamePadCursorLeftClick none
+pin_set GamePadCursorRightClick none
+
 # Soften defaults once — couch box is CPU-limited (4c/4t); raise in-game if desired.
 if [[ "${FOREVER_GRAPHICS_FORCE:-0}" == "1" || ! -f "$FLAG" ]]; then
   pin_set graphicsQuality 3
