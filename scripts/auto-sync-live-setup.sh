@@ -19,6 +19,14 @@ cd "$REPO_ROOT"
 
 log() { printf '%s %s\n' "$LOG_PREFIX" "$*"; }
 
+# Stay on an up-to-date main before snapshotting (mirror can lag Documents checkouts).
+git fetch origin
+git checkout main >/dev/null 2>&1 || true
+if ! git pull --ff-only origin main; then
+  log "cannot fast-forward main — skip (resolve mirror manually)"
+  exit 0
+fi
+
 if ! ssh -o BatchMode=yes -o ConnectTimeout=15 "$BAZZITE_HOST" "true"; then
   log "SSH to $BAZZITE_HOST failed — skip"
   exit 0
@@ -55,15 +63,13 @@ Autosaved from ${BAZZITE_HOST} while tuning bindings/prefs.
 EOF
 )"
   if [[ "$PUSH" == "1" ]]; then
-    # Prefer main; create it if this mirror was left on a detached/feature tip.
-    branch=$(git rev-parse --abbrev-ref HEAD)
-    if [[ "$branch" != "main" && "$branch" != "HEAD" ]]; then
-      git checkout main
-      git pull --ff-only origin main || true
-      # re-apply commit if checkout moved — rare; mirror should stay on main
+    if git push origin main; then
+      log "pushed live-setup update (${STAMP})"
+    else
+      log "push failed — attempting rebase onto origin/main"
+      git pull --rebase origin main && git push origin main
+      log "pushed live-setup update after rebase (${STAMP})"
     fi
-    git push origin HEAD:main
-    log "pushed live-setup update (${STAMP})"
   else
     log "committed locally (${STAMP}); push skipped (AUTO_SYNC_PUSH=0)"
   fi
