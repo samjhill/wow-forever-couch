@@ -21,6 +21,7 @@ ADDONS=(
   NodeSight
   GatherRadar
   SelfBuffs
+  AutoFeed
   CouchBuffReminder
 )
 # Removed from couch stack (Immersion covers quest/gossip keys)

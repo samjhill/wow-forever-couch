@@ -48,6 +48,7 @@ QOL = [
     (1731463, ""),  # NodeSight
     (1757790, ""),  # Gather Radar
     (1718593, ""),  # SelfBuffs
+    (1703450, ""),  # AutoFeed (AutoFeed + AutoDrink macros)
 ]
 
 
