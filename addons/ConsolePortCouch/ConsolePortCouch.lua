@@ -11,6 +11,48 @@ local INVITE_MACRO_ICON = "INV_Misc_GroupLooking"
 local INVITE_MACRO_BODY = "/click StaticPopup1Button1\n/targetfriendplayer\n/invite"
 local INVITE_BINDING = "MACRO " .. INVITE_MACRO_NAME
 
+-- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
+local GAMEPAD_BAR_CLICKS = {
+  PAD1 = "CLICK ConsolePortGamepadBar1Slot2:LeftButton",
+  PAD2 = "CLICK ConsolePortGamepadBar1Slot5:LeftButton",
+  PAD3 = "CLICK ConsolePortGamepadBar1Slot3:LeftButton",
+  PAD4 = "CLICK ConsolePortGamepadBar1Slot4:LeftButton",
+  SHIFT_PAD1 = "CLICK ConsolePortGamepadBar1Slot1:LeftButton",
+  SHIFT_PAD2 = "CLICK ConsolePortGamepadBar1Slot8:LeftButton",
+  SHIFT_PAD3 = "CLICK ConsolePortGamepadBar1Slot6:LeftButton",
+  SHIFT_PAD4 = "CLICK ConsolePortGamepadBar1Slot7:LeftButton",
+  PADDUP = "CLICK ConsolePortGamepadBar2Slot2:LeftButton",
+  PADDDOWN = "CLICK ConsolePortGamepadBar2Slot4:LeftButton",
+  PADDLEFT = "CLICK ConsolePortGamepadBar2Slot1:LeftButton",
+  PADDRIGHT = "CLICK ConsolePortGamepadBar2Slot3:LeftButton",
+}
+
+local function restoreGamepadBarClicks()
+  if InCombatLockdown and InCombatLockdown() then
+    return false
+  end
+  local function chord(key)
+    if key:sub(1, 6) == "SHIFT_" then
+      return "SHIFT-" .. key:sub(7)
+    end
+    return key
+  end
+  local function needsRestore(current)
+    return current == nil
+      or current == ""
+      or current == "NONE"
+      or current == "JUMP"
+  end
+  for key, action in pairs(GAMEPAD_BAR_CLICKS) do
+    local button = chord(key)
+    local current = GetBindingAction(button, true) or ""
+    if needsRestore(current) then
+      SetBinding(button, action)
+    end
+  end
+  return true
+end
+
 local function getDb()
   if not ConsolePort then
     return nil
@@ -95,15 +137,20 @@ local function pinGameMenuBindings(force)
     ensure("PADSYSTEM", "TOGGLEGAMEMENU")
   end
 
-  if dirty and SaveBindings and GetCurrentBindingSet then
-    SaveBindings(GetCurrentBindingSet())
-  end
+  -- Do not call SaveBindings here. On Forever/ConsolePort, saving after a partial
+  -- SetBinding can rewrite ConsolePortShared character Bindings and wipe
+  -- CLICK ConsolePortGamepadBar* face/dpad assignments.
 
   local db = getDb()
   if db then
     -- Prefer Blizzard Escape menu chrome on Forever; keep CP overlay available.
     pcall(function()
       db("Settings/gameMenuEnable", true)
+    end)
+    -- Prevent Shared character Bindings backup from overwriting gamepad-bar clicks
+    -- with empty GetBindingAction snapshots after partial SetBinding.
+    pcall(function()
+      db("bindingAutomaticBackup", false)
     end)
   end
 
@@ -140,13 +187,12 @@ local function pinInviteNearestBindings(force)
     return false
   end
 
-  local dirty = false
+  -- Session-only SetBinding; never SaveBindings (see pinGameMenuBindings).
+  -- Persist RB via scripts/pin-invite-nearest-macro.sh (bindings-cache + Shared).
   local function ensure(button, action)
     local current = GetBindingAction(button, true) or ""
-    if force or current ~= action then
-      if current ~= action and SetBinding(button, action) then
-        dirty = true
-      end
+    if (force or current ~= action) and current ~= action then
+      SetBinding(button, action)
     end
   end
 
@@ -157,9 +203,7 @@ local function pinInviteNearestBindings(force)
     ensure("PADLTRIGGER", "INTERACTTARGET")
   end
 
-  if dirty and SaveBindings and GetCurrentBindingSet then
-    SaveBindings(GetCurrentBindingSet())
-  end
+  restoreGamepadBarClicks()
 
   ConsolePortCouchDB.invitePinned = true
   ConsolePortCouchDB.inviteTs = time()
@@ -177,12 +221,15 @@ local function applyPreset(force)
     print("|cffff6666ConsolePort Couch:|r Xbox device preset not found.")
     return false
   end
-  if not force and ConsolePortCouchDB.applied and not shouldersEmpty() then
+  -- Never re-apply the Xbox preset over an existing layout. Only apply when
+  -- shoulders/triggers are blank, or the user force-runs /cpcouch apply.
+  if not force and not shouldersEmpty() then
     pinGameMenuBindings(false)
     pinInviteNearestBindings(false)
+    ConsolePortCouchDB.applied = true
     return true
   end
-  if not force and not shouldersEmpty() and ConsolePortCouchDB.applied then
+  if not force and ConsolePortCouchDB.applied then
     pinGameMenuBindings(false)
     pinInviteNearestBindings(false)
     return true
@@ -283,7 +330,8 @@ boot:SetScript("OnEvent", function(self, event)
     C_Timer.After(5.0, function()
       if not InCombatLockdown or not InCombatLockdown() then
         pinGameMenuBindings(false)
-        pinInviteNearestBindings(true)
+        restoreGamepadBarClicks()
+        pinInviteNearestBindings(false)
       end
     end)
   elseif event == "UPDATE_BINDINGS" then

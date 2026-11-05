@@ -55,5 +55,6 @@ Also:
 
 - ConsolePort not binding → enable ConsolePort* modules; `/consoleport`.
 - Empty shoulders/triggers (blank slate) → `./scripts/install-consoleport-couch.sh` then `/reload`, or `/consoleport` → Defaults → **Apply recommended bindings** (Xbox). Force: `/cpcouch apply`. See [`controller-bindings.md`](controller-bindings.md).
+- ConsolePort face/dpad dead after a Couch pin → Forever gamepad abilities live in action slots **185–360** (not 1–120). Partial `SaveBindings` from Couch rewrote `ConsolePortShared` and wiped `CLICK ConsolePortGamepadBar*` binds — fixed in Couch (no `SaveBindings` on pin; won’t re-apply Xbox preset unless shoulders are empty). Prefer `/reload` only; **quit Forever before** editing `WTF`/`SavedVariables` (running client flushes memory over disk on exit).
 - Menu/Start (☰) flips crosshair ↔ mouse instead of Escape menu → Forever was treating Escape as cursor toggle. `./scripts/pin-forever-graphics.sh` + `/cpcouch menu` (or `/reload` after updating ConsolePortCouch). Check `/cpcouch status` shows `PADFORWARD=TOGGLEGAMEMENU` and `CursorAutoEnable=0`.
 - Dictate bind does nothing → Steam Controller: left grip → Insert; Xbox: **R3 → Insert** ([`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)). Ensure `wow-dictate-daemon.service` is active (`systemctl --user restart wow-dictate-daemon`).
