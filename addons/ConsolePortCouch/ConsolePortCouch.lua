@@ -2,6 +2,7 @@
 -- 1) Apply Xbox recommended bindings when shoulders/triggers are blank.
 -- 2) Pin Menu/Start → Escape game menu (not crosshair ↔ free-cursor flip).
 -- 3) Pin RB → account macro InviteNearest; park Interact on empty LT.
+-- 4) Ensure account macro Campsite (place campfire kit + /sit for camping buffs).
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -10,6 +11,12 @@ local INVITE_MACRO_NAME = "InviteNearest"
 local INVITE_MACRO_ICON = "INV_Misc_GroupLooking"
 local INVITE_MACRO_BODY = "/click StaticPopup1Button1\n/targetfriendplayer\n/invite"
 local INVITE_BINDING = "MACRO " .. INVITE_MACRO_NAME
+
+-- Forever camping: use best available campfire kit from bags, then sit to collect buffs.
+local CAMP_MACRO_NAME = "Campsite"
+local CAMP_MACRO_ICON = "Spell_Fire_Fire"
+local CAMP_MACRO_BODY =
+  "#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit\n/sit"
 
 -- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
 local GAMEPAD_BAR_CLICKS = {
@@ -159,24 +166,38 @@ local function pinGameMenuBindings(force)
   return true
 end
 
--- Account-wide invite+accept: click party popup Accept, target nearest friend, invite.
-local function ensureInviteMacro()
+local function ensureAccountMacro(name, icon, body)
   if not CreateMacro or not EditMacro or not GetMacroIndexByName then
     return false
   end
-  local index = GetMacroIndexByName(INVITE_MACRO_NAME) or 0
+  local index = GetMacroIndexByName(name) or 0
   if index > 0 then
-    EditMacro(index, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY)
+    EditMacro(index, name, icon, body)
     return true
   end
   -- false = account macro (shared across characters)
-  local ok, created = pcall(CreateMacro, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY, false)
+  local ok, created = pcall(CreateMacro, name, icon, body, false)
   if ok and created then
     return true
   end
   -- Fallback: character macro if account slots are full / API differs
-  ok, created = pcall(CreateMacro, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY, true)
+  ok, created = pcall(CreateMacro, name, icon, body, true)
   return ok and created and true or false
+end
+
+-- Account-wide invite+accept: click party popup Accept, target nearest friend, invite.
+local function ensureInviteMacro()
+  return ensureAccountMacro(INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY)
+end
+
+-- Place highest-tier campfire kit available, then /sit for Forever camping buffs.
+local function ensureCampsiteMacro()
+  local ok = ensureAccountMacro(CAMP_MACRO_NAME, CAMP_MACRO_ICON, CAMP_MACRO_BODY)
+  if ok then
+    ConsolePortCouchDB.campsitePinned = true
+    ConsolePortCouchDB.campsiteTs = time()
+  end
+  return ok
 end
 
 local function pinInviteNearestBindings(force)
@@ -296,6 +317,16 @@ SlashCmdList.CPCOUCH = function(msg)
     else
       print("|cffff6666ConsolePort Couch:|r could not create/pin InviteNearest macro.")
     end
+  elseif msg == "camp" or msg == "campsite" or msg == "pincamp" then
+    if ensureCampsiteMacro() then
+      print(
+        "|cff66ff66ConsolePort Couch:|r account macro |cffffffff"
+          .. CAMP_MACRO_NAME
+          .. "|r ready (campfire kit + /sit). Drag it onto a gamepad bar slot."
+      )
+    else
+      print("|cffff6666ConsolePort Couch:|r could not create Campsite macro.")
+    end
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -312,11 +343,13 @@ SlashCmdList.CPCOUCH = function(msg)
       tostring(GetBindingAction("PADRSHOULDER", true)),
       "PADLTRIGGER=",
       tostring(GetBindingAction("PADLTRIGGER", true)),
+      "CampsiteMacro=",
+      tostring(GetMacroIndexByName and GetMacroIndexByName(CAMP_MACRO_NAME) or 0),
       "CursorAutoEnable=",
       tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
   else
-    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | status")
+    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | status")
   end
 end
 
@@ -326,12 +359,14 @@ boot:RegisterEvent("UPDATE_BINDINGS")
 boot:SetScript("OnEvent", function(self, event)
   if event == "PLAYER_LOGIN" then
     tryApply(false)
+    ensureCampsiteMacro()
     -- Re-pin after Forever/CP finish remapping gamepad actions.
     C_Timer.After(5.0, function()
       if not InCombatLockdown or not InCombatLockdown() then
         pinGameMenuBindings(false)
         restoreGamepadBarClicks()
         pinInviteNearestBindings(false)
+        ensureCampsiteMacro()
       end
     end)
   elseif event == "UPDATE_BINDINGS" then
