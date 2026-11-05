@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=WoW Forever Couch Setup
+Comment=Install/update wow-forever-couch (Battle.net, Forever addons, auto-sync)
+Exec=bash -lc 'REPO="$HOME/Projects/wow-forever-couch"; if [ ! -x "$REPO/scripts/bootstrap-steamos.sh" ]; then mkdir -p "$HOME/Projects" && git clone https://github.com/samjhill/wow-forever-couch.git "$REPO"; fi; exec "$REPO/scripts/bootstrap-steamos.sh"'
+Icon=steam_icon_default
+Terminal=true
+Categories=Game;
+Keywords=wow;forever;couch;bazzite;steamdeck;

@@ -18,6 +18,16 @@ git clone https://github.com/samjhill/wow-forever-couch.git
 cd wow-forever-couch
 ```
 
+### Steam Deck / one-click host setup
+
+Desktop Mode: run `./scripts/bootstrap-steamos.sh` (or the `.desktop` under `config/desktop/`). That installs GE-Proton, Battle.net scaffolding, Forever addons when present, and a **systemd user timer** that pulls this repo on a schedule. Battle.net launch also runs a quick sync. Details: [`docs/steam-deck.md`](docs/steam-deck.md).
+
+```bash
+./scripts/bootstrap-steamos.sh
+# log into Battle.net → install Forever → run bootstrap again
+WOW_COUCH_UPDATE_MODE=full ./scripts/apply-repo-updates.sh   # manual sync anytime
+```
+
 ### 1. Proton + Battle.net (Desktop Mode)
 
 ```bash
