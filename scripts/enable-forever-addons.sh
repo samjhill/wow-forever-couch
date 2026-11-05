@@ -14,7 +14,7 @@ ADDONS=(
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
   CouchDictateRoute
   # QoL install set (Forever-tagged); staged addons intentionally omitted
-  Syndicator Baganator Leatrix_Plus Plater
+  Syndicator Baganator Leatrix_Plus Plater PlaterQuestPin
   LoreForever LoreForever_Voice_Default LoreForever_Voice_Default_Alliance LoreForever_Voice_Default_Horde
   TheFishingLog
   ForeverLootSparkles
