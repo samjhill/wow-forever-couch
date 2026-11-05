@@ -51,6 +51,25 @@ Errors / warnings (chat + UIErrorsFrame): dead, in combat, item on cooldown (fea
 
 In-game: `/cpcouch camp` runs it; `/cpcouch campstatus` lists what is in bags. Drag **Campsite** onto a gamepad bar slot — not bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
 
+### FishingCouch macro (Forever fishing)
+
+Account macro **FishingCouch** (created on login / `/cpcouch pinfish`):
+
+```
+#showtooltip Fishing
+/click CPCCouchFish
+```
+
+Each press (out of combat):
+
+1. Equips the best **fishing pole** in bags if better than what’s equipped
+2. Applies the best **lure** if the pole has none (Attractor → Baubles → Nightcrawlers → …)
+3. Eats Forever **+Fishing food** if not already Well Fed
+4. Places **Fishing Hut / Rack / Bowl** (and a campfire kit if present) for uncommon/rare catches
+5. `/cast Fishing`
+
+Errors/warnings for dead, combat, missing pole/skill, lure/feature cooldown, or missing Forever camp objects. `/cpcouch fish` runs it; `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
+
 ## Apply (manual in-game)
 
 1. `/consoleport`

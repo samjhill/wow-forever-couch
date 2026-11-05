@@ -3,6 +3,7 @@
 -- 2) Pin Menu/Start → Escape game menu (not crosshair ↔ free-cursor flip).
 -- 3) Pin RB → account macro InviteNearest; park Interact on empty LT.
 -- 4) Campsite: secure button + account macro place fire, profession object, then /sit.
+-- 5) Fishing: secure button + account macro for Forever poles/lures/food/camp features + cast.
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -39,6 +40,50 @@ local CAMP_FEATURE_LINES = {
   { profession = "Tailoring", items = { "Loom", "Spinning Wheel", "Faction Banner" } },
   { profession = "Engineering", items = { "Anarchist's Workbench", "Repair Bot", "Reagent Bot" } },
   { profession = "Cooking", items = { "Iron Oven", "Cookie's Feast" } },
+}
+
+-- Forever fishing: /click CPCCouchFish (pole + lure + food + Rack/Hut + cast).
+local FISH_MACRO_NAME = "FishingCouch"
+local FISH_MACRO_ICON = "Trade_Fishing"
+local FISH_BUTTON_NAME = "CPCCouchFish"
+local FISH_MACRO_BODY = "#showtooltip Fishing\n/click " .. FISH_BUTTON_NAME
+
+-- Best-first poles (+skill).
+local FISH_POLES = {
+  "Arcanite Fishing Pole",
+  "Nat Pagle's Extreme Angler FC-5000",
+  "Big Iron Fishing Pole",
+  "Ravaged Fishing Pole",
+  "Strong Fishing Pole",
+  "Blump Family Fishing Pole",
+  "Fishing Pole",
+}
+
+-- Best-first lures (+skill).
+local FISH_LURES = {
+  "Aquadynamic Fish Attractor",
+  "Bright Baubles",
+  "Flesh Eating Worm",
+  "Nightcrawlers",
+  "Aquadynamic Fish Lens",
+  "Shiny Bauble",
+}
+
+-- Forever +Fishing Well Fed dishes (best first).
+local FISH_FOOD = {
+  "Spinefin Halibut",
+  "Filet of Redgill",
+  "Rockscale Cod",
+  "Bristle Whisker Catfish",
+  "Fillet of Frenzy",
+  "Loch Frenzy Delight",
+}
+
+-- Forever fishing camp features (best first) — uncommon/rare catches + Fish Bowl buff.
+local FISH_CAMP_FEATURES = {
+  "Fishing Hut",
+  "Fishing Rack",
+  "Fish Bowl",
 }
 
 -- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
@@ -407,6 +452,257 @@ local function runCampsite()
   return true
 end
 
+local function fishPrint(kind, msg)
+  local color = "|cff66ff66"
+  if kind == "error" then
+    color = "|cffff6666"
+  elseif kind == "warn" then
+    color = "|cffffaa00"
+  end
+  local text = color .. "Fishing:|r " .. msg
+  print(text)
+  if UIErrorsFrame and UIErrorsFrame.AddMessage then
+    local r, g, b = 1, 0.4, 0.4
+    if kind == "ok" then
+      r, g, b = 0.4, 1, 0.4
+    elseif kind == "warn" then
+      r, g, b = 1, 0.7, 0.2
+    end
+    UIErrorsFrame:AddMessage(msg, r, g, b, 1.0)
+  end
+end
+
+local function knowsFishing()
+  -- SpellID 7620 = Fishing (Classic / Forever).
+  if IsPlayerSpell and IsPlayerSpell(7620) then
+    return true
+  end
+  if IsSpellKnown and IsSpellKnown(7620) then
+    return true
+  end
+  -- If APIs are missing, still attempt /cast Fishing (errors in UI if unknown).
+  if not IsPlayerSpell and not IsSpellKnown then
+    return true
+  end
+  return false
+end
+
+local function equippedPoleName()
+  local link = GetInventoryItemLink and GetInventoryItemLink("player", 16)
+  if not link then
+    return nil
+  end
+  for _, name in ipairs(FISH_POLES) do
+    if link:find(name, 1, true) then
+      return name
+    end
+  end
+  return nil
+end
+
+local function poleRank(name)
+  if not name then
+    return 999
+  end
+  for i, n in ipairs(FISH_POLES) do
+    if n == name then
+      return i
+    end
+  end
+  return 999
+end
+
+local function bestPoleToEquip()
+  local equipped = equippedPoleName()
+  local bagPole = pickFirstOwned(FISH_POLES)
+  if not bagPole then
+    return nil, equipped
+  end
+  if not equipped or poleRank(bagPole) < poleRank(equipped) then
+    return bagPole, equipped
+  end
+  return nil, equipped
+end
+
+local function hasWeaponLure()
+  if not GetWeaponEnchantInfo then
+    return false
+  end
+  local hasMainHandEnchant = GetWeaponEnchantInfo()
+  return hasMainHandEnchant and true or false
+end
+
+local function isWellFed()
+  if not UnitBuff then
+    return false
+  end
+  for i = 1, 40 do
+    local name = UnitBuff("player", i)
+    if not name then
+      break
+    end
+    if name == "Well Fed" or name == "Food" or name == "Drink" then
+      return true
+    end
+  end
+  return false
+end
+
+local function fishInventoryReport()
+  local equipPole, wantPole = equippedPoleName(), pickFirstOwned(FISH_POLES)
+  local lure = pickFirstOwned(FISH_LURES)
+  local food = pickFirstOwned(FISH_FOOD)
+  local feat = pickFirstOwned(FISH_CAMP_FEATURES)
+  local fire = pickFirstOwned(CAMP_FIRES)
+  fishPrint(
+    "ok",
+    "pole="
+      .. (equipPole or "none")
+      .. (wantPole and (" bag=" .. wantPole) or "")
+      .. " lure="
+      .. (lure or "none")
+      .. (hasWeaponLure() and " (applied)" or "")
+      .. " food="
+      .. (food or "none")
+      .. " camp="
+      .. (feat or "none")
+      .. " fire="
+      .. (fire or "none")
+  )
+end
+
+local function buildFishMacrotext()
+  if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then
+    fishPrint("error", "you are dead — cannot fish")
+    return nil
+  end
+  if InCombatLockdown and InCombatLockdown() then
+    fishPrint("error", "in combat — wait, then try again")
+    return nil
+  end
+  if not knowsFishing() then
+    fishPrint("error", "Fishing skill not learned — visit a fishing trainer")
+    return nil
+  end
+
+  local lines = {}
+  local equipPole, currentPole = bestPoleToEquip()
+  if equipPole then
+    table.insert(lines, "/equip " .. equipPole)
+    fishPrint("ok", "equipping " .. equipPole)
+  elseif not currentPole and not equippedPoleName() then
+    -- May still fish with fists on some clients, but Forever needs a pole.
+    if not pickFirstOwned(FISH_POLES) then
+      fishPrint("error", "no fishing pole equipped or in bags")
+      return nil
+    end
+  elseif currentPole then
+    fishPrint("ok", "using " .. currentPole)
+  end
+
+  if not hasWeaponLure() then
+    local lure = pickFirstOwned(FISH_LURES)
+    if lure then
+      local cd = itemCooldownRemaining(lure)
+      if cd > 0 then
+        fishPrint("warn", lure .. " on cooldown (" .. formatCd(cd) .. ") — casting without new lure")
+      else
+        table.insert(lines, "/use " .. lure)
+        fishPrint("ok", "applying " .. lure)
+      end
+    else
+      fishPrint("warn", "no lure in bags (Shiny Bauble / Nightcrawlers / Bright Baubles / Attractor)")
+    end
+  else
+    fishPrint("ok", "lure already on pole")
+  end
+
+  if not isWellFed() then
+    local food = pickFirstOwned(FISH_FOOD)
+    if food then
+      table.insert(lines, "/use " .. food)
+      fishPrint("ok", "eating " .. food .. " (+Fishing)")
+    end
+  end
+
+  -- Forever uncommon/rare catches need Rack/Hut at a campfire.
+  local feat = pickFirstOwned(FISH_CAMP_FEATURES)
+  if feat then
+    local cd = itemCooldownRemaining(feat)
+    if cd > 0 then
+      fishPrint("warn", feat .. " on cooldown (" .. formatCd(cd) .. ") — camping features share 1h CD")
+    else
+      local fire = pickFirstOwned(CAMP_FIRES)
+      if fire then
+        local fcd = itemCooldownRemaining(fire)
+        if fcd > 0 then
+          fishPrint("warn", fire .. " on cooldown — place " .. feat .. " near an existing fire")
+        else
+          table.insert(lines, "/use " .. fire)
+          fishPrint("ok", "placing " .. fire)
+        end
+      else
+        fishPrint("warn", "no campfire kit — " .. feat .. " needs a campfire nearby")
+      end
+      table.insert(lines, "/use " .. feat)
+      fishPrint("ok", "placing " .. feat .. " (Forever uncommon/rare fishing)")
+    end
+  else
+    fishPrint(
+      "warn",
+      "no Fishing Hut/Rack/Bowl in bags — craft at Fishing 20/140/300 for Forever catches"
+    )
+  end
+
+  table.insert(lines, "/cast Fishing")
+  return table.concat(lines, "\n")
+end
+
+local fishButton = _G[FISH_BUTTON_NAME]
+  or CreateFrame("Button", FISH_BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
+fishButton:RegisterForClicks("AnyUp", "AnyDown")
+fishButton:SetScript("PreClick", function(self)
+  if InCombatLockdown and InCombatLockdown() then
+    fishPrint("error", "in combat — wait, then try again")
+    self:SetAttribute("type", nil)
+    self:SetAttribute("macrotext", nil)
+    return
+  end
+  local body = buildFishMacrotext()
+  if not body then
+    self:SetAttribute("type", nil)
+    self:SetAttribute("macrotext", nil)
+    return
+  end
+  self:SetAttribute("type", "macro")
+  self:SetAttribute("macrotext", body)
+end)
+
+local function ensureFishingMacro()
+  local ok = ensureAccountMacro(FISH_MACRO_NAME, FISH_MACRO_ICON, FISH_MACRO_BODY)
+  if ok then
+    ConsolePortCouchDB.fishingPinned = true
+    ConsolePortCouchDB.fishingTs = time()
+  end
+  return ok
+end
+
+local function runFishing()
+  ensureFishingMacro()
+  if InCombatLockdown and InCombatLockdown() then
+    fishPrint("error", "in combat — wait, then try again")
+    return false
+  end
+  local body = buildFishMacrotext()
+  if not body then
+    return false
+  end
+  fishButton:SetAttribute("type", "macro")
+  fishButton:SetAttribute("macrotext", body)
+  fishButton:Click()
+  return true
+end
+
 local function pinInviteNearestBindings(force)
   if InCombatLockdown and InCombatLockdown() then
     return false
@@ -540,6 +836,22 @@ SlashCmdList.CPCOUCH = function(msg)
     end
   elseif msg == "campstatus" or msg == "campinv" then
     campInventoryReport()
+  elseif msg == "fish" or msg == "fishing" then
+    runFishing()
+  elseif msg == "pinfish" then
+    if ensureFishingMacro() then
+      print(
+        "|cff66ff66ConsolePort Couch:|r account macro |cffffffff"
+          .. FISH_MACRO_NAME
+          .. "|r → /click "
+          .. FISH_BUTTON_NAME
+          .. " (pole + lure + food + Hut/Rack + cast). Drag onto a gamepad bar slot."
+      )
+    else
+      print("|cffff6666ConsolePort Couch:|r could not create FishingCouch macro.")
+    end
+  elseif msg == "fishstatus" or msg == "fishinv" then
+    fishInventoryReport()
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -558,13 +870,16 @@ SlashCmdList.CPCOUCH = function(msg)
       tostring(GetBindingAction("PADLTRIGGER", true)),
       "CampsiteMacro=",
       tostring(GetMacroIndexByName and GetMacroIndexByName(CAMP_MACRO_NAME) or 0),
+      "FishingMacro=",
+      tostring(GetMacroIndexByName and GetMacroIndexByName(FISH_MACRO_NAME) or 0),
       "CursorAutoEnable=",
       tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
     campInventoryReport()
+    fishInventoryReport()
   else
     print(
-      "|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | pincamp | campstatus | status"
+      "|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | fish | pincamp | pinfish | campstatus | fishstatus | status"
     )
   end
 end
@@ -576,6 +891,7 @@ boot:SetScript("OnEvent", function(self, event)
   if event == "PLAYER_LOGIN" then
     tryApply(false)
     ensureCampsiteMacro()
+    ensureFishingMacro()
     -- Re-pin after Forever/CP finish remapping gamepad actions.
     C_Timer.After(5.0, function()
       if not InCombatLockdown or not InCombatLockdown() then
@@ -583,6 +899,7 @@ boot:SetScript("OnEvent", function(self, event)
         restoreGamepadBarClicks()
         pinInviteNearestBindings(false)
         ensureCampsiteMacro()
+        ensureFishingMacro()
       end
     end)
   elseif event == "UPDATE_BINDINGS" then
