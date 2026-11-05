@@ -36,6 +36,9 @@ FIFO = BASE / "config" / "dictate.trigger"
 STATUS = BASE / "config" / "dictate-status.json"
 COOLDOWN_S = float(os.environ.get("DICTATE_COOLDOWN", "1.5"))
 DRAFT_TTL_S = float(os.environ.get("DICTATE_DRAFT_TTL", "60"))
+# While capture/Whisper/inject runs, ignore extra R3 presses (they used to spawn
+# no-op "dictate" jobs and felt like the bind needed double taps).
+BUSY_STATES = frozenset({"recording", "transcribing", "injecting", "busy"})
 
 # Linux BTN_GRIPL / BTN_GRIPR (Steam Controller) and fallbacks
 GRIPL = getattr(ecodes, "BTN_GRIPL", 548)
@@ -93,6 +96,10 @@ def pending_draft() -> bool:
     return True
 
 
+def pipeline_busy() -> bool:
+    return load_status().get("state") in BUSY_STATES
+
+
 def run_script(script: Path, args: list[str] | None = None, env_extra: dict | None = None) -> None:
     env = os.environ.copy()
     if env_extra:
@@ -144,6 +151,10 @@ def fire(reason: str, action: str = "auto") -> None:
         now = time.time()
         if now - _last_fire < COOLDOWN_S:
             log(f"cooldown skip ({reason})")
+            return
+        # Cancel always wins; confirm/dictate wait out an in-flight pipeline.
+        if action != "cancel" and pipeline_busy():
+            log(f"busy skip ({reason}) — wait for stop/done beep, then R3 once to send")
             return
         _last_fire = now
 
