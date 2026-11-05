@@ -52,14 +52,14 @@ Forever cannot use items from `/run`. Every couch macro is a normal account macr
 /cast Fishing
 ```
 
-**EatBest / DrinkBest** — addon rewrites these out of combat to the strongest food/drink in bags:
+**Food / drink** — use the Forever **AutoFeed** addon (CurseForge 1703450), not custom couch macros:
 
-```
-#showtooltip
-/use <best food or drink name>
-```
+| Macro | Does |
+| --- | --- |
+| `AutoFeed` | Eat best food in bags |
+| `AutoDrink` | Drink best water in bags |
 
-`/cpcouch eat` or `/cpcouch drink` rescans and prints the current target. Offline seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh`, `./scripts/pin-eat-drink-macros.sh` (quit Forever first).
+Create with `/af` (or the AutoFeed welcome UI), then drag onto a bar. Offline campsite/fishing seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh` (quit Forever first).
 
 ## Apply (manual in-game)
 
