@@ -42,8 +42,9 @@ def ok(f):
     return True
 
 cand = [f for f in files if ok(f)]
+# Prefer Release over Beta, then newest upload (dateCreated desc).
 cand.sort(
-    key=lambda f: (0 if f.get("releaseType") == 1 else 1, f.get("dateCreated") or ""),
+    key=lambda f: (1 if f.get("releaseType") == 1 else 0, f.get("dateCreated") or ""),
     reverse=True,
 )
 if not cand:
@@ -128,7 +129,22 @@ unzip_addon_dirs() {
   local target="$2"
   local tmp root d base toc
   tmp=$(mktemp -d)
-  unzip -qo "$zip" -d "$tmp"
+  # Python zipfile handles Windows backslash paths that Info-ZIP warns about.
+  python3 - "$zip" "$tmp" <<'PY'
+import sys, zipfile
+from pathlib import Path
+zpath, dest = Path(sys.argv[1]), Path(sys.argv[2])
+with zipfile.ZipFile(zpath) as zf:
+    for info in zf.infolist():
+        name = info.filename.replace("\\", "/")
+        if not name or name.endswith("/"):
+            (dest / name).mkdir(parents=True, exist_ok=True)
+            continue
+        out = dest / name
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with zf.open(info) as src, open(out, "wb") as dst:
+            dst.write(src.read())
+PY
   root="$tmp"
   # If zip has a single non-addon wrapper dir, descend one level
   local entries=()
@@ -190,9 +206,15 @@ FISH_ZIP="$FETCHED_NAME"
 # Forever Loot Sparkles — quest-item sparkles (+ optional herb/ore)
 fetch_forever 1729017
 SPARKLE_ZIP="$FETCHED_NAME"
+# NodeSight — live herb/ore icons on minimap tracking dots (controller-friendly)
+fetch_forever 1731463
+NODESIGHT_ZIP="$FETCHED_NAME"
+# Gather Radar — live icons + remembered herb/ore pins on minimap & world map
+fetch_forever 1757790
+GATHER_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 # Immersion already covers controller quest/gossip; do not install DialogKey forks.
@@ -228,6 +250,8 @@ done
   echo "- $LORE_ZIP"
   echo "- $FISH_ZIP"
   echo "- $SPARKLE_ZIP"
+  echo "- $NODESIGHT_ZIP"
+  echo "- $GATHER_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"

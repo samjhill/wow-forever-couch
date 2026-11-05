@@ -39,7 +39,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ```bash
 ./scripts/install-forever-addons.sh        # ConsolePort, Immersion, ForeverVO + voice packs
 ./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
-./scripts/install-forever-qol-addons.sh    # Baganator/…/Lore Forever/Fishing Log/Loot Sparkles; stages Questie/BW/…
+./scripts/install-forever-qol-addons.sh    # Baganator/…/Loot Sparkles/NodeSight/Gather Radar; stages Questie/BW/…
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
 ./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
