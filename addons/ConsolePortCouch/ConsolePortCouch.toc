@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: ConsolePort Couch
+## Notes: Applies ConsolePort Xbox recommended bindings for Steam Input / Xbox controllers
+## Author: wow-forever-couch
+## Version: 1.0.0
+## Dependencies: ConsolePort
+## LoadWith: ConsolePort
+## SavedVariables: ConsolePortCouchDB
+
+ConsolePortCouch.lua

@@ -8,6 +8,7 @@ ADDONS=(
   ConsolePort ConsolePort_Bar ConsolePort_Config ConsolePort_Cursor
   ConsolePort_Menu ConsolePort_Rings ConsolePort_Target ConsolePort_World
   # ConsolePort_Keyboard left to player preference (often disabled on couch)
+  ConsolePortCouch
   Immersion ForeverVO
   ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
