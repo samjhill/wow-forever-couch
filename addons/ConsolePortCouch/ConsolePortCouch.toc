@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: ConsolePort Couch
-## Notes: Applies ConsolePort Xbox recommended bindings for Steam Input / Xbox controllers
+## Notes: ConsolePort couch bindings + plain Forever-safe Campsite/FishingCouch macros
 ## Author: wow-forever-couch
-## Version: 1.4.5
+## Version: 1.5.0
 ## Dependencies: ConsolePort
 ## LoadWith: ConsolePort
 ## SavedVariables: ConsolePortCouchDB

@@ -32,41 +32,32 @@ Class abilities are **not** pre-slotted — after the preset loads, put spells o
 
 Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once), then pins **RB → InviteNearest**. Force: `/cpcouch apply`. Re-pin invite only: `/cpcouch invite`. Offline file seed: `./scripts/pin-invite-nearest-macro.sh` (quit Forever first for cache writes).
 
-### Campsite macro (Forever camping)
+### Campsite / FishingCouch (plain Forever macros)
 
-Account macro **Campsite** (created on login / `/cpcouch pincamp`):
+Forever’s secure-snippet path is broken, so these stay **plain account macros** (same idea as InviteNearest) — no `/run`, no SecureActionButton `/click`.
+
+**Campsite** (`/cpcouch camp`):
 
 ```
 #showtooltip
-/click CPCCouchCamp
+/use Expert Campfire Kit
+/use Journeyman Campfire Kit
+/use Basic Campfire Kit
+/sit
 ```
 
-`ConsolePortCouch` picks, in order:
+Uses the first kit present in bags, then sits. Craft kits in Cooking beforehand if you have none.
 
-1. Best **campfire kit** in bags (Expert → Journeyman → Basic). If none, opens **Cooking** and crafts the best available kit (needs Flint and Tinder + Simple Wood / Star Wood / Thick Logs; ~10s cast — press Campsite again after)
-2. Best **profession camp object** in bags when present (optional — never blocks the fire)
-3. Always `/sit` so camping buffs can tick (~1 min)
-
-Hard errors only for dead/combat (and craft failures when trying to make a kit). Missing profession objects are skipped quietly.
-
-In-game: `/cpcouch camp` runs it; `/cpcouch campstatus` lists what is in bags. Drag **Campsite** onto a gamepad bar slot — not bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
-
-### FishingCouch macro (Forever fishing)
-
-Account macro **FishingCouch** (created on login / `/cpcouch pinfish`):
+**FishingCouch** (`/cpcouch fish`):
 
 ```
 #showtooltip Fishing
-/run if ConsolePortCouch_PreFish then ConsolePortCouch_PreFish() end
 /cast Fishing
 ```
 
-Each press (out of combat):
+Equip a pole (and lure) yourself; the macro only casts Fishing.
 
-1. `/run` optionally equips a better pole, applies lure/food, places Hut/Rack/Bowl
-2. `/cast Fishing` always runs on the same bar press (works on Forever; nested `/click` did not)
-
-Missing lure/food/camp objects are skipped quietly. `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
+Drag either macro onto a ConsolePort gamepad bar slot (not over RB). Offline seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh` (quit Forever first).
 
 ## Apply (manual in-game)
 

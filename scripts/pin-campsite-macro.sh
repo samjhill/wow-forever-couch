@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
-# Create account macro "Campsite": /click CPCCouchCamp (ConsolePortCouch).
-# The addon picks best campfire kit + profession camp object, errors on CD/combat,
-# then /sit. Forever camping buffs need ~1 min near the fire.
-#
+# Create account macro "Campsite" — plain Forever-safe /use + /sit (no /run, no /click helpers).
 # Forever should be fully quit so macros-cache is not overwritten.
-# Does not steal gamepad bindings — drag Campsite onto a ConsolePort bar slot.
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
@@ -13,10 +9,9 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="Campsite"
 MACRO_ICON="Spell_Fire_Fire"
-MACRO_BODY=$'#showtooltip\n/click CPCCouchCamp'
+MACRO_BODY=$'#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit\n/sit'
 
 if [[ ! -d "$ACCT" ]]; then
-  # Fall back to first account folder that has macros-cache or any account dir
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
     ACCT="$(find "${WOW_FOREVER}/WTF/Account" -mindepth 1 -maxdepth 1 -type d ! -name SavedVariables | head -1 || true)"
     MACROS="${ACCT}/macros-cache.txt"
@@ -73,8 +68,6 @@ if [[ -d "${WOW_COUCH_CONFIG}/live-setup/account" ]]; then
   echo "mirrored macros into config/live-setup/account/"
 fi
 
-echo "Done. Fully quit Forever if it was open, then relaunch."
-echo "In-game: /cpcouch camp  (recreates Campsite if missing)"
-echo "Macro: ${MACRO_NAME}"
+echo "Done. Macro body:"
 echo "$MACRO_BODY"
-echo "Drag Campsite onto a gamepad bar slot (RB stays InviteNearest)."
+echo "Drag Campsite onto a gamepad bar. In-game: /cpcouch camp"

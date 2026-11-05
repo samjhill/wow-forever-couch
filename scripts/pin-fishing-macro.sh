@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Create account macro "FishingCouch": /run PreFish + /cast Fishing (ConsolePortCouch).
-# The /run applies optional pole/lure/food/camp items; /cast Fishing does the cast.
-#
+# Create account macro "FishingCouch" — plain Forever-safe /cast Fishing only.
 # Forever should be fully quit so macros-cache is not overwritten.
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -11,7 +9,7 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="FishingCouch"
 MACRO_ICON="Trade_Fishing"
-MACRO_BODY=$'#showtooltip Fishing\n/run if ConsolePortCouch_PreFish then ConsolePortCouch_PreFish() end\n/cast Fishing'
+MACRO_BODY=$'#showtooltip Fishing\n/cast Fishing'
 
 if [[ ! -d "$ACCT" ]]; then
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
@@ -70,8 +68,6 @@ if [[ -d "${WOW_COUCH_CONFIG}/live-setup/account" ]]; then
   echo "mirrored macros into config/live-setup/account/"
 fi
 
-echo "Done. Fully quit Forever if it was open, then relaunch."
-echo "In-game: /cpcouch fish  (or /cpcouch pinfish to recreate macro only)"
-echo "Macro: ${MACRO_NAME}"
+echo "Done. Macro body:"
 echo "$MACRO_BODY"
-echo "Drag FishingCouch onto a gamepad bar slot."
+echo "Drag FishingCouch onto a gamepad bar. In-game: /cpcouch fish"
