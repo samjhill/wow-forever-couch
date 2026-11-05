@@ -32,6 +32,20 @@ Class abilities are **not** pre-slotted — after the preset loads, put spells o
 
 Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once), then pins **RB → InviteNearest**. Force: `/cpcouch apply`. Re-pin invite only: `/cpcouch invite`. Offline file seed: `./scripts/pin-invite-nearest-macro.sh` (quit Forever first for cache writes).
 
+### Campsite macro (Forever camping)
+
+Account macro **Campsite** (created on login / `/cpcouch camp`):
+
+```
+#showtooltip
+/use Expert Campfire Kit
+/use Journeyman Campfire Kit
+/use Basic Campfire Kit
+/sit
+```
+
+Uses the best campfire kit in your bags, then `/sit` so you can collect camping buffs (~1 min near the fire). Drag it onto a gamepad bar slot — it is **not** bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
+
 ## Apply (manual in-game)
 
 1. `/consoleport`
