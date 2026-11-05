@@ -2,7 +2,7 @@
 ## Title: ConsolePort Couch
 ## Notes: ConsolePort couch bindings + Campsite/Fishing/EatBest/DrinkBest macros
 ## Author: wow-forever-couch
-## Version: 1.5.1
+## Version: 1.5.2
 ## Dependencies: ConsolePort
 ## LoadWith: ConsolePort
 ## SavedVariables: ConsolePortCouchDB
