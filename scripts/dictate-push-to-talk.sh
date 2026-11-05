@@ -22,7 +22,20 @@ CHANNEL="${DICTATE_CHANNEL:-auto}"
 # Restore Bose/etc. to A2DP after capture (better game audio). Set 0 to stay on HFP.
 RESTORE_A2DP="${DICTATE_RESTORE_A2DP:-1}"
 SILENCE_DB="${DICTATE_SILENCE_DB:--45}"
+# Keep Forever playable on the i5: Whisper defaults to all cores otherwise.
+WHISPER_THREADS="${DICTATE_WHISPER_THREADS:-1}"
 mkdir -p "${WOW_COUCH_CONFIG}/sounds"
+
+nice_cmd() {
+  # Best-effort low priority so transcription does not tank gamescope FPS.
+  if command -v nice >/dev/null && command -v ionice >/dev/null; then
+    nice -n 19 ionice -c3 "$@"
+  elif command -v nice >/dev/null; then
+    nice -n 19 "$@"
+  else
+    "$@"
+  fi
+}
 
 if [[ ! -f "$START_SND" ]] && command -v ffmpeg >/dev/null; then
   ffmpeg -y -f lavfi -i "sine=f=880:d=0.12" -ar 44100 "$START_SND" 2>/dev/null || true
@@ -117,7 +130,7 @@ if ! python3 "${REPO_ROOT}/scripts/wav-energy.py" "$WAV" "$SILENCE_DB"; then
 fi
 
 CONV="/tmp/wow-dictate-16k.wav"
-ffmpeg -y -i "$WAV" -ar 16000 -ac 1 "$CONV" 2>/dev/null || CONV="$WAV"
+nice_cmd ffmpeg -y -i "$WAV" -ar 16000 -ac 1 "$CONV" 2>/dev/null || CONV="$WAV"
 
 if [[ ! -f "$MODEL" ]]; then
   echo "Model missing: $MODEL — run scripts/setup-whisper.sh" >&2
@@ -131,7 +144,9 @@ if [[ ! -e "$WHISPER_BIN" ]]; then
 fi
 
 write_status "transcribing"
-"$WHISPER_BIN" -m "$MODEL" -f "$CONV" -nt 2>/dev/null > "$TXT" || true
+# -t 1 / -bs 1 / -bo 1: greedy, single-thread — much kinder to Forever on 4c CPU
+nice_cmd "$WHISPER_BIN" -t "$WHISPER_THREADS" -bs 1 -bo 1 -m "$MODEL" -f "$CONV" -nt -np \
+  2>/dev/null > "$TXT" || true
 cat "$TXT"
 
 if command -v wl-copy >/dev/null; then

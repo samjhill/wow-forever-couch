@@ -76,11 +76,13 @@ Steam Input:
 ## Workflow (current default: draft)
 
 1. Forever focused; `CouchDictateRoute` loaded.
-2. **Dictate bind** — SC left grip / Xbox R3 (or `echo fire > config/dictate.trigger`).
-3. Speak (~4s, `DICTATE_SECS`).
+2. **Dictate bind once** — SC left grip / Xbox R3 (or `echo fire > config/dictate.trigger`).
+3. Wait for the **start beep**, speak (`DICTATE_SECS`, default 6), wait for **stop/done** beeps. Extra R3 presses during record/Whisper are ignored.
 4. Inject opens chat and types the transcript (**does not send**).
-5. Read the draft → **same bind again** to send (daemon presses Enter).
+5. Read the draft → **same bind once more** to send (daemon presses Enter).
 6. Discard: SC right grip, or `echo cancel > config/dictate.trigger`, or Esc.
+
+One message = **two** R3 presses (start, then send after the done beep) — not four. If you mash R3 while it is still recording, those presses no longer start extra jobs.
 
 Pending drafts expire after `DICTATE_DRAFT_TTL` seconds (default 60); the next bind press then starts a new dictation instead of confirming.
 
@@ -112,6 +114,7 @@ DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
 | `DICTATE_WAV` | unset | Replay file instead of mic |
 | `DICTATE_SECS` | `6` | Record length after start beep |
 | `DICTATE_RESTORE_A2DP` | `1` | After Bose HFP capture, restore A2DP music profile |
+| `DICTATE_WHISPER_THREADS` | `1` | Whisper CPU threads (keep low while Forever runs) |
 
 Whisper capture/transcription is unchanged.
 
