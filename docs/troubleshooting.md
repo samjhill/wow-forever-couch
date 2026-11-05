@@ -49,4 +49,4 @@ Also:
 
 - ConsolePort not binding → enable ConsolePort* modules; `/consoleport`.
 - Empty shoulders/triggers (blank slate) → `./scripts/install-consoleport-couch.sh` then `/reload`, or `/consoleport` → Defaults → **Apply recommended bindings** (Xbox). Force: `/cpcouch apply`. See [`controller-bindings.md`](controller-bindings.md).
-- Grip does nothing for dictate → bind left grip → F20 in Steam Input for the Forever shortcut, and ensure `wow-dictate-daemon.service` is active.
+- Dictate bind does nothing → Steam Controller: left grip → F20; Xbox: **R3 → F20** ([`forever-xbox-r3-f20.md`](../config/steam-input/forever-xbox-r3-f20.md)). Ensure `wow-dictate-daemon.service` is active (`systemctl --user restart wow-dictate-daemon`).

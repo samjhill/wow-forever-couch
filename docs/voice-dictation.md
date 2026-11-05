@@ -2,7 +2,12 @@
 
 ## Goal
 
-Controller left grip → speak → local Whisper → draft (or send) into Forever chat, with **group-aware channel routing**:
+Controller dictate button → speak → local Whisper → draft (or send) into Forever chat, with **group-aware channel routing**:
+
+| Controller | Start / confirm draft | Cancel draft |
+|------------|----------------------|--------------|
+| Steam Controller | Left grip | Right grip |
+| Xbox | **R3** (right stick click) | Esc / FIFO `cancel` |
 
 | Group state | Default channel |
 |-------------|-----------------|
@@ -15,7 +20,7 @@ Party-of-two uses `/say` on purpose: couch co-op in the same room does not need 
 ## Architecture
 
 ```
-Steam grip / F20 / FIFO
+SC grip / Xbox R3 / F20 / FIFO
         │
         ▼
 wow-dictate-daemon ──► dictate-push-to-talk.sh
@@ -37,7 +42,7 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
 Two cooperating pieces:
 
 1. **`CouchDictateRoute` addon** — observes `GROUP_ROSTER_UPDATE` / login and sets each chat edit box `chatType` + `stickyType` via `SetAttribute` + `ChatEdit_UpdateHeader`. When Enter opens chat, Blizzard uses that sticky type. The addon **never** calls `SendChatMessage`.
-2. **Host inject** — still only simulates keys from your grip-triggered pipeline. Default mode is **draft** (no final Enter); **left grip again** confirms send (no keyboard Enter needed). Right grip (or FIFO `cancel`) presses Esc to discard.
+2. **Host inject** — still only simulates keys from your dictate bind. Default mode is **draft** (no final Enter); **press the bind again** (SC left grip / Xbox R3 / F20) to confirm send. SC right grip (or FIFO `cancel` / Esc) discards.
 
 ### API / ToS notes
 
@@ -63,18 +68,21 @@ Two cooperating pieces:
 
 In-game: `/reload`, then `/cdr status`. Manual sticky override: `/cdr say|party|raid` or `/cdr auto`.
 
-Steam Input: left grip → **F20** — see [`config/steam-input/forever-left-grip-f20.md`](../config/steam-input/forever-left-grip-f20.md).
+Steam Input:
+
+- Steam Controller: left grip → **F20** — [`forever-left-grip-f20.md`](../config/steam-input/forever-left-grip-f20.md)
+- Xbox: **R3** → **F20** — [`forever-xbox-r3-f20.md`](../config/steam-input/forever-xbox-r3-f20.md)
 
 ## Workflow (current default: draft)
 
 1. Forever focused; `CouchDictateRoute` loaded.
-2. **Left grip** (or `echo fire > config/dictate.trigger`).
+2. **Dictate bind** — SC left grip / Xbox R3 (or `echo fire > config/dictate.trigger`).
 3. Speak (~4s, `DICTATE_SECS`).
 4. Inject opens chat and types the transcript (**does not send**).
-5. Read the draft → **left grip again** to send (daemon presses Enter).
-6. Discard instead: **right grip**, or `echo cancel > config/dictate.trigger`, or Esc.
+5. Read the draft → **same bind again** to send (daemon presses Enter).
+6. Discard: SC right grip, or `echo cancel > config/dictate.trigger`, or Esc.
 
-Pending drafts expire after `DICTATE_DRAFT_TTL` seconds (default 60); the next left grip then starts a new dictation instead of confirming.
+Pending drafts expire after `DICTATE_DRAFT_TTL` seconds (default 60); the next bind press then starts a new dictation instead of confirming.
 
 Auto-send (after you trust routing in-game):
 
