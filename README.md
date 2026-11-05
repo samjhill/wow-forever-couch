@@ -42,6 +42,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ./scripts/install-forever-qol-addons.sh    # Baganator/…/DialogKey/Lore Forever/Fishing Log; stages Questie/BW/…
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
+./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
 ```
 
 In-game: enable the install set at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
