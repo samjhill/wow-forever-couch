@@ -1,8 +1,6 @@
 # Live couch setup snapshot
 
-Captured **2026-11-05T01:35Z** from account `SAMUHILL` / character `91/Chain-Milk` on bazzite.
-
-Policy overlay: ForeverVO `showPanel = false` (Immersion owns quest UI; ForeverVO is audio-only).
+Captured **2026-11-05T01:48Z** from account `SAMUHILL` / character `91/Chain-Milk`.
 
 ## Contents
 

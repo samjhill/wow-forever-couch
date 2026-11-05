@@ -1,6 +1,6 @@
 
 ConsolePortCouchDB = {
 ["device"] = "Xbox",
-["ts"] = 1793840588,
+["ts"] = 1793841271,
 ["applied"] = true,
 }
