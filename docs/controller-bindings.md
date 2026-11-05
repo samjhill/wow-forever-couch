@@ -57,7 +57,7 @@ Account macro **FishingCouch** (created on login / `/cpcouch pinfish`):
 
 ```
 #showtooltip Fishing
-/click CPCCouchFish
+/click CPCCouchFish LeftButton
 ```
 
 Each press (out of combat):

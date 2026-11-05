@@ -12,7 +12,7 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="FishingCouch"
 MACRO_ICON="Trade_Fishing"
-MACRO_BODY=$'#showtooltip Fishing\n/click CPCCouchFish'
+MACRO_BODY=$'#showtooltip Fishing\n/click CPCCouchFish LeftButton'
 
 if [[ ! -d "$ACCT" ]]; then
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
