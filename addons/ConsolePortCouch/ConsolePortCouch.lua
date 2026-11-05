@@ -62,12 +62,13 @@ local CAMP_FEATURE_LINES = {
   { profession = "Cooking", items = { "Iron Oven", "Cookie's Feast" } },
 }
 
--- Forever fishing: /click CPCCouchFish (pole + lure + food + Rack/Hut + cast).
+-- Forever fishing: account macro /run PreFish + /cast Fishing.
 local FISH_MACRO_NAME = "FishingCouch"
 local FISH_MACRO_ICON = "Trade_Fishing"
-local FISH_BUTTON_NAME = "CPCCouchFish"
--- LeftButton required so the secure cast runs on Forever/Classic.
-local FISH_MACRO_BODY = "#showtooltip Fishing\n/click " .. FISH_BUTTON_NAME .. " LeftButton"
+-- Forever ignores nested SecureActionButton /click casts; use a normal macro:
+-- /run applies optional goodies, then /cast Fishing rides the hardware press.
+local FISH_MACRO_BODY =
+  "#showtooltip Fishing\n/run if ConsolePortCouch_PreFish then ConsolePortCouch_PreFish() end\n/cast Fishing"
 
 -- Best-first poles (+skill). Include Forever extras (Darkwood, Ravaged).
 local FISH_POLES = {
@@ -678,16 +679,10 @@ local function fishPrint(kind, msg)
   elseif kind == "warn" then
     color = "|cffffaa00"
   end
-  local text = color .. "Fishing:|r " .. msg
-  print(text)
-  if UIErrorsFrame and UIErrorsFrame.AddMessage then
-    local r, g, b = 1, 0.4, 0.4
-    if kind == "ok" then
-      r, g, b = 0.4, 1, 0.4
-    elseif kind == "warn" then
-      r, g, b = 1, 0.7, 0.2
-    end
-    UIErrorsFrame:AddMessage(msg, r, g, b, 1.0)
+  -- Chat only — avoid UIErrorsFrame spam on every cast ("using fishing pole").
+  print(color .. "Fishing:|r " .. msg)
+  if kind == "error" and UIErrorsFrame and UIErrorsFrame.AddMessage then
+    UIErrorsFrame:AddMessage(msg, 1, 0.4, 0.4, 1.0)
   end
 end
 
@@ -859,42 +854,23 @@ local function useBagItemByName(name)
   return false
 end
 
-local function fishingSpellName()
-  if GetSpellInfo then
-    return GetSpellInfo(7620) or "Fishing"
-  end
-  return "Fishing"
-end
-
--- Apply optional bag items via API, then securely cast Fishing (not nested /cast macrotext).
--- Returns false if the press should abort (dead/combat/no pole/crafting).
-local function prepareFishingClick(self)
+-- Called from the FishingCouch account macro via /run before /cast Fishing.
+function ConsolePortCouch_PreFish()
   if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then
     fishPrint("error", "you are dead — cannot fish")
-    return false
+    return
   end
   if InCombatLockdown and InCombatLockdown() then
-    fishPrint("error", "in combat — wait, then try again")
-    return false
-  end
-  if not knowsFishing() then
-    fishPrint("error", "Fishing skill not learned — visit a fishing trainer")
-    return false
+    return
   end
 
-  local equipPole, currentPole = bestPoleToEquip()
-  if equipPole then
-    if EquipItemByName then
-      EquipItemByName(equipPole)
-    end
+  local equipPole = bestPoleToEquip()
+  if equipPole and EquipItemByName then
+    EquipItemByName(equipPole)
     fishPrint("ok", "equipping " .. equipPole)
-  elseif not currentPole then
-    if not findBestPoleInBags() then
-      fishPrint("error", "no fishing pole equipped or in bags")
-      return false
-    end
-  else
-    fishPrint("ok", "using " .. currentPole)
+  elseif not equippedPoleName() and not findBestPoleInBags() then
+    fishPrint("error", "no fishing pole equipped or in bags")
+    return
   end
 
   if not hasWeaponLure() then
@@ -917,10 +893,8 @@ local function prepareFishingClick(self)
   if feat and itemCooldownRemaining(feat) <= 0 then
     local fire = pickFirstOwned(CAMP_FIRES)
     if not fire then
-      if startCraftCampfireKit() then
-        return false
-      end
-      fire = pickFirstOwned(CAMP_FIRES)
+      startCraftCampfireKit()
+      return
     end
     if fire and itemCooldownRemaining(fire) <= 0 then
       useBagItemByName(fire)
@@ -929,30 +903,7 @@ local function prepareFishingClick(self)
     useBagItemByName(feat)
     fishPrint("ok", "placing " .. feat)
   end
-
-  local spell = fishingSpellName()
-  -- Prefer direct spell cast; Forever often ignores nested macrotext from /click.
-  self:SetAttribute("type", "spell")
-  self:SetAttribute("spell", spell)
-  self:SetAttribute("type1", "spell")
-  self:SetAttribute("spell1", spell)
-  self:SetAttribute("macrotext", nil)
-  self:SetAttribute("macrotext1", nil)
-  return true
 end
-
-local fishButton = _G[FISH_BUTTON_NAME]
-  or CreateFrame("Button", FISH_BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
-fishButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-fishButton:SetScript("PreClick", function(self, button)
-  if not prepareFishingClick(self) then
-    self:SetAttribute("type", nil)
-    self:SetAttribute("type1", nil)
-    self:SetAttribute("spell", nil)
-    self:SetAttribute("spell1", nil)
-    return
-  end
-end)
 
 local function ensureFishingMacro()
   local ok = ensureAccountMacro(FISH_MACRO_NAME, FISH_MACRO_ICON, FISH_MACRO_BODY)
@@ -965,13 +916,9 @@ end
 
 local function runFishing()
   ensureFishingMacro()
-  fishPrint(
-    "warn",
-    "press the FishingCouch action-bar button to cast (slash cannot start Fishing securely)"
-  )
-  -- Still refresh the macro body / prepare messaging for the next bar press.
-  prepareFishingClick(fishButton)
-  return false
+  fishPrint("ok", "FishingCouch macro refreshed — press the bar button to fish")
+  ConsolePortCouch_PreFish()
+  return true
 end
 
 local function pinInviteNearestBindings(force)
@@ -1114,9 +1061,7 @@ SlashCmdList.CPCOUCH = function(msg)
       print(
         "|cff66ff66ConsolePort Couch:|r account macro |cffffffff"
           .. FISH_MACRO_NAME
-          .. "|r → /click "
-          .. FISH_BUTTON_NAME
-          .. " (pole + lure + food + Hut/Rack + cast). Drag onto a gamepad bar slot."
+          .. "|r → /run PreFish + /cast Fishing. Drag onto a gamepad bar slot."
       )
     else
       print("|cffff6666ConsolePort Couch:|r could not create FishingCouch macro.")
