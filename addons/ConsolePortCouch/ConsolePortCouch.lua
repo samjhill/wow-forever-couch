@@ -26,6 +26,26 @@ local CAMP_FIRES = {
   "Basic Campfire Kit",
 }
 
+-- Cooking recipes that create those kits (best first). Spell tooltips name the recipe
+-- "Basic/Journeyman/Expert Campfire"; kits are the bag items.
+local CAMP_FIRE_RECIPES = {
+  {
+    kit = "Expert Campfire Kit",
+    names = { "Expert Campfire", "Expert Campfire Kit" },
+    reagent = "Thick Logs",
+  },
+  {
+    kit = "Journeyman Campfire Kit",
+    names = { "Journeyman Campfire", "Journeyman Campfire Kit" },
+    reagent = "Star Wood",
+  },
+  {
+    kit = "Basic Campfire Kit",
+    names = { "Basic Campfire", "Basic Campfire Kit" },
+    reagent = "Simple Wood",
+  },
+}
+
 -- Profession camp features: each line is best-first (tier 3 → 1). One object per player.
 local CAMP_FEATURE_LINES = {
   { profession = "Fishing", items = { "Fishing Hut", "Fishing Rack", "Fish Bowl" } },
@@ -347,6 +367,144 @@ local function campInventoryReport()
   return fire, feat, prof
 end
 
+local function hasCookingSkill()
+  if not GetNumSkillLines or not GetSkillLineInfo then
+    return nil
+  end
+  for i = 1, GetNumSkillLines() do
+    local name, _, _, rank = GetSkillLineInfo(i)
+    if name == "Cooking" then
+      return true, rank or 0
+    end
+  end
+  return false, 0
+end
+
+local function findCraftableCampfireRecipe()
+  if not GetNumTradeSkills or not GetTradeSkillInfo or not DoTradeSkill then
+    return nil, nil, "no_tradeskill_api"
+  end
+  local line = GetTradeSkillLine and GetTradeSkillLine()
+  if line and line ~= "Cooking" then
+    return nil, nil, "wrong_tradeskill"
+  end
+  local knownButEmpty = nil
+  for _, entry in ipairs(CAMP_FIRE_RECIPES) do
+    for i = 1, GetNumTradeSkills() do
+      local name, skillType = GetTradeSkillInfo(i)
+      if skillType ~= "header" and name then
+        for _, rname in ipairs(entry.names) do
+          if name == rname then
+            local avail = GetTradeSkillNumAvailable and (GetTradeSkillNumAvailable(i) or 0) or 0
+            if avail > 0 then
+              return i, entry, nil
+            end
+            knownButEmpty = knownButEmpty or entry
+            break
+          end
+        end
+      end
+    end
+  end
+  if knownButEmpty then
+    return nil, knownButEmpty, "missing_reagents"
+  end
+  return nil, nil, "recipe_not_found"
+end
+
+local function diagnoseCampfireCraftFailure(entry, reason)
+  local hasCooking, rank = hasCookingSkill()
+  if hasCooking == false then
+    campPrint("error", "Cooking not learned — train Cooking to craft campfire kits")
+    return
+  end
+  if itemCount("Flint and Tinder") < 1 then
+    campPrint("error", "need Flint and Tinder in bags (Cooking tool) to craft a campfire")
+    return
+  end
+  if entry and entry.reagent and itemCount(entry.reagent) < 1 then
+    campPrint("error", "need " .. entry.reagent .. " to craft " .. entry.kit)
+    return
+  end
+  if
+    itemCount("Simple Wood") < 1
+    and itemCount("Star Wood") < 1
+    and itemCount("Thick Logs") < 1
+  then
+    campPrint("error", "need Simple Wood (or Star Wood / Thick Logs) to craft a campfire kit")
+    return
+  end
+  if reason == "recipe_not_found" then
+    campPrint(
+      "error",
+      "campfire recipe not in Cooking window"
+        .. (rank and (" (Cooking " .. tostring(rank) .. ")") or "")
+        .. " — open Cooking once or re-train Basic Campfire"
+    )
+    return
+  end
+  campPrint("error", "cannot craft a campfire kit right now (" .. tostring(reason or "unknown") .. ")")
+end
+
+local campCraftPending = false
+local campCraftWatcher = CreateFrame("Frame")
+
+-- Returns true if a craft was started (caller should abort place/sit this click).
+local function startCraftCampfireKit()
+  if campCraftPending then
+    campPrint("warn", "already opening Cooking to craft — wait a moment")
+    return true
+  end
+  if InCombatLockdown and InCombatLockdown() then
+    campPrint("error", "in combat — cannot craft a campfire kit")
+    return false
+  end
+
+  local function tryCraftNow()
+    local idx, entry, reason = findCraftableCampfireRecipe()
+    if idx and entry and DoTradeSkill then
+      DoTradeSkill(idx, 1)
+      campPrint(
+        "ok",
+        "crafting " .. entry.kit .. " (~10s) — press Campsite again when the kit appears"
+      )
+      return true
+    end
+    diagnoseCampfireCraftFailure(entry, reason)
+    return false
+  end
+
+  local line = GetTradeSkillLine and GetTradeSkillLine()
+  if line == "Cooking" and GetNumTradeSkills and GetNumTradeSkills() > 0 then
+    return tryCraftNow()
+  end
+
+  if not CastSpellByName then
+    campPrint("error", "cannot open Cooking to craft a campfire kit")
+    return false
+  end
+
+  campCraftPending = true
+  campCraftWatcher:RegisterEvent("TRADE_SKILL_SHOW")
+  campCraftWatcher:SetScript("OnEvent", function(self, event)
+    if event ~= "TRADE_SKILL_SHOW" then
+      return
+    end
+    self:UnregisterEvent("TRADE_SKILL_SHOW")
+    campCraftPending = false
+    if C_Timer and C_Timer.After then
+      C_Timer.After(0.05, function()
+        tryCraftNow()
+      end)
+    else
+      tryCraftNow()
+    end
+  end)
+  CastSpellByName("Cooking")
+  campPrint("ok", "opening Cooking to craft a campfire kit…")
+  return true
+end
+
 local function buildCampMacrotext()
   if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then
     campPrint("error", "you are dead — cannot place a camp")
@@ -358,6 +516,15 @@ local function buildCampMacrotext()
   end
 
   local fire = pickFirstOwned(CAMP_FIRES)
+  if not fire then
+    campPrint("warn", "no campfire kit in bags — trying to craft one")
+    if startCraftCampfireKit() then
+      -- Craft takes ~10s; place on the next press once the kit lands in bags.
+      return nil
+    end
+  end
+
+  fire = pickFirstOwned(CAMP_FIRES)
   local feat, prof = pickBestFeature()
   local hadFire, hadFeat = fire ~= nil, feat ~= nil
   local lines = {}
@@ -633,6 +800,13 @@ local function buildFishMacrotext()
       fishPrint("warn", feat .. " on cooldown (" .. formatCd(cd) .. ") — camping features share 1h CD")
     else
       local fire = pickFirstOwned(CAMP_FIRES)
+      if not fire then
+        fishPrint("warn", "no campfire kit — crafting one before placing " .. feat)
+        if startCraftCampfireKit() then
+          return nil
+        end
+        fire = pickFirstOwned(CAMP_FIRES)
+      end
       if fire then
         local fcd = itemCooldownRemaining(fire)
         if fcd > 0 then
