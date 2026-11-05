@@ -46,6 +46,7 @@ Also:
 - FPS dip while dictating → Whisper is `nice`’d (2 threads); Bose HFP switch hitch only on the first press after A2DP.
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
+- Inject opens Escape game menu → fixed: inject no longer sends Esc (ConsolePort maps Esc → menu). Update `inject-wow-chat.sh` / restart not needed (script is read each fire).
 - Want preview before send → `DICTATE_SEND_MODE=draft` (bind again to send).
 - Garbage capture → speak after the start beep while holding; `DICTATE_NO_SEND=1` while tuning.
 - Wrong chat channel → `/cdr status`; `/cdr say|party|raid` or `DICTATE_CHANNEL=...` override; ensure CouchDictateRoute is enabled.

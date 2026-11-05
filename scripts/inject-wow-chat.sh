@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Inject text into focused WoW chat: Esc → Enter → [optional /channel] type → [Enter if send].
+# Inject text into focused WoW chat: Enter → [optional /channel] type → [Enter if send].
+# Do NOT send Esc first — with ConsolePort, Escape is TOGGLEGAMEMENU and opens the game menu.
 #
 # Env:
 #   DICTATE_SEND_MODE=send|draft   send (default): final Enter after typing
@@ -55,10 +56,8 @@ esac
 
 PAYLOAD="${PREFIX}${TEXT}"
 
-"$EMIT" key esc
-sleep 0.03
 "$EMIT" key enter
-sleep 0.03
+sleep 0.05
 "$EMIT" type "$PAYLOAD"
 sleep 0.03
 
