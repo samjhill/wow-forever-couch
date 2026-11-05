@@ -76,8 +76,19 @@ PY
 beep() {
   local f="$1"
   [[ -f "$f" ]] || return 0
-  # Non-blocking — don't add latency to the pipeline
-  paplay "$f" >/dev/null 2>&1 &
+  # Non-blocking. Prefer Bose/BT sinks — default is often HDMI while headphones are in use.
+  local sinks=()
+  local s
+  while IFS= read -r s; do
+    [[ -n "$s" ]] && sinks+=("$s")
+  done < <(pactl list short sinks 2>/dev/null | awk '$2 ~ /^bluez_output\./ { print $2 }')
+  if [[ ${#sinks[@]} -eq 0 ]]; then
+    paplay "$f" >/dev/null 2>&1 &
+    return 0
+  fi
+  for s in "${sinks[@]}"; do
+    paplay --device="$s" "$f" >/dev/null 2>&1 &
+  done
 }
 
 if [[ ! -x "$WHISPER_BIN" ]]; then
@@ -98,7 +109,6 @@ fi
 trap 'flock -u 9 2>/dev/null || true' EXIT
 
 write_status "recording"
-beep "$START_SND"
 
 if [[ -n "${DICTATE_WAV:-}" ]]; then
   if [[ ! -s "$DICTATE_WAV" ]]; then
@@ -107,6 +117,7 @@ if [[ -n "${DICTATE_WAV:-}" ]]; then
     exit 3
   fi
   echo "Using simulated/replay WAV: $DICTATE_WAV"
+  beep "$START_SND"
   cp -f "$DICTATE_WAV" "$WAV"
 else
   # Cancel pending A2DP restore — stay on HFP for this capture.
@@ -117,6 +128,8 @@ else
     write_status "error" "no mic source"
     exit 3
   fi
+  # Start ding after HFP switch so it plays on the headset, not HDMI.
+  beep "$START_SND"
   # Record 16 kHz mono — Whisper-ready, skips ffmpeg convert
   if [[ "$HOLD" == "1" ]]; then
     if [[ -f "$STOP_FILE" ]]; then
