@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: ConsolePort Couch
-## Notes: ConsolePort couch bindings + plain Forever-safe Campsite/FishingCouch macros
+## Notes: ConsolePort couch bindings + Campsite/Fishing/EatBest/DrinkBest macros
 ## Author: wow-forever-couch
-## Version: 1.5.0
+## Version: 1.5.1
 ## Dependencies: ConsolePort
 ## LoadWith: ConsolePort
 ## SavedVariables: ConsolePortCouchDB
