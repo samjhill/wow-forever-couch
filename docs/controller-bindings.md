@@ -19,7 +19,7 @@ Use ConsolePort’s built-in **Xbox** device preset:
 | LT | Target nearest enemy |
 | RB / RT | Primary action buttons + modifier layers |
 | D-pad | Extra action bar slots |
-| Back / Start | Bags / game menu (and map on Ctrl) |
+| Back / Start | Bags / **Escape game menu** (ConsolePortCouch pins Start + System → `TOGGLEGAMEMENU`; cursor auto-enable off so Menu doesn’t only flip crosshair ↔ mouse) |
 
 Class abilities are **not** pre-slotted — after the preset loads, put spells on the ConsolePort gamepad action bar (drag in `/consoleport` or use the action placer). Conceptual bear layout: [`bear-tank-bindings.md`](bear-tank-bindings.md).
 

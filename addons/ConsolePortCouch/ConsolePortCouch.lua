@@ -1,5 +1,6 @@
--- Apply ConsolePort's built-in Xbox recommended binding preset once.
--- Steam Controller via Steam Input emulates Xbox; CP docs recommend that device.
+-- Couch helpers for ConsolePort on Forever (Camelot):
+-- 1) Apply Xbox recommended bindings when shoulders/triggers are blank.
+-- 2) Pin Menu/Start → Escape game menu (not crosshair ↔ free-cursor flip).
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -34,7 +35,6 @@ local function getXboxDevice(db)
       end
     end
   end
-  -- Fall back to whatever is active (often Xbox after Steam Input).
   if db.Gamepad.GetActiveDevice then
     return db.Gamepad:GetActiveDevice()
   end
@@ -42,7 +42,6 @@ local function getXboxDevice(db)
 end
 
 local function shouldersEmpty()
-  -- Detect the "blank slate" state that clears bumpers/triggers.
   local lb = GetBindingAction("PADLSHOULDER", true)
   local rb = GetBindingAction("PADRSHOULDER", true)
   local lt = GetBindingAction("PADLTRIGGER", true)
@@ -51,6 +50,60 @@ local function shouldersEmpty()
     and (rb == nil or rb == "")
     and (lt == nil or lt == "")
     and (rt == nil or rt == "")
+end
+
+local function setCVarSafe(name, value)
+  if GetCVar and SetCVar and GetCVar(name) ~= nil then
+    pcall(SetCVar, name, value)
+  end
+end
+
+-- Forever's gamepad Escape path often toggles center-crosshair ↔ free mouse
+-- when GamePadCursorAutoEnable is on, so the real game menu never appears.
+-- Also pin Menu on both PADFORWARD (Start/☰) and PADSYSTEM in case the
+-- Linux/Steam raw map swaps Start with Guide.
+local function pinGameMenuBindings(force)
+  if InCombatLockdown and InCombatLockdown() then
+    return false
+  end
+
+  setCVarSafe("GamePadCursorAutoEnable", "0")
+  setCVarSafe("GamePadCursorCenteredEmulation", "0")
+  setCVarSafe("GamePadCursorLeftClick", "none")
+  setCVarSafe("GamePadCursorRightClick", "none")
+
+  local dirty = false
+  local function ensure(button, action)
+    local current = GetBindingAction(button, true) or ""
+    if current ~= action then
+      if SetBinding(button, action) then
+        dirty = true
+      end
+    end
+  end
+
+  ensure("PADFORWARD", "TOGGLEGAMEMENU")
+  -- Backup: some Wine/Steam stacks deliver Menu/Start as PADSYSTEM.
+  local systemAction = GetBindingAction("PADSYSTEM", true) or ""
+  if force or systemAction == "" or systemAction == "NONE" then
+    ensure("PADSYSTEM", "TOGGLEGAMEMENU")
+  end
+
+  if dirty and SaveBindings and GetCurrentBindingSet then
+    SaveBindings(GetCurrentBindingSet())
+  end
+
+  local db = getDb()
+  if db then
+    -- Prefer Blizzard Escape menu chrome on Forever; keep CP overlay available.
+    pcall(function()
+      db("Settings/gameMenuEnable", true)
+    end)
+  end
+
+  ConsolePortCouchDB.menuPinned = true
+  ConsolePortCouchDB.menuTs = time()
+  return true
 end
 
 local function applyPreset(force)
@@ -65,9 +118,11 @@ local function applyPreset(force)
     return false
   end
   if not force and ConsolePortCouchDB.applied and not shouldersEmpty() then
+    pinGameMenuBindings(false)
     return true
   end
   if not force and not shouldersEmpty() and ConsolePortCouchDB.applied then
+    pinGameMenuBindings(false)
     return true
   end
 
@@ -82,6 +137,7 @@ local function applyPreset(force)
   ConsolePortCouchDB.applied = true
   ConsolePortCouchDB.device = device.Name or "Xbox"
   ConsolePortCouchDB.ts = time()
+  pinGameMenuBindings(true)
   print(
     "|cff66ff66ConsolePort Couch:|r applied |cffffffff"
       .. (device.Name or "Xbox")
@@ -95,7 +151,6 @@ local function tryApply(force)
     print("|cffffaa00ConsolePort Couch:|r wait until out of combat, then /cpcouch apply")
     return
   end
-  -- Defer so Forever's gamepad action storage finishes remapping ACTIONBUTTON → bar clicks.
   C_Timer.After(force and 0.5 or 2.0, function()
     applyPreset(force)
   end)
@@ -107,6 +162,16 @@ SlashCmdList.CPCOUCH = function(msg)
   if msg == "apply" or msg == "reset" or msg == "force" then
     ConsolePortCouchDB.applied = nil
     tryApply(true)
+  elseif msg == "menu" or msg == "pinmenu" then
+    if InCombatLockdown and InCombatLockdown() then
+      print("|cffffaa00ConsolePort Couch:|r wait until out of combat, then /cpcouch menu")
+      return
+    end
+    pinGameMenuBindings(true)
+    print(
+      "|cff66ff66ConsolePort Couch:|r Menu/Start → TOGGLEGAMEMENU"
+        .. " (PADFORWARD + PADSYSTEM); cursor auto-enable off."
+    )
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -114,10 +179,16 @@ SlashCmdList.CPCOUCH = function(msg)
       "device=",
       tostring(ConsolePortCouchDB.device),
       "shouldersEmpty=",
-      tostring(shouldersEmpty())
+      tostring(shouldersEmpty()),
+      "PADFORWARD=",
+      tostring(GetBindingAction("PADFORWARD", true)),
+      "PADSYSTEM=",
+      tostring(GetBindingAction("PADSYSTEM", true)),
+      "CursorAutoEnable=",
+      tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
   else
-    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | status")
+    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | status")
   end
 end
 
@@ -127,7 +198,17 @@ boot:RegisterEvent("UPDATE_BINDINGS")
 boot:SetScript("OnEvent", function(self, event)
   if event == "PLAYER_LOGIN" then
     tryApply(false)
-  elseif event == "UPDATE_BINDINGS" and not ConsolePortCouchDB.applied and shouldersEmpty() then
-    tryApply(false)
+    -- Re-pin after Forever/CP finish remapping gamepad actions.
+    C_Timer.After(5.0, function()
+      if not InCombatLockdown or not InCombatLockdown() then
+        pinGameMenuBindings(false)
+      end
+    end)
+  elseif event == "UPDATE_BINDINGS" then
+    if not ConsolePortCouchDB.applied and shouldersEmpty() then
+      tryApply(false)
+    else
+      pinGameMenuBindings(false)
+    end
   end
 end)
