@@ -44,10 +44,10 @@ Account macro **Campsite** (created on login / `/cpcouch pincamp`):
 `ConsolePortCouch` picks, in order:
 
 1. Best **campfire kit** in bags (Expert → Journeyman → Basic). If none, opens **Cooking** and crafts the best available kit (needs Flint and Tinder + Simple Wood / Star Wood / Thick Logs; ~10s cast — press Campsite again after)
-2. Best **profession camp object** in bags (e.g. Fishing Hut → Rack → Fish Bowl; same for other professions)
-3. `/sit` so camping buffs can tick (~1 min)
+2. Best **profession camp object** in bags when present (optional — never blocks the fire)
+3. Always `/sit` so camping buffs can tick (~1 min)
 
-Errors / warnings (chat + UIErrorsFrame): dead, in combat, item on cooldown (features share a 1h CD), missing Cooking/wood/Flint and Tinder, or missing profession object. Visiting someone else’s camp with empty bags still sits, with a warning.
+Hard errors only for dead/combat (and craft failures when trying to make a kit). Missing profession objects are skipped quietly.
 
 In-game: `/cpcouch camp` runs it; `/cpcouch campstatus` lists what is in bags. Drag **Campsite** onto a gamepad bar slot — not bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
 

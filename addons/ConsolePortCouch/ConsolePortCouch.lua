@@ -599,7 +599,6 @@ local function buildCampMacrotext()
 
   local fire = pickFirstOwned(CAMP_FIRES)
   if not fire then
-    campPrint("warn", "no campfire kit in bags — trying to craft one")
     if startCraftCampfireKit() then
       -- Craft takes ~10s; place on the next press once the kit lands in bags.
       return nil
@@ -608,47 +607,17 @@ local function buildCampMacrotext()
 
   fire = pickFirstOwned(CAMP_FIRES)
   local feat, prof = pickBestFeature()
-  local hadFire, hadFeat = fire ~= nil, feat ~= nil
   local lines = {}
 
-  if fire then
-    local cd = itemCooldownRemaining(fire)
-    if cd > 0 then
-      campPrint("error", fire .. " on cooldown (" .. formatCd(cd) .. ")")
-      fire = nil
-    else
-      table.insert(lines, "/use " .. fire)
-    end
+  -- Campfire first; profession objects are optional and never block the fire.
+  if fire and itemCooldownRemaining(fire) <= 0 then
+    table.insert(lines, "/use " .. fire)
+    campPrint("ok", "placing " .. fire)
   end
 
-  if feat then
-    local cd = itemCooldownRemaining(feat)
-    if cd > 0 then
-      campPrint("error", feat .. " on cooldown (" .. formatCd(cd) .. ") — camping features share a 1h CD")
-      feat = nil
-    else
-      table.insert(lines, "/use " .. feat)
-    end
-  end
-
-  if not fire and not feat then
-    -- Still allow sit so visiting another player's camp works.
-    if not hadFire and not hadFeat then
-      campPrint("warn", "no campfire kit or profession camp object in bags — sitting only")
-    else
-      campPrint("warn", "no usable camp items right now — sitting only")
-    end
-  else
-    if fire then
-      campPrint("ok", "placing " .. fire)
-    elseif hadFeat then
-      campPrint("warn", "no campfire kit — feature needs a campfire nearby")
-    end
-    if feat then
-      campPrint("ok", "placing " .. feat .. (prof and (" [" .. prof .. "]") or ""))
-    elseif hadFire then
-      campPrint("warn", "no profession camp object in bags (craft at skill 20+)")
-    end
+  if feat and itemCooldownRemaining(feat) <= 0 then
+    table.insert(lines, "/use " .. feat)
+    campPrint("ok", "placing " .. feat .. (prof and (" [" .. prof .. "]") or ""))
   end
 
   table.insert(lines, "/sit")
