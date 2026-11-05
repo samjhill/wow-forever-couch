@@ -20,7 +20,7 @@ Party-of-two uses `/say` on purpose: couch co-op in the same room does not need 
 ## Architecture
 
 ```
-SC grip / Xbox R3 / F20 / FIFO
+SC grip / Xbox R3 / Insert / FIFO
         │
         ▼
 wow-dictate-daemon ──► dictate-push-to-talk.sh
@@ -42,7 +42,7 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
 Two cooperating pieces:
 
 1. **`CouchDictateRoute` addon** — observes `GROUP_ROSTER_UPDATE` / login and sets each chat edit box `chatType` + `stickyType` via `SetAttribute` + `ChatEdit_UpdateHeader`. When Enter opens chat, Blizzard uses that sticky type. The addon **never** calls `SendChatMessage`.
-2. **Host inject** — still only simulates keys from your dictate bind. Default mode is **draft** (no final Enter); **press the bind again** (SC left grip / Xbox R3 / F20) to confirm send. SC right grip (or FIFO `cancel` / Esc) discards.
+2. **Host inject** — still only simulates keys from your dictate bind. Default mode is **draft** (no final Enter); **press the bind again** (SC left grip / Xbox R3 / Insert) to confirm send. SC right grip (or FIFO `cancel` / Esc) discards.
 
 ### API / ToS notes
 
@@ -70,8 +70,8 @@ In-game: `/reload`, then `/cdr status`. Manual sticky override: `/cdr say|party|
 
 Steam Input:
 
-- Steam Controller: left grip → **F20** — [`forever-left-grip-f20.md`](../config/steam-input/forever-left-grip-f20.md)
-- Xbox: **R3** → **F20** — [`forever-xbox-r3-f20.md`](../config/steam-input/forever-xbox-r3-f20.md)
+- Steam Controller: left grip → **Insert** — [`forever-left-grip-insert.md`](../config/steam-input/forever-left-grip-insert.md)
+- Xbox: **R3** → **Insert** — [`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)
 
 ## Workflow (current default: draft)
 
@@ -170,7 +170,7 @@ DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/inject-wow-chat.sh <<< '
 1. ~~No character folders~~ — account `SAMUHILL`, character `Chain-Milk` now present; host enable/pin scripts can run.
 2. Prior Forever login failed with `ERROR_GAME_UTILITY_SERVER_NO_SERVER (34200)` (realm utility unavailable) — superseded by successful login.
 3. Moonlight not paired to Sunshine; cannot stream the TV/gamescope view from this Mac session yet.
-4. Live grip → draft → confirm into Forever chat still needs in-game verification (Steam Input left grip → F20 on the Battle.net shortcut).
+4. Live grip → draft → confirm into Forever chat still needs in-game verification (Steam Input left grip / Xbox R3 → Insert on the Battle.net shortcut).
 
 Once in-world: `/reload` → `/cdr status` → left grip → read draft → left grip to send.
 
@@ -188,4 +188,4 @@ Once in-world: `/reload` → `/cdr status` → left grip → read draft → left
 | Unit | Role |
 |------|------|
 | `ydotoold.service` | uinput typing into the focused game |
-| `wow-dictate-daemon.service` | grip / F20 / FIFO → `dictate-push-to-talk.sh` |
+| `wow-dictate-daemon.service` | grip / Insert / FIFO → `dictate-push-to-talk.sh` |

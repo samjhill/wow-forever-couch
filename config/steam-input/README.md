@@ -1,10 +1,10 @@
 Export Steam Input profiles here after tuning.
 
-Dictation binds (host daemon always listens for **F20**):
+Dictation binds (host daemon listens for **Insert**; legacy F20 still works):
 
 | Pad | Steam Input bind | Notes |
 |-----|------------------|-------|
-| Steam Controller | Left grip → F20 | [`forever-left-grip-f20.md`](forever-left-grip-f20.md) |
-| Xbox | **R3** → F20 | [`forever-xbox-r3-f20.md`](forever-xbox-r3-f20.md) |
+| Steam Controller | Left grip → **Insert** | [`forever-left-grip-insert.md`](forever-left-grip-insert.md) |
+| Xbox | **R3** → **Insert** | [`forever-xbox-r3-insert.md`](forever-xbox-r3-insert.md) |
 
-Keep separate Steam Input layouts per controller on the Battle.net (WoW Forever) shortcut.
+F20 is not in Steam’s keyboard picker — do not use it. Keep separate layouts per controller on the Battle.net (WoW Forever) shortcut.
