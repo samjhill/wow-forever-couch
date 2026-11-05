@@ -34,6 +34,7 @@ Also:
 - Addons missing in-game → character select → AddOns list; run `./scripts/enable-forever-addons.sh` after `WTF/Account` exists.
 - ForeverVO silent → ensure `ForeverVO_Data_*` packs are enabled; `/fvo status`.
 - Double speech → turn off Immersion TTS (`./scripts/pin-voiceover-prefs.sh`).
+- Duplicate quest UI (modern Immersion + parchment/classic underneath) → ForeverVO’s talking-head panel is also on. Run `./scripts/pin-voiceover-prefs.sh` (sets `showPanel = false`) or `/forevervo` → Display → clear **Show the panel**. Keep Immersion for the dialogue UI; ForeverVO for audio only.
 
 ## Dictation
 

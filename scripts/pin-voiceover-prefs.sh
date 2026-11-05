@@ -59,27 +59,39 @@ import pathlib, re, sys
 path = pathlib.Path(sys.argv[1])
 text = path.read_text(encoding="utf-8", errors="replace")
 orig = text
-# Ensure core play flags stay on if the ForeverVODB table exists
+# ForeverVO audio on; hide ForeverVO talking-head panel so Immersion owns quest UI
+# (otherwise Immersion talkbox + ForeverVO parchment panel stack: modern + classic).
+# Rewrite EVERY occurrence — ForeverVO SV often has both bare and ["key"] forms.
 if re.search(r"\bForeverVODB\s*=", text):
-    for key in ("playAccept", "playComplete", "playGreeting", "playGossip"):
-        if re.search(rf"\b{key}\s*=", text):
-            text = re.sub(rf"(\b{key}\s*=\s*)[^,\n}}]+", rf"\1true", text, count=1)
-        else:
-            text = re.sub(
-                r"(\bForeverVODB\s*=\s*\{)",
-                rf"\1\n\t{key} = true,",
-                text,
-                count=1,
-            )
+    on_flags = ("playAccept", "playComplete", "playGreeting", "playGossip")
+    off_flags = ("showPanel",)  # audio-only; Immersion shows the dialogue
+
+    def set_flag(blob: str, key: str, value: str) -> str:
+        # bare key = … and ["key"] = … (ForeverVO SV often has both)
+        pat = rf'(\["{key}"\]|{key})\s*=\s*[^,\n}}]+'
+        if re.search(pat, blob):
+            return re.sub(pat, rf'\1 = {value}', blob)
+        return re.sub(
+            r"(\bForeverVODB\s*=\s*\{)",
+            rf"\1\n\t{key} = {value},",
+            blob,
+            count=1,
+        )
+
+    for key in on_flags:
+        text = set_flag(text, key, "true")
+    for key in off_flags:
+        text = set_flag(text, key, "false")
 if text != orig:
     path.write_text(text, encoding="utf-8")
-    print(f"ensured ForeverVO play flags on: {path}")
+    print(f"ensured ForeverVO audio on + showPanel off (Immersion UI): {path}")
 else:
-    print(f"ForeverVO prefs OK (or defaults apply): {path}")
+    print(f"ForeverVO prefs OK (audio on, showPanel off): {path}")
 PY
     patched_fvo=$((patched_fvo + 1))
   done
 fi
 
 echo "Done. Immersion files: ${patched_immersion}; ForeverVO files: ${patched_fvo}."
-echo "If the game is running, fully quit and relaunch so SavedVariables reload."
+echo "If the game is running, /reload may not be enough for SavedVariables — quit Forever fully, then relaunch."
+echo "In-game toggle: /forevervo → Display → clear 'Show the panel' (audio only)."

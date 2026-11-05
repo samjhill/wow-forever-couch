@@ -93,7 +93,7 @@ Zips cache under `config/addons-staging/` (gitignored). Backup before QoL instal
 
 ## Voiceover policy
 
-Use **ForeverVO** for spoken quest/gossip lines. Keep **Immersion TTS off**. Keep Lore Forever **Speak quest dialogue** off. Do not install Storyline or Lore Forever Quest Dialogue packs.
+Use **ForeverVO** for spoken quest/gossip lines. Keep **Immersion TTS off**. Keep ForeverVO **Show the panel** off (`pin-voiceover-prefs.sh`) so Immersion alone draws the quest UI. Keep Lore Forever **Speak quest dialogue** off. Do not install Storyline or Lore Forever Quest Dialogue packs.
 
 ## Bear tank / Plater recommendations (config only — untested)
 
@@ -121,7 +121,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
 - [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; ForeverVO still speaks quests
 - [ ] `/tfl journal` opens The Fishing Log; casting/lure helpers usable while fishing
-- [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off (`pin-voiceover-prefs.sh` after SV exists)
+- [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off; ForeverVO showPanel off (`pin-voiceover-prefs.sh` after SV exists)
 - [ ] ConsolePort bars unchanged; no duplicate bag/quest dialogue UI
 - [ ] Built-in meter, Cooldown Manager, Edit Mode still usable
 - [ ] DX11 + maxFPS 60 after relaunch (`pin-forever-graphics.sh`)
