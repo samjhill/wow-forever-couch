@@ -59,7 +59,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 
 ### 4. Controller
 
-- ConsolePort handles in-game bars/UI.
+- ConsolePort handles in-game bars/UI. Empty LB/RB/LT/RT → `./scripts/install-consoleport-couch.sh` then `/reload` ([`docs/controller-bindings.md`](docs/controller-bindings.md)).
 - Optional Steam Input: left grip → **F20** for dictation — [`config/steam-input/forever-left-grip-f20.md`](config/steam-input/forever-left-grip-f20.md).
 - Draft layouts: [`docs/controller-layout.md`](docs/controller-layout.md), bear/PvP notes under `docs/`.
 

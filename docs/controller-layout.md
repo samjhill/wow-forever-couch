@@ -30,6 +30,8 @@ Steam Input should manage both. Do not overwrite unrelated game profiles.
 
 Exact ConsolePort slot → ability mapping: see `bear-tank-bindings.md`.
 
+Recommended device preset (Xbox / Steam Input): [`controller-bindings.md`](controller-bindings.md) — install `ConsolePortCouch` or use `/consoleport` → Defaults → **Apply recommended bindings** (not blank slate).
+
 ## Xbox alternate
 
 Simpler bumper/trigger layout; no trackpad radials. Same ConsolePort class loadout; Steam Input profile named `WoW Forever Xbox` once exported.

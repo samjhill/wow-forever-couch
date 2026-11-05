@@ -30,6 +30,7 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 | Addon | Version / evidence | Role |
 |-------|-------------------|------|
 | ConsolePort (+ modules) | 3.3.13 (`Interface` includes `16001`) | Controller / couch UI |
+| ConsolePortCouch | repo `addons/` | Applies Xbox recommended bindings once (Steam Input / Xbox) |
 | Immersion | 1.4.61 | Quest/gossip UI (**TTS off**) |
 | ForeverVO + `ForeverVO_Data_*` | v0.1.10 packs | Spoken quests/gossip |
 | CouchDictateRoute | repo addon | Sticky say/party/raid for dictation |
@@ -84,6 +85,7 @@ Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion al
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
 ./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
+./scripts/install-consoleport-couch.sh       # Xbox recommended bindings helper (empty LB/RB/LT/RT)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ```
 
