@@ -81,12 +81,12 @@ bind CTRL-SHIFT-PAD1 CLICK ConsolePortUtilityToggle:LeftButton
 bind SHIFT-PADRSHOULDER NONE
 bind CTRL-SHIFT-PADLSTICKLEFT NONE
 bind SHIFT-PAD6 NONE
-bind PAD1 JUMP
+bind PAD1 CLICK ConsolePortGamepadBar1Slot2:LeftButton
 bind SHIFT-PADLSHOULDER NONE
 bind CTRL-PAD6 NONE
 bind CTRL-PADRTRIGGER NONE
 bind PADRSTICKLEFT NONE
-bind SHIFT-PAD1 CLICK ConsolePortGamepadBar17Slot1:LeftButton
+bind SHIFT-PAD1 CLICK ConsolePortGamepadBar1Slot1:LeftButton
 bind CTRL-SHIFT-PAD3 CLICK ConsolePortGamepadBar16Slot6:LeftButton
 bind SHIFT-PADRSTICKDOWN NONE
 bind CTRL-PAD5 NONE

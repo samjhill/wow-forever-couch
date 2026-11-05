@@ -1,5 +1,5 @@
 Baganator: enabled
-ConsolePort: enabled
+ConsolePort: disabled
 ConsolePort_Bar: enabled
 ConsolePort_Config: enabled
 ConsolePort_Cursor: enabled
