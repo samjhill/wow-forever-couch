@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Plater Quest Pin
+## Notes: Forces Plater quest-mob tracking + color; enables showQuestTrackingTooltips
+## Author: wow-forever-couch
+## Version: 1.0.0
+## Dependencies: Plater
+## LoadWith: Plater
+## SavedVariables: PlaterQuestPinDB
+
+PlaterQuestPin.lua
