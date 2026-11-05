@@ -66,7 +66,8 @@ local CAMP_FEATURE_LINES = {
 local FISH_MACRO_NAME = "FishingCouch"
 local FISH_MACRO_ICON = "Trade_Fishing"
 local FISH_BUTTON_NAME = "CPCCouchFish"
-local FISH_MACRO_BODY = "#showtooltip Fishing\n/click " .. FISH_BUTTON_NAME
+-- LeftButton required so the secure cast runs on Forever/Classic.
+local FISH_MACRO_BODY = "#showtooltip Fishing\n/click " .. FISH_BUTTON_NAME .. " LeftButton"
 
 -- Best-first poles (+skill). Include Forever extras (Darkwood, Ravaged).
 local FISH_POLES = {
@@ -832,39 +833,74 @@ local function fishInventoryReport()
   )
 end
 
-local function buildFishMacrotext()
+local function useBagItemByName(name)
+  if not name then
+    return false
+  end
+  if UseItemByName then
+    UseItemByName(name)
+    return true
+  end
+  for bag = 0, 4 do
+    local slots = containerNumSlots(bag)
+    for slot = 1, slots do
+      if linkItemName(containerItemLink(bag, slot)) == name then
+        if C_Container and C_Container.UseContainerItem then
+          C_Container.UseContainerItem(bag, slot)
+        elseif UseContainerItem then
+          UseContainerItem(bag, slot)
+        else
+          return false
+        end
+        return true
+      end
+    end
+  end
+  return false
+end
+
+local function fishingSpellName()
+  if GetSpellInfo then
+    return GetSpellInfo(7620) or "Fishing"
+  end
+  return "Fishing"
+end
+
+-- Apply optional bag items via API, then securely cast Fishing (not nested /cast macrotext).
+-- Returns false if the press should abort (dead/combat/no pole/crafting).
+local function prepareFishingClick(self)
   if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then
     fishPrint("error", "you are dead — cannot fish")
-    return nil
+    return false
   end
   if InCombatLockdown and InCombatLockdown() then
     fishPrint("error", "in combat — wait, then try again")
-    return nil
+    return false
   end
   if not knowsFishing() then
     fishPrint("error", "Fishing skill not learned — visit a fishing trainer")
-    return nil
+    return false
   end
 
-  local lines = {}
   local equipPole, currentPole = bestPoleToEquip()
   if equipPole then
-    table.insert(lines, "/equip " .. equipPole)
+    if EquipItemByName then
+      EquipItemByName(equipPole)
+    end
     fishPrint("ok", "equipping " .. equipPole)
   elseif not currentPole then
     if not findBestPoleInBags() then
       fishPrint("error", "no fishing pole equipped or in bags")
-      return nil
+      return false
     end
   else
     fishPrint("ok", "using " .. currentPole)
   end
 
-  -- Optional goodies: apply when found; otherwise skip quietly and fish.
   if not hasWeaponLure() then
     local lure = pickFirstOwned(FISH_LURES)
     if lure and itemCooldownRemaining(lure) <= 0 then
-      table.insert(lines, "/use " .. lure)
+      useBagItemByName(lure)
       fishPrint("ok", "applying " .. lure)
     end
   end
@@ -872,7 +908,7 @@ local function buildFishMacrotext()
   if not isWellFed() then
     local food = pickFirstOwned(FISH_FOOD)
     if food then
-      table.insert(lines, "/use " .. food)
+      useBagItemByName(food)
       fishPrint("ok", "eating " .. food .. " (+Fishing)")
     end
   end
@@ -881,42 +917,41 @@ local function buildFishMacrotext()
   if feat and itemCooldownRemaining(feat) <= 0 then
     local fire = pickFirstOwned(CAMP_FIRES)
     if not fire then
-      -- Best-effort craft; if it starts, place on the next press.
       if startCraftCampfireKit() then
-        return nil
+        return false
       end
       fire = pickFirstOwned(CAMP_FIRES)
     end
     if fire and itemCooldownRemaining(fire) <= 0 then
-      table.insert(lines, "/use " .. fire)
+      useBagItemByName(fire)
       fishPrint("ok", "placing " .. fire)
     end
-    table.insert(lines, "/use " .. feat)
+    useBagItemByName(feat)
     fishPrint("ok", "placing " .. feat)
   end
 
-  table.insert(lines, "/cast Fishing")
-  return table.concat(lines, "\n")
+  local spell = fishingSpellName()
+  -- Prefer direct spell cast; Forever often ignores nested macrotext from /click.
+  self:SetAttribute("type", "spell")
+  self:SetAttribute("spell", spell)
+  self:SetAttribute("type1", "spell")
+  self:SetAttribute("spell1", spell)
+  self:SetAttribute("macrotext", nil)
+  self:SetAttribute("macrotext1", nil)
+  return true
 end
 
 local fishButton = _G[FISH_BUTTON_NAME]
   or CreateFrame("Button", FISH_BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
-fishButton:RegisterForClicks("AnyUp", "AnyDown")
-fishButton:SetScript("PreClick", function(self)
-  if InCombatLockdown and InCombatLockdown() then
-    fishPrint("error", "in combat — wait, then try again")
+fishButton:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+fishButton:SetScript("PreClick", function(self, button)
+  if not prepareFishingClick(self) then
     self:SetAttribute("type", nil)
-    self:SetAttribute("macrotext", nil)
+    self:SetAttribute("type1", nil)
+    self:SetAttribute("spell", nil)
+    self:SetAttribute("spell1", nil)
     return
   end
-  local body = buildFishMacrotext()
-  if not body then
-    self:SetAttribute("type", nil)
-    self:SetAttribute("macrotext", nil)
-    return
-  end
-  self:SetAttribute("type", "macro")
-  self:SetAttribute("macrotext", body)
 end)
 
 local function ensureFishingMacro()
@@ -930,18 +965,13 @@ end
 
 local function runFishing()
   ensureFishingMacro()
-  if InCombatLockdown and InCombatLockdown() then
-    fishPrint("error", "in combat — wait, then try again")
-    return false
-  end
-  local body = buildFishMacrotext()
-  if not body then
-    return false
-  end
-  fishButton:SetAttribute("type", "macro")
-  fishButton:SetAttribute("macrotext", body)
-  fishButton:Click()
-  return true
+  fishPrint(
+    "warn",
+    "press the FishingCouch action-bar button to cast (slash cannot start Fishing securely)"
+  )
+  -- Still refresh the macro body / prepare messaging for the next bar press.
+  prepareFishingClick(fishButton)
+  return false
 end
 
 local function pinInviteNearestBindings(force)
