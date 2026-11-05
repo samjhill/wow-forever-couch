@@ -17,7 +17,7 @@ DEFAULT_ENABLE = [
     "LoreForever", "LoreForever_Voice_Default", "LoreForever_Voice_Default_Alliance",
     "LoreForever_Voice_Default_Horde",
     "TheFishingLog", "ForeverLootSparkles", "NodeSight", "GatherRadar",
-    "SelfBuffs", "CouchBuffReminder",
+    "SelfBuffs", "AutoFeed", "CouchBuffReminder",
 ]
 
 DEFAULT_DISABLE = ["DialogKey_Numy", "DialogKey_Aeonzara", "DialogKey"]
