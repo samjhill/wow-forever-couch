@@ -61,8 +61,8 @@ path.write_text(text, encoding="utf-8")
 PY
 }
 
-upsert_macro "EatBest" "INV_Misc_Food_15" $'#showtooltip\n/sit\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end'
-upsert_macro "DrinkBest" "INV_Drink_07" $'#showtooltip\n/sit\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end'
+upsert_macro "EatBest" "INV_Misc_Food_15" $'#showtooltip\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end'
+upsert_macro "DrinkBest" "INV_Drink_07" $'#showtooltip\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end'
 
 LIVE_MACROS="${WOW_COUCH_CONFIG}/live-setup/account/macros-cache.txt"
 if [[ -d "${WOW_COUCH_CONFIG}/live-setup/account" ]]; then

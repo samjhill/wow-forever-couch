@@ -10,7 +10,7 @@
 -- 2) Pin Menu/Start → Escape game menu.
 -- 3) Pin RB → InviteNearest; park Interact on empty LT.
 -- 4) Ensure simple Campsite + FishingCouch account macros.
--- 5) EatBest / DrinkBest: /sit + /run picks highest restore food/drink in bags.
+-- 5) EatBest / DrinkBest: /run picks highest restore food/drink in bags.
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -34,12 +34,12 @@ local FISH_MACRO_BODY = "#showtooltip Fishing\n/cast Fishing"
 local EAT_MACRO_NAME = "EatBest"
 local EAT_MACRO_ICON = "INV_Misc_Food_15"
 local EAT_MACRO_BODY =
-  "#showtooltip\n/sit\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end"
+  "#showtooltip\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end"
 
 local DRINK_MACRO_NAME = "DrinkBest"
 local DRINK_MACRO_ICON = "INV_Drink_07"
 local DRINK_MACRO_BODY =
-  "#showtooltip\n/sit\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end"
+  "#showtooltip\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end"
 
 -- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
 local GAMEPAD_BAR_CLICKS = {

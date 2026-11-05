@@ -61,17 +61,15 @@ Drag either macro onto a ConsolePort gamepad bar slot (not over RB). Offline see
 
 ### EatBest / DrinkBest
 
-Scans bags for the strongest health food / mana drink (tooltip “Restores N …”), skips alcohol, sits, then uses it:
+Scans bags for the strongest health food / mana drink (tooltip “Restores N …”), skips alcohol, then uses it:
 
 ```
 #showtooltip
-/sit
 /run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end
 ```
 
 ```
 #showtooltip
-/sit
 /run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end
 ```
 
