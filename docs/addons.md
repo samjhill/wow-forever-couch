@@ -42,13 +42,12 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 | Baganator | 914482 | `Baganator-839.zip` (`## Version: 839`, Interface includes `16001`) | **Syndicator** | Bag/bank UI |
 | Leatrix Plus | 94855 | `Leatrix_Plus-1.60.25-forever.zip` (`## Interface: 16001`) | — | QoL toggles |
 | Plater | 100547 | `Plater-v662.zip` (`## Version: Plater-v662-Forever`, `## Interface: 16001`) | — | Tank nameplates |
-| DialogKey (Numy) | 1098587 | `DialogKey_Numy-v1.2.62.zip` (`## Version: v1.2.62`, Interface includes `16001`) | — | Space / number keys for gossip, quest, popup buttons |
 | Lore Forever | 1715510 | `LoreForever.zip` (`## Version: 0.37.0`, `## Interface: 16001`) | ships `LoreForever_Voice_Default*` | Zone/NPC/quest lore panel + optional story narration (`/lore`) |
 | The Fishing Log | 1702832 | `TheFishingLog-1.0.0.zip` (`## Version: 1.0.0`, `## Interface: 16001`) | optional Auctionator/TSM for catch value | Catch log, journal, spot records, matches (`/tfl`) |
 
 **Nameplate choice:** Plater (not Platynator). Plater Forever file exists and better matches bear-tank needs (threat colors, enemy casts, scripting). Do not install both.
 
-**DialogKey:** Install **Numy Edition** only. Do not enable DialogKey Aeonzara or other DialogKey forks alongside it. Works with Immersion (clicks Immersion/quest buttons); default bind is Space when a dialog is up. Tune with `/dialogkey`. Untested in live Forever until launch checklist.
+**DialogKey:** Not installed. Immersion already owns keyboard/gamepad quest + gossip confirms (`padaccept` = PAD1); DialogKey would only add StaticPopup Space-click and overlaps Immersion’s baked-in numbers.
 
 **Lore Forever:** Complements ForeverVO — lore Q&A and zone primers, not a quest-dubber. Leave **Speak quest dialogue** off (addon default). Do **not** install Lore Forever Quest Dialogue packs or Spoken/Chatty Little NPC alongside ForeverVO. Optional extra narrator language packs are fine; male English packs ship in the main zip. Untested in live Forever until launch checklist.
 
@@ -76,14 +75,14 @@ Forever already ships tools that replace common Classic addons:
 - **Combined bags** — optional; Baganator is an enhancement, not a requirement
 - **Controller / click-cast** — ConsolePort owns couch input (skip Clique)
 
-Do **not** install Storyline (overlaps Immersion), AdiBags/Bagnon/BetterBags (overlaps Baganator), a second nameplate addon beside Plater, or a second DialogKey fork beside DialogKey_Numy.
+Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), AdiBags/Bagnon/BetterBags (overlaps Baganator), or a second nameplate addon beside Plater.
 
 ## Install commands
 
 ```bash
 ./scripts/install-forever-addons.sh          # ConsolePort / Immersion / ForeverVO
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + DialogKey + Lore Forever + Fishing Log; stages the rest
+./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ```
@@ -113,24 +112,24 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [ ] Character select → AddOns: ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, DialogKey_Numy, LoreForever (+ Voice_Default*), TheFishingLog enabled
-- [ ] Staged addons (Questie, BigWigs, GTFO, Talents Forever, Auctionator) **absent/disabled**
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog (DialogKey removed)
+- [x] Staged addons (Questie, BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Baganator UI; tooltip counts via Syndicator
 - [ ] `/leatrix` options open
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
-- [ ] DialogKey: Space advances Immersion/quest/popup; number keys pick options; `/dialogkey` opens settings
 - [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; ForeverVO still speaks quests
 - [ ] `/tfl journal` opens The Fishing Log; casting/lure helpers usable while fishing
-- [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off
+- [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off (`pin-voiceover-prefs.sh` after SV exists)
 - [ ] ConsolePort bars unchanged; no duplicate bag/quest dialogue UI
 - [ ] Built-in meter, Cooldown Manager, Edit Mode still usable
+- [ ] DX11 + maxFPS 60 after relaunch (`pin-forever-graphics.sh`)
 
 ## Compatibility evidence (research date 2026-11-03)
 
 - CurseForge files API: Forever candidates selected when `gameVersions` contains `1.60.x`
-- Installed TOC checks on box after unzip: Syndicator/Baganator include `16001`; Leatrix_Plus and Plater Forever builds are `16001`-only; DialogKey_Numy v1.2.62 Interface list includes `16001`; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only
+- Installed TOC checks on box after unzip: Syndicator/Baganator include `16001`; Leatrix_Plus and Plater Forever builds are `16001`-only; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only
 - Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files; Questie called out for remaining Forever quest bugs — hence staged
 
 ## In-game commands (after first login)
 
-`/consoleport`, `/immersion`, `/fvo`, `/fvo status`, `/cdr status`, `/leatrix`, `/dialogkey` (aliases `/dkey`, `/dk`), `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC), Baganator bag bind.
+`/consoleport`, `/immersion`, `/fvo`, `/fvo status`, `/cdr status`, `/leatrix`, `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC), Baganator bag bind.
