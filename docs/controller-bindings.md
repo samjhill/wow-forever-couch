@@ -15,9 +15,10 @@ Use ConsolePort’s built-in **Xbox** device preset:
 |--------|----------------------------|
 | A (PAD1) | Jump (+ Shift/Ctrl utility layers) |
 | B / X / Y | Action buttons (place ST/AoE/taunt spells on the gamepad bar) |
-| LB | Interact / loot target |
-| LT | Target nearest enemy |
-| RB / RT | Primary action buttons + modifier layers |
+| LB | Interact / loot target (Xbox preset) |
+| LT | Target nearest enemy; if empty, Couch parks **Interact** here when RB is remapped |
+| RB | **InviteNearest** account macro (accept party popup + target nearest friend + invite) — pinned by ConsolePortCouch |
+| RT | Primary action buttons + modifier layers |
 | D-pad | Extra action bar slots |
 | Back / Start | Bags / **Escape game menu** (ConsolePortCouch pins Start + System → `TOGGLEGAMEMENU`; cursor auto-enable off so Menu doesn’t only flip crosshair ↔ mouse) |
 
@@ -29,7 +30,7 @@ Class abilities are **not** pre-slotted — after the preset loads, put spells o
 ./scripts/install-consoleport-couch.sh
 ```
 
-Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once). Force: `/cpcouch apply`.
+Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once), then pins **RB → InviteNearest**. Force: `/cpcouch apply`. Re-pin invite only: `/cpcouch invite`. Offline file seed: `./scripts/pin-invite-nearest-macro.sh` (quit Forever first for cache writes).
 
 ## Apply (manual in-game)
 
