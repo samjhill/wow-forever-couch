@@ -1,30 +1,35 @@
 # WoW Forever couch gaming (Bazzite / SteamOS-like)
 
-Opinionated setup for playing **World of Warcraft: Forever** from the couch on **Bazzite** (or similar Steam Gaming Mode + Desktop Mode Linux boxes):
+Opinionated setup for playing **World of Warcraft: Forever** from the couch on **Bazzite** or **Steam Deck** (Gaming Mode + Desktop Mode):
 
 - Battle.net under **GE-Proton**
 - Steam **Gaming Mode** non-Steam shortcut
 - **ConsolePort** + **Immersion** + **Forever Voiceover** (spoken quests)
 - Optional **voice → Whisper → auto-type into WoW chat** (mic + controller grip)
 
-Tested on Bazzite with an NVIDIA GPU, Steam Controller, and a RØDE Wireless GO II into the PC **mic-in** jack. Paths are configurable; defaults assume `~/Games/battlenet` for the Proton prefix.
+Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same installer. Defaults assume `~/Games/battlenet` for the Proton prefix.
 
 > Not affiliated with Blizzard. Forever addons and voice packs come from their upstream authors (ConsolePort/Immersion, Forever Voiceover on CurseForge/GitHub).
 
-## Quick start
+## Steam Deck / Bazzite — easiest install
+
+**Desktop Mode → Konsole → paste:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash
+```
+
+Then: log into Battle.net → install **Forever** → run the same command again → add the Steam shortcut (the script prints the path). Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
+
+Prefer a Desktop icon instead? Download [`Install WoW Forever Couch`](config/desktop/wow-forever-couch-bootstrap.desktop) → mark executable → Trust and Launch.
+
+## Quick start (manual clone)
 
 ```bash
 git clone https://github.com/samjhill/wow-forever-couch.git
 cd wow-forever-couch
-```
-
-### Steam Deck / one-click host setup
-
-Desktop Mode: run `./scripts/bootstrap-steamos.sh` (or the `.desktop` under `config/desktop/`). That installs GE-Proton, Battle.net scaffolding, Forever addons when present, and a **systemd user timer** that pulls this repo on a schedule. Battle.net launch also runs a quick sync. Details: [`docs/steam-deck.md`](docs/steam-deck.md).
-
-```bash
 ./scripts/bootstrap-steamos.sh
-# log into Battle.net → install Forever → run bootstrap again
+# log into Battle.net → install Forever → bootstrap again
 WOW_COUCH_UPDATE_MODE=full ./scripts/apply-repo-updates.sh   # manual sync anytime
 ```
 

@@ -99,24 +99,8 @@ else
   echo "Dictation skipped (set WOW_COUCH_DICTATION=1 to enable)."
 fi
 
-# Desktop launcher pointing at this checkout
-mkdir -p "${HOME}/Desktop" "${HOME}/.local/share/applications"
-python3 - "$REPO_ROOT" <<'PY'
-import pathlib, sys
-repo = pathlib.Path(sys.argv[1])
-src = repo / "config/desktop/wow-forever-couch-bootstrap.desktop"
-text = src.read_text(encoding="utf-8")
-text = "\n".join(
-    f"Exec={repo}/scripts/bootstrap-steamos.sh" if line.startswith("Exec=") else line
-    for line in text.splitlines()
-) + "\n"
-for dest in (pathlib.Path.home() / "Desktop", pathlib.Path.home() / ".local/share/applications"):
-    dest.mkdir(parents=True, exist_ok=True)
-    out = dest / "wow-forever-couch-bootstrap.desktop"
-    out.write_text(text, encoding="utf-8")
-    out.chmod(out.stat().st_mode | 0o111)
-    print(f"wrote {out}")
-PY
+# Desktop + app-menu launcher for re-runs
+"${REPO_ROOT}/scripts/install-desktop-launcher.sh" || true
 
 echo
 echo "=== Done ==="
