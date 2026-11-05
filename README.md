@@ -47,7 +47,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ./scripts/restore-live-setup.sh            # applies config/live-setup/ (quit Forever first)
 ```
 
-Refresh the snapshot from a tuned play box: `./scripts/snapshot-live-setup.sh` then commit `config/live-setup/`.
+Refresh the snapshot from a tuned play box: `./scripts/snapshot-live-setup.sh` then commit `config/live-setup/`. On this Mac, launchd autosaves every 4h — see [`docs/live-setup-autosave.md`](docs/live-setup-autosave.md).
 
 In-game: enable the install set at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
 
