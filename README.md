@@ -79,12 +79,12 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 
-**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type). Press the dictate bind again (SC left grip / Xbox R3) to send. SC right grip or Esc cancels. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)).
+**Default behavior:** one dictate bind (SC left grip / Xbox R3) → record → Whisper → type into chat and **send**. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)).
 
 ```bash
-DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh          # clipboard only
-DICTATE_SEND_MODE=send ./scripts/dictate-push-to-talk.sh     # auto final Enter
-DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh      # manual /p override
+DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh            # clipboard only
+DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh      # type only; bind again to send
+DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh        # manual /p override
 ```
 
 ## Layout
@@ -113,7 +113,7 @@ Environment variables used by scripts (via `scripts/lib.sh`):
 ## Safety
 
 - Never commit Sunshine/RustDesk passwords or Battle.net credentials.
-- Draft mode is the default; use `DICTATE_NO_SEND=1` while tuning the mic, and only enable `DICTATE_SEND_MODE=send` after in-game channel checks.
+- Auto-send is the default; use `DICTATE_NO_SEND=1` while tuning the mic, or `DICTATE_SEND_MODE=draft` to preview before sending.
 - Addon zips are downloaded by the install script (not vendored in git).
 
 ## License

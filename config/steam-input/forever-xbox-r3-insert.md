@@ -4,10 +4,10 @@ Use this when the **Xbox** pad is the couch controller.
 
 Steam’s keyboard picker does **not** list F20. Bind **Insert** instead — the daemon listens for `KEY_INSERT` (and still accepts legacy F20).
 
-| Controller | Dictate / confirm draft | Cancel draft |
-|------------|-------------------------|--------------|
-| Steam Controller | Left grip → Insert / `BTN_GRIPL` | Right grip |
-| Xbox | **R3** → Insert / `BTN_THUMBR` | Esc, or `echo cancel > config/dictate.trigger` |
+| Controller | Dictate + send | Notes |
+|------------|----------------|-------|
+| Steam Controller | Left grip → Insert / `BTN_GRIPL` | |
+| Xbox | **R3** → Insert / `BTN_THUMBR` | Default auto-sends after Whisper |
 
 ## Apply
 

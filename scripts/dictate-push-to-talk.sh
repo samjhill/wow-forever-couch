@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Record → whisper.cpp → clipboard → inject into WoW chat (Esc/Enter/type[/Enter]).
 # DICTATE_NO_SEND=1 skips chat inject. DICTATE_WAV=/path skips mic.
-# DICTATE_SEND_MODE=draft|send (default draft — second left grip confirms send).
+# DICTATE_SEND_MODE=send|draft (default send — one R3/grip records and sends).
 # DICTATE_CHANNEL=auto|say|party|raid (manual override; auto uses CouchDictateRoute sticky).
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -17,7 +17,7 @@ START_SND="${WOW_COUCH_CONFIG}/sounds/dictate-start.wav"
 STOP_SND="${WOW_COUCH_CONFIG}/sounds/dictate-stop.wav"
 DONE_SND="${WOW_COUCH_CONFIG}/sounds/dictate-done.wav"
 INJECT="${REPO_ROOT}/scripts/inject-wow-chat.sh"
-SEND_MODE="${DICTATE_SEND_MODE:-draft}"
+SEND_MODE="${DICTATE_SEND_MODE:-send}"
 CHANNEL="${DICTATE_CHANNEL:-auto}"
 # Restore Bose/etc. to A2DP after capture (better game audio). Set 0 to stay on HFP.
 RESTORE_A2DP="${DICTATE_RESTORE_A2DP:-1}"
@@ -184,7 +184,7 @@ if "$INJECT" < "$TXT"; then
     echo "Sent to WoW chat (Esc → Enter → type → Enter) channel=${CHANNEL}."
   else
     write_status "draft" "$TRIMMED"
-    echo "Draft in WoW chat (Esc → Enter → type; left grip again to send) channel=${CHANNEL}."
+    echo "Draft in WoW chat (DICTATE_SEND_MODE=draft — press bind again to send) channel=${CHANNEL}."
   fi
   beep "$DONE_SND"
 else

@@ -2,10 +2,10 @@
 
 ## Goal
 
-Controller dictate button → speak → local Whisper → draft (or send) into Forever chat, with **group-aware channel routing**:
+Controller dictate button → speak → local Whisper → **send** into Forever chat, with **group-aware channel routing**:
 
-| Controller | Start / confirm draft | Cancel draft |
-|------------|----------------------|--------------|
+| Controller | Dictate + send | Optional cancel (draft mode only) |
+|------------|----------------|-----------------------------------|
 | Steam Controller | Left grip | Right grip |
 | Xbox | **R3** (right stick click) | Esc / FIFO `cancel` |
 
@@ -29,8 +29,8 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
                               │
                               ▼
                      inject-wow-chat.sh
-                     Esc → Enter → [optional /channel] type
-                     [Enter only if DICTATE_SEND_MODE=send]
+                     Esc → Enter → [optional /channel] type → Enter
+                     (omit final Enter only if DICTATE_SEND_MODE=draft)
                               │
                               ▼
               Forever chat edit box (sticky type)
@@ -42,7 +42,7 @@ wow-dictate-daemon ──► dictate-push-to-talk.sh
 Two cooperating pieces:
 
 1. **`CouchDictateRoute` addon** — observes `GROUP_ROSTER_UPDATE` / login and sets each chat edit box `chatType` + `stickyType` via `SetAttribute` + `ChatEdit_UpdateHeader`. When Enter opens chat, Blizzard uses that sticky type. The addon **never** calls `SendChatMessage`.
-2. **Host inject** — still only simulates keys from your dictate bind. Default mode is **draft** (no final Enter); **press the bind again** (SC left grip / Xbox R3 / Insert) to confirm send. SC right grip (or FIFO `cancel` / Esc) discards.
+2. **Host inject** — simulates keys from your dictate bind. Default mode is **send** (types and presses Enter). Set `DICTATE_SEND_MODE=draft` to preview in the edit box and confirm with a second bind.
 
 ### API / ToS notes
 
@@ -73,24 +73,18 @@ Steam Input:
 - Steam Controller: left grip → **Insert** — [`forever-left-grip-insert.md`](../config/steam-input/forever-left-grip-insert.md)
 - Xbox: **R3** → **Insert** — [`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)
 
-## Workflow (current default: draft)
+## Workflow (current default: send)
 
 1. Forever focused; `CouchDictateRoute` loaded.
 2. **Dictate bind once** — SC left grip / Xbox R3 (or `echo fire > config/dictate.trigger`).
-3. Wait for the **start beep**, speak (`DICTATE_SECS`, default 6), wait for **stop/done** beeps. Extra R3 presses during record/Whisper are ignored.
-4. Inject opens chat and types the transcript (**does not send**).
-5. Read the draft → **same bind once more** to send (daemon presses Enter).
-6. Discard: SC right grip, or `echo cancel > config/dictate.trigger`, or Esc.
+3. Wait for the **start beep**, speak (`DICTATE_SECS`, default 6). Extra presses during record/Whisper are ignored.
+4. After stop/done beeps, chat opens, types the transcript, and **sends** (final Enter).
 
-One message = **two** R3 presses (start, then send after the done beep) — not four. If you mash R3 while it is still recording, those presses no longer start extra jobs.
-
-Pending drafts expire after `DICTATE_DRAFT_TTL` seconds (default 60); the next bind press then starts a new dictation instead of confirming.
-
-Auto-send (after you trust routing in-game):
+Preview-before-send (optional):
 
 ```bash
-DICTATE_SEND_MODE=send ./scripts/dictate-push-to-talk.sh
-# or export in the user unit / dictate-env sidecar
+DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
+# then press the bind again to send, or Esc / right grip to discard
 ```
 
 Clipboard-only (no inject):
@@ -102,14 +96,14 @@ DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh
 Manual channel override (host slash prefix; ignores sticky for that inject):
 
 ```bash
-DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
+DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh
 ```
 
 | Env | Default | Meaning |
 |-----|---------|---------|
-| `DICTATE_SEND_MODE` | `draft` | `draft` = type only; `send` = final Enter immediately |
+| `DICTATE_SEND_MODE` | `send` | `send` = final Enter; `draft` = type only + second bind to send |
 | `DICTATE_CHANNEL` | `auto` | `auto` = bare text + addon sticky; `say`/`party`/`raid` = slash prefix |
-| `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable via second grip |
+| `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable (draft mode only) |
 | `DICTATE_NO_SEND` | unset | Skip inject entirely |
 | `DICTATE_WAV` | unset | Replay file instead of mic |
 | `DICTATE_SECS` | `6` | Record length after start beep |

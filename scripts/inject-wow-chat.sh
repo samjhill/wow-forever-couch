@@ -2,8 +2,8 @@
 # Inject text into focused WoW chat: Esc → Enter → [optional /channel] type → [Enter if send].
 #
 # Env:
-#   DICTATE_SEND_MODE=draft|send   draft (default): leave text in edit box for confirm
-#                                  send: press final Enter to submit
+#   DICTATE_SEND_MODE=send|draft   send (default): final Enter after typing
+#                                  draft: leave text in edit box for a second bind
 #   DICTATE_CHANNEL=auto|say|party|raid
 #                                  auto (default): bare text; CouchDictateRoute sticky picks channel
 #                                  otherwise prefix /say /p /raid as a manual override
@@ -13,7 +13,7 @@ set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 EMIT="${REPO_ROOT}/scripts/emit-input-event.sh"
 
-SEND_MODE="${DICTATE_SEND_MODE:-draft}"
+SEND_MODE="${DICTATE_SEND_MODE:-send}"
 CHANNEL="${DICTATE_CHANNEL:-auto}"
 
 if [[ -z "${DICTATE_MOCK_FIFO:-}" ]]; then
