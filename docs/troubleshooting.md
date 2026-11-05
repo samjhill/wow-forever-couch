@@ -41,7 +41,8 @@ Also:
 - No capture / only “you” → Bose was on **A2DP** (music, no mic). Dictation switches to **Headset (HFP)** for the record then restores A2DP. `prefer-mic-source.sh` must print `bluez_input…`, not `*.monitor`.
 - Silent capture aborted → mic muted or wrong source (Whisper won’t hallucinate into chat).
 - Feels like R3 needs extra presses → one press starts+sends; presses during record/Whisper are ignored (`busy skip` in `journalctl --user -u wow-dictate-daemon`).
-- FPS dip while dictating → Whisper is capped to 1 thread + `nice`; brief hitch from Bose A2DP↔HFP switch is expected.
+- Dictation feels slow → defaults use **tiny.en**, 4s record, 16 kHz capture, deferred A2DP restore (back-to-back R3 stays on HFP). For max accuracy: `WHISPER_MODEL=$HOME/.local/share/whisper/ggml-base.en.bin`.
+- FPS dip while dictating → Whisper is `nice`’d (2 threads); Bose HFP switch hitch only on the first press after A2DP.
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
 - Want preview before send → `DICTATE_SEND_MODE=draft` (bind again to send).

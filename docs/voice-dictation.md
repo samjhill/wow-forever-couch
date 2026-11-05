@@ -106,9 +106,10 @@ DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh
 | `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable (draft mode only) |
 | `DICTATE_NO_SEND` | unset | Skip inject entirely |
 | `DICTATE_WAV` | unset | Replay file instead of mic |
-| `DICTATE_SECS` | `6` | Record length after start beep |
-| `DICTATE_RESTORE_A2DP` | `1` | After Bose HFP capture, restore A2DP music profile |
-| `DICTATE_WHISPER_THREADS` | `1` | Whisper CPU threads (keep low while Forever runs) |
+| `DICTATE_SECS` | `4` | Record length after start beep |
+| `DICTATE_RESTORE_A2DP_DEFER` | `45` | Seconds after capture before Bose returns to A2DP (`0` = stay on HFP) |
+| `DICTATE_WHISPER_THREADS` | `2` | Whisper CPU threads |
+| `WHISPER_MODEL` | `…/ggml-tiny.en.bin` | Use `ggml-base.en.bin` for more accuracy, slower |
 
 Whisper capture/transcription is unchanged.
 

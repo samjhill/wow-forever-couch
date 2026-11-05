@@ -24,11 +24,19 @@ export LD_LIBRARY_PATH="$HOME/.local/opt/whisper-cpp:${LD_LIBRARY_PATH:-}"
 exec "$HOME/.local/opt/whisper-cpp/whisper-cli" "$@"
 WRAP
 chmod +x "${BINDIR}/whisper-cli" "${APPDIR}/whisper-cli"
-MODEL="${SHARE}/ggml-base.en.bin"
-if [[ ! -f "$MODEL" ]]; then
-  curl -L --fail --retry 3 -o "$MODEL.partial" \
+# tiny.en is the couch default (fast on 4c CPU). base.en stays optional for accuracy.
+TINY="${SHARE}/ggml-tiny.en.bin"
+BASE_MODEL="${SHARE}/ggml-base.en.bin"
+if [[ ! -f "$TINY" ]]; then
+  curl -L --fail --retry 3 -o "$TINY.partial" \
+    "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin"
+  mv "$TINY.partial" "$TINY"
+fi
+if [[ "${WHISPER_INSTALL_BASE:-0}" == "1" && ! -f "$BASE_MODEL" ]]; then
+  curl -L --fail --retry 3 -o "$BASE_MODEL.partial" \
     "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
-  mv "$MODEL.partial" "$MODEL"
+  mv "$BASE_MODEL.partial" "$BASE_MODEL"
 fi
 echo "OK: ${BINDIR}/whisper-cli → ${APPDIR}/whisper-cli"
-echo "OK: $MODEL"
+echo "OK: $TINY (default)"
+[[ -f "$BASE_MODEL" ]] && echo "OK: $BASE_MODEL (optional; WHISPER_MODEL=... to use)"
