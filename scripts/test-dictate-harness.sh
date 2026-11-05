@@ -89,21 +89,21 @@ else
   fi
 fi
 
-echo "=== E: ydotool F20 (optional) ==="
+echo "=== E: ydotool Insert (optional) ==="
 if command -v ydotool >/dev/null && [[ -e /dev/uinput ]]; then
   rm -f "$STATUS"
   printf 'DICTATE_WAV=%s\n' "$SIM_WAV" > "$ENVF"
-  if ydotool key 190:1 190:0 2>/tmp/ydotool-f20.err; then
+  if ydotool key 110:1 110:0 2>/tmp/ydotool-insert.err; then
     if wait_status done 45 && [[ -s "$TXT" ]]; then
-      pass "ydotool F20 triggered dictate"
+      pass "ydotool Insert triggered dictate"
     else
-      warn "ydotool sent F20 but daemon did not complete (gamescope/key routing)"
+      warn "ydotool sent Insert but daemon did not complete (gamescope/key routing)"
     fi
   else
-    warn "ydotool failed: $(head -c 120 /tmp/ydotool-f20.err 2>/dev/null)"
+    warn "ydotool failed: $(head -c 120 /tmp/ydotool-insert.err 2>/dev/null)"
   fi
 else
-  warn "ydotool/uinput unavailable — soft skip F20 inject"
+  warn "ydotool/uinput unavailable — soft skip Insert inject"
 fi
 
 echo "=== F: ydotoold + draft/no-send path ==="
@@ -149,7 +149,7 @@ echo "=== H: manual couch checklist ==="
 
 cat <<'CHK'
 [ ] Gaming Mode → Battle.net (WoW Forever) → Steam Input on
-[ ] Left grip → F20 (see config/steam-input/forever-left-grip-f20.md)
+[ ] Left grip / Xbox R3 → Insert (see config/steam-input/)
 [ ] CouchDictateRoute enabled; /cdr status
 [ ] Forever focused; grip → draft in chat; left grip again sends
 [ ] Right grip (or echo cancel > config/dictate.trigger) discards draft

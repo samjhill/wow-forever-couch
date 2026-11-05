@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Watch FIFO + controller dictate binds + KEY_F20; run dictate or confirm draft.
+"""Watch FIFO + controller dictate binds + Steam Input keyboard key.
 
 Binds (host / Steam Input):
   Steam Controller — left grip (BTN_GRIPL) start/confirm; right grip cancel
-  Xbox / Xbox-via-Steam — R3 / right stick click (BTN_THUMBR); Steam Input → F20
-  Any path that emits KEY_F20 (Steam Input keyboard layer)
+  Xbox — R3 (BTN_THUMBR); Steam Input → Insert (KEY_INSERT)
+  Steam keyboard layer — KEY_INSERT (preferred; shown in Steam's picker)
+  Legacy — KEY_F20 still accepted if an old layout emits it
 """
 from __future__ import annotations
 
@@ -47,7 +48,10 @@ GRIP_CODES = {
 # Xbox / DualSense-style right stick click (R3)
 THUMBR = getattr(ecodes, "BTN_THUMBR", 318)
 THUMBL = getattr(ecodes, "BTN_THUMBL", 317)  # unused for dictate; reserved
-F20 = getattr(ecodes, "KEY_F20", 190)
+# Steam Input keyboard target — Insert is in Steam's picker; F20 usually is not
+INSERT = getattr(ecodes, "KEY_INSERT", 110)
+F20 = getattr(ecodes, "KEY_F20", 190)  # legacy
+STEAM_KEYS = {INSERT, F20}
 
 XBOX_NAME_HINTS = (
     "xbox",
@@ -153,7 +157,7 @@ def fire(reason: str, action: str = "auto") -> None:
         fire_dictate(reason)
         return
 
-    # auto: second left-grip / F20 confirms an open draft instead of re-recording
+    # auto: second bind press confirms an open draft instead of re-recording
     if pending_draft():
         fire_confirm(reason)
     else:
@@ -194,8 +198,8 @@ def open_devices():
                 want = True
         if looks_like_xbox(name, caps):
             want = True
-        if F20 in caps or "keyboard" in name or "steam" in name:
-            if F20 in caps or "steam" in name:
+        if STEAM_KEYS & caps or "keyboard" in name or "steam" in name:
+            if STEAM_KEYS & caps or "steam" in name:
                 want = True
         if want:
             devices.append(dev)
@@ -269,10 +273,10 @@ def evdev_loop(devices) -> None:
                     elif event.code in GRIP_CODES:
                         fire(f"grip:{dev.name}:{event.code}", "auto")
                     elif event.code == THUMBR:
-                        # Xbox R3 — same as left grip / F20 (start or confirm draft)
+                        # Xbox R3 — same as left grip / Insert (start or confirm draft)
                         fire(f"R3:{dev.name}", "auto")
-                    elif event.code == F20:
-                        fire(f"F20:{dev.name}", "auto")
+                    elif event.code in STEAM_KEYS:
+                        fire(f"key{event.code}:{dev.name}", "auto")
             except (OSError, BlockingIOError):
                 continue
 
@@ -289,7 +293,7 @@ def main() -> int:
     t.start()
     devices = open_devices()
     log(
-        "ready (SC left grip / Xbox R3 / F20 → dictate or confirm; "
+        "ready (SC left grip / Xbox R3 / Insert → dictate or confirm; "
         f"TTL={DRAFT_TTL_S:.0f}s)"
     )
     evdev_loop(devices)
