@@ -7,9 +7,10 @@
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>/Users/samhilll/Documents/opensource/wow-forever-couch/scripts/auto-sync-live-setup.sh</string>
+    <string>/Users/samhilll/Library/Application Support/wow-forever-couch/run-auto-sync-live-setup.sh</string>
   </array>
-  <!-- Every 4 hours while this Mac is awake -->
+  <key>WorkingDirectory</key>
+  <string>/Users/samhilll/Projects/wow-forever-couch</string>
   <key>StartInterval</key>
   <integer>14400</integer>
   <key>RunAtLoad</key>
@@ -22,6 +23,10 @@
   <dict>
     <key>PATH</key>
     <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>WOW_FOREVER_COUCH_REPO</key>
+    <string>/Users/samhilll/Projects/wow-forever-couch</string>
+    <key>HOME</key>
+    <string>/Users/samhilll</string>
   </dict>
 </dict>
 </plist>

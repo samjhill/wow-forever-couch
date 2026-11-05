@@ -4,20 +4,25 @@ While you tune ConsolePort bindings and couch prefs, this Mac pulls a snapshot f
 
 ## How it works
 
-1. launchd runs `scripts/auto-sync-live-setup.sh`
-2. Script SSHs to `bazzite`, runs `snapshot-live-setup.sh`, rsyncs into the repo
-3. If only `config/live-setup/` changed → commit + push to `main`
+1. launchd runs a wrapper outside `~/Documents` (macOS blocks LaunchAgents from reading that folder)
+2. Work happens in the mirror clone `~/Projects/wow-forever-couch`
+3. Script SSHs to `bazzite`, runs `snapshot-live-setup.sh`, commits + pushes when `config/live-setup/` changed
 
-**Important:** Forever writes SavedVariables on logout/quit. Quit Forever (or relog) after binding changes so the next sync picks them up. Mid-session snapshots only see the last flush.
+**Important:** Forever writes SavedVariables on logout/quit. Quit Forever (or relog) after binding changes so the next sync picks them up.
+
+Pull in your Documents Cursor checkout when you want the latest: `git pull` in `Documents/opensource/wow-forever-couch`.
 
 ## Install / reload (this Mac)
 
 ```bash
-mkdir -p ~/.cache/wow-forever-couch
+mkdir -p ~/.cache/wow-forever-couch ~/Projects
+# Mirror clone used by launchd (once)
+[[ -d ~/Projects/wow-forever-couch/.git ]] || git clone https://github.com/samjhill/wow-forever-couch.git ~/Projects/wow-forever-couch
+
+mkdir -p "$HOME/Library/Application Support/wow-forever-couch"
 cp config/launchd/com.samjhill.wow-forever-couch-live-setup.plist ~/Library/LaunchAgents/
-launchctl bootout gui/$(id -u)/com.samjhill.wow-forever-couch-live-setup 2>/dev/null || true
-launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.samjhill.wow-forever-couch-live-setup.plist
-launchctl kickstart -k gui/$(id -u)/com.samjhill.wow-forever-couch-live-setup
+# Wrapper is installed by scripts/install-live-setup-autosave.sh
+./scripts/install-live-setup-autosave.sh
 ```
 
 Logs: `~/.cache/wow-forever-couch/live-setup-sync.*.log`
@@ -25,7 +30,10 @@ Logs: `~/.cache/wow-forever-couch/live-setup-sync.*.log`
 ## Manual run
 
 ```bash
+# From either checkout:
 ./scripts/auto-sync-live-setup.sh
+# Or kick the agent:
+launchctl kickstart -k gui/$(id -u)/com.samjhill.wow-forever-couch-live-setup
 ```
 
 ## Stop

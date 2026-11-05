@@ -45,14 +45,8 @@ rsync -az --delete \
   "$REPO_ROOT/config/live-setup/"
 
 if git status --porcelain -- config/live-setup | grep -q .; then
-  # Do not mix unrelated local edits into the autosave commit
-  if git status --porcelain | grep -vE '^[ M\?][ M\?]? config/live-setup' | grep -q .; then
-    log "live-setup changed, but other dirty files exist — leaving unstaged for a human"
-    git status --porcelain
-    exit 0
-  fi
-
-  git add config/live-setup
+  # Only stage live-setup — never touch unrelated dirty files in the working tree.
+  git add -- config/live-setup
   STAMP=$(grep '^stamp=' config/live-setup/MANIFEST.txt 2>/dev/null | cut -d= -f2- || date -u +%Y-%m-%dT%H:%MZ)
   git commit -m "$(cat <<EOF
 Refresh live couch setup snapshot (${STAMP}).
@@ -61,7 +55,14 @@ Autosaved from ${BAZZITE_HOST} while tuning bindings/prefs.
 EOF
 )"
   if [[ "$PUSH" == "1" ]]; then
-    git push origin HEAD
+    # Prefer main; create it if this mirror was left on a detached/feature tip.
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    if [[ "$branch" != "main" && "$branch" != "HEAD" ]]; then
+      git checkout main
+      git pull --ff-only origin main || true
+      # re-apply commit if checkout moved — rare; mirror should stay on main
+    fi
+    git push origin HEAD:main
     log "pushed live-setup update (${STAMP})"
   else
     log "committed locally (${STAMP}); push skipped (AUTO_SYNC_PUSH=0)"
