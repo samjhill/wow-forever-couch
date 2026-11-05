@@ -151,8 +151,8 @@ cat <<'CHK'
 [ ] Gaming Mode → Battle.net (WoW Forever) → Steam Input on
 [ ] Left grip / Xbox R3 → Insert (see config/steam-input/)
 [ ] CouchDictateRoute enabled; /cdr status
-[ ] Forever focused; grip → draft in chat; left grip again sends
-[ ] Right grip (or echo cancel > config/dictate.trigger) discards draft
+[ ] Forever focused; R3/grip → speak → message sends (auto-send default)
+[ ] Optional: DICTATE_SEND_MODE=draft then second bind / Esc discard
 [ ] Solo / party-of-2 → Say; party-of-3+ → Party; raid → Raid
 [ ] DICTATE_CHANNEL=party override types /p
 [ ] DICTATE_NO_SEND=1 still clipboard-only for debug

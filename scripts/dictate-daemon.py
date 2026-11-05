@@ -154,7 +154,7 @@ def fire(reason: str, action: str = "auto") -> None:
             return
         # Cancel always wins; confirm/dictate wait out an in-flight pipeline.
         if action != "cancel" and pipeline_busy():
-            log(f"busy skip ({reason}) — wait for stop/done beep, then R3 once to send")
+            log(f"busy skip ({reason}) — wait for stop/done beep")
             return
         _last_fire = now
 
@@ -304,8 +304,8 @@ def main() -> int:
     t.start()
     devices = open_devices()
     log(
-        "ready (SC left grip / Xbox R3 / Insert → dictate or confirm; "
-        f"TTL={DRAFT_TTL_S:.0f}s)"
+        "ready (SC left grip / Xbox R3 / Insert → dictate+send; "
+        f"draft TTL={DRAFT_TTL_S:.0f}s if DICTATE_SEND_MODE=draft)"
     )
     evdev_loop(devices)
     return 0
