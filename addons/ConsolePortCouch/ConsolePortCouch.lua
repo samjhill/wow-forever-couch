@@ -891,21 +891,13 @@ local function buildFishMacrotext()
     fishPrint("ok", "using " .. currentPole)
   end
 
+  -- Optional goodies: apply when found; otherwise skip quietly and fish.
   if not hasWeaponLure() then
     local lure = pickFirstOwned(FISH_LURES)
-    if lure then
-      local cd = itemCooldownRemaining(lure)
-      if cd > 0 then
-        fishPrint("warn", lure .. " on cooldown (" .. formatCd(cd) .. ") — casting without new lure")
-      else
-        table.insert(lines, "/use " .. lure)
-        fishPrint("ok", "applying " .. lure)
-      end
-    else
-      fishPrint("warn", "no lure in bags (Shiny Bauble / Nightcrawlers / Bright Baubles / Attractor)")
+    if lure and itemCooldownRemaining(lure) <= 0 then
+      table.insert(lines, "/use " .. lure)
+      fishPrint("ok", "applying " .. lure)
     end
-  else
-    fishPrint("ok", "lure already on pole")
   end
 
   if not isWellFed() then
@@ -916,40 +908,22 @@ local function buildFishMacrotext()
     end
   end
 
-  -- Forever uncommon/rare catches need Rack/Hut at a campfire.
   local feat = pickFirstOwned(FISH_CAMP_FEATURES)
-  if feat then
-    local cd = itemCooldownRemaining(feat)
-    if cd > 0 then
-      fishPrint("warn", feat .. " on cooldown (" .. formatCd(cd) .. ") — camping features share 1h CD")
-    else
-      local fire = pickFirstOwned(CAMP_FIRES)
-      if not fire then
-        fishPrint("warn", "no campfire kit — crafting one before placing " .. feat)
-        if startCraftCampfireKit() then
-          return nil
-        end
-        fire = pickFirstOwned(CAMP_FIRES)
+  if feat and itemCooldownRemaining(feat) <= 0 then
+    local fire = pickFirstOwned(CAMP_FIRES)
+    if not fire then
+      -- Best-effort craft; if it starts, place on the next press.
+      if startCraftCampfireKit() then
+        return nil
       end
-      if fire then
-        local fcd = itemCooldownRemaining(fire)
-        if fcd > 0 then
-          fishPrint("warn", fire .. " on cooldown — place " .. feat .. " near an existing fire")
-        else
-          table.insert(lines, "/use " .. fire)
-          fishPrint("ok", "placing " .. fire)
-        end
-      else
-        fishPrint("warn", "no campfire kit — " .. feat .. " needs a campfire nearby")
-      end
-      table.insert(lines, "/use " .. feat)
-      fishPrint("ok", "placing " .. feat .. " (Forever uncommon/rare fishing)")
+      fire = pickFirstOwned(CAMP_FIRES)
     end
-  else
-    fishPrint(
-      "warn",
-      "no Fishing Hut/Rack/Bowl in bags — craft at Fishing 20/140/300 for Forever catches"
-    )
+    if fire and itemCooldownRemaining(fire) <= 0 then
+      table.insert(lines, "/use " .. fire)
+      fishPrint("ok", "placing " .. fire)
+    end
+    table.insert(lines, "/use " .. feat)
+    fishPrint("ok", "placing " .. feat)
   end
 
   table.insert(lines, "/cast Fishing")

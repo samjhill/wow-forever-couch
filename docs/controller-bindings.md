@@ -63,12 +63,12 @@ Account macro **FishingCouch** (created on login / `/cpcouch pinfish`):
 Each press (out of combat):
 
 1. Equips the best **fishing pole** in bags if better than what’s equipped
-2. Applies the best **lure** if the pole has none (Attractor → Baubles → Nightcrawlers → …)
-3. Eats Forever **+Fishing food** if not already Well Fed
-4. Places **Fishing Hut / Rack / Bowl** (and a campfire kit if present) for uncommon/rare catches
-5. `/cast Fishing`
+2. Applies the best **lure** if present and the pole has none
+3. Eats Forever **+Fishing food** if present and not already Well Fed
+4. Places **Fishing Hut / Rack / Bowl** (+ campfire kit) when those items are in bags
+5. Always `/cast Fishing` — missing lure/food/camp objects are skipped quietly
 
-Errors/warnings for dead, combat, missing pole/skill, lure/feature cooldown, or missing Forever camp objects. `/cpcouch fish` runs it; `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
+Hard errors only for dead, combat, or no pole / no Fishing skill. `/cpcouch fish` runs it; `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
 
 ## Apply (manual in-game)
 
