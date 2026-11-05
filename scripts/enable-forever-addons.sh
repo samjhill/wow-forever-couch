@@ -18,6 +18,8 @@ ADDONS=(
   LoreForever LoreForever_Voice_Default LoreForever_Voice_Default_Alliance LoreForever_Voice_Default_Horde
   TheFishingLog
   ForeverLootSparkles
+  NodeSight
+  GatherRadar
 )
 # Removed from couch stack (Immersion covers quest/gossip keys)
 DISABLE_ADDONS=(
