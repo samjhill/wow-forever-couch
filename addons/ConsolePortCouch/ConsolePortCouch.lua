@@ -2,7 +2,7 @@
 -- 1) Apply Xbox recommended bindings when shoulders/triggers are blank.
 -- 2) Pin Menu/Start → Escape game menu (not crosshair ↔ free-cursor flip).
 -- 3) Pin RB → account macro InviteNearest; park Interact on empty LT.
--- 4) Ensure account macro Campsite (place campfire kit + /sit for camping buffs).
+-- 4) Campsite: secure button + account macro place fire, profession object, then /sit.
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -12,11 +12,34 @@ local INVITE_MACRO_ICON = "INV_Misc_GroupLooking"
 local INVITE_MACRO_BODY = "/click StaticPopup1Button1\n/targetfriendplayer\n/invite"
 local INVITE_BINDING = "MACRO " .. INVITE_MACRO_NAME
 
--- Forever camping: use best available campfire kit from bags, then sit to collect buffs.
+-- Forever camping: /click CPCCouchCamp picks best kit + profession feature, errors loudly.
 local CAMP_MACRO_NAME = "Campsite"
 local CAMP_MACRO_ICON = "Spell_Fire_Fire"
-local CAMP_MACRO_BODY =
-  "#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit\n/sit"
+local CAMP_BUTTON_NAME = "CPCCouchCamp"
+local CAMP_MACRO_BODY = "#showtooltip\n/click " .. CAMP_BUTTON_NAME
+
+-- Best-first campfire kits (Cooking).
+local CAMP_FIRES = {
+  "Expert Campfire Kit",
+  "Journeyman Campfire Kit",
+  "Basic Campfire Kit",
+}
+
+-- Profession camp features: each line is best-first (tier 3 → 1). One object per player.
+local CAMP_FEATURE_LINES = {
+  { profession = "Fishing", items = { "Fishing Hut", "Fishing Rack", "Fish Bowl" } },
+  { profession = "First Aid", items = { "Plague Doctor's Laboratory", "Toxin Study", "First Aid Kit" } },
+  { profession = "Skinning", items = { "Trapper's Workbench", "Field Guide", "Camp Chair" } },
+  { profession = "Leatherworking", items = { "Sewing Machine", "Tanning Rack", "Camp Tent" } },
+  { profession = "Enchanting", items = { "Arcane Forge", "Arcane Salvager", "Enchanted Lute" } },
+  { profession = "Mining", items = { "Molten Foundry", "Rock Garden", "Lodestone" } },
+  { profession = "Alchemy", items = { "Alchemy Laboratory", "Fermenter", "Mana Well" } },
+  { profession = "Blacksmithing", items = { "Master Forge", "Anvil", "Sharpening Wheel" } },
+  { profession = "Herbalism", items = { "Seed Hybridizer", "Greenhouse", "Incense Candle" } },
+  { profession = "Tailoring", items = { "Loom", "Spinning Wheel", "Faction Banner" } },
+  { profession = "Engineering", items = { "Anarchist's Workbench", "Repair Bot", "Reagent Bot" } },
+  { profession = "Cooking", items = { "Iron Oven", "Cookie's Feast" } },
+}
 
 -- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
 local GAMEPAD_BAR_CLICKS = {
@@ -190,7 +213,174 @@ local function ensureInviteMacro()
   return ensureAccountMacro(INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY)
 end
 
--- Place highest-tier campfire kit available, then /sit for Forever camping buffs.
+local function campPrint(kind, msg)
+  local color = "|cff66ff66"
+  if kind == "error" then
+    color = "|cffff6666"
+  elseif kind == "warn" then
+    color = "|cffffaa00"
+  end
+  local text = color .. "Campsite:|r " .. msg
+  print(text)
+  if UIErrorsFrame and UIErrorsFrame.AddMessage then
+    local r, g, b = 1, 0.4, 0.4
+    if kind == "ok" then
+      r, g, b = 0.4, 1, 0.4
+    elseif kind == "warn" then
+      r, g, b = 1, 0.7, 0.2
+    end
+    UIErrorsFrame:AddMessage(msg, r, g, b, 1.0)
+  end
+end
+
+local function itemCount(name)
+  if not name or name == "" then
+    return 0
+  end
+  if GetItemCount then
+    local n = GetItemCount(name, false, false)
+    if type(n) == "number" then
+      return n
+    end
+  end
+  return 0
+end
+
+local function itemCooldownRemaining(name)
+  if not GetItemInfo or not GetItemCooldown then
+    return 0
+  end
+  local _, _, _, _, _, _, _, _, _, _, itemId = GetItemInfo(name)
+  if not itemId then
+    -- Name may still work as GetItemCooldown arg on some clients
+    itemId = name
+  end
+  local start, duration, enable = GetItemCooldown(itemId)
+  if not start or not duration or duration <= 0 or enable == 0 then
+    return 0
+  end
+  local left = (start + duration) - GetTime()
+  if left < 0 then
+    return 0
+  end
+  return left
+end
+
+local function formatCd(sec)
+  if sec >= 60 then
+    return string.format("%dm %ds", math.floor(sec / 60), math.floor(sec % 60))
+  end
+  return string.format("%ds", math.floor(sec + 0.5))
+end
+
+local function pickFirstOwned(list)
+  for _, name in ipairs(list) do
+    if itemCount(name) > 0 then
+      return name
+    end
+  end
+  return nil
+end
+
+-- First matching profession line (priority order), highest tier in that line.
+local function pickBestFeature()
+  for _, line in ipairs(CAMP_FEATURE_LINES) do
+    for tier, name in ipairs(line.items) do
+      if itemCount(name) > 0 then
+        return name, line.profession, tier
+      end
+    end
+  end
+  return nil, nil, nil
+end
+
+local function campInventoryReport()
+  local fire = pickFirstOwned(CAMP_FIRES)
+  local feat, prof = pickBestFeature()
+  campPrint("ok", "fire=" .. (fire or "none") .. " feature=" .. (feat or "none")
+    .. (prof and (" (" .. prof .. ")") or ""))
+  return fire, feat, prof
+end
+
+local function buildCampMacrotext()
+  if UnitIsDeadOrGhost and UnitIsDeadOrGhost("player") then
+    campPrint("error", "you are dead — cannot place a camp")
+    return nil
+  end
+  if InCombatLockdown and InCombatLockdown() then
+    campPrint("error", "in combat — wait, then try again")
+    return nil
+  end
+
+  local fire = pickFirstOwned(CAMP_FIRES)
+  local feat, prof = pickBestFeature()
+  local hadFire, hadFeat = fire ~= nil, feat ~= nil
+  local lines = {}
+
+  if fire then
+    local cd = itemCooldownRemaining(fire)
+    if cd > 0 then
+      campPrint("error", fire .. " on cooldown (" .. formatCd(cd) .. ")")
+      fire = nil
+    else
+      table.insert(lines, "/use " .. fire)
+    end
+  end
+
+  if feat then
+    local cd = itemCooldownRemaining(feat)
+    if cd > 0 then
+      campPrint("error", feat .. " on cooldown (" .. formatCd(cd) .. ") — camping features share a 1h CD")
+      feat = nil
+    else
+      table.insert(lines, "/use " .. feat)
+    end
+  end
+
+  if not fire and not feat then
+    -- Still allow sit so visiting another player's camp works.
+    if not hadFire and not hadFeat then
+      campPrint("warn", "no campfire kit or profession camp object in bags — sitting only")
+    else
+      campPrint("warn", "no usable camp items right now — sitting only")
+    end
+  else
+    if fire then
+      campPrint("ok", "placing " .. fire)
+    elseif hadFeat then
+      campPrint("warn", "no campfire kit — feature needs a campfire nearby")
+    end
+    if feat then
+      campPrint("ok", "placing " .. feat .. (prof and (" [" .. prof .. "]") or ""))
+    elseif hadFire then
+      campPrint("warn", "no profession camp object in bags (craft at skill 20+)")
+    end
+  end
+
+  table.insert(lines, "/sit")
+  return table.concat(lines, "\n")
+end
+
+local campButton = _G[CAMP_BUTTON_NAME]
+  or CreateFrame("Button", CAMP_BUTTON_NAME, UIParent, "SecureActionButtonTemplate")
+campButton:RegisterForClicks("AnyUp", "AnyDown")
+campButton:SetScript("PreClick", function(self)
+  if InCombatLockdown and InCombatLockdown() then
+    campPrint("error", "in combat — wait, then try again")
+    self:SetAttribute("type", nil)
+    self:SetAttribute("macrotext", nil)
+    return
+  end
+  local body = buildCampMacrotext()
+  if not body then
+    self:SetAttribute("type", nil)
+    self:SetAttribute("macrotext", nil)
+    return
+  end
+  self:SetAttribute("type", "macro")
+  self:SetAttribute("macrotext", body)
+end)
+
 local function ensureCampsiteMacro()
   local ok = ensureAccountMacro(CAMP_MACRO_NAME, CAMP_MACRO_ICON, CAMP_MACRO_BODY)
   if ok then
@@ -198,6 +388,23 @@ local function ensureCampsiteMacro()
     ConsolePortCouchDB.campsiteTs = time()
   end
   return ok
+end
+
+local function runCampsite()
+  ensureCampsiteMacro()
+  if InCombatLockdown and InCombatLockdown() then
+    campPrint("error", "in combat — wait, then try again")
+    return false
+  end
+  -- Drive the same secure path the action-bar macro uses.
+  local body = buildCampMacrotext()
+  if not body then
+    return false
+  end
+  campButton:SetAttribute("type", "macro")
+  campButton:SetAttribute("macrotext", body)
+  campButton:Click()
+  return true
 end
 
 local function pinInviteNearestBindings(force)
@@ -317,16 +524,22 @@ SlashCmdList.CPCOUCH = function(msg)
     else
       print("|cffff6666ConsolePort Couch:|r could not create/pin InviteNearest macro.")
     end
-  elseif msg == "camp" or msg == "campsite" or msg == "pincamp" then
+  elseif msg == "camp" or msg == "campsite" or msg == "usecamp" or msg == "place" then
+    runCampsite()
+  elseif msg == "pincamp" then
     if ensureCampsiteMacro() then
       print(
         "|cff66ff66ConsolePort Couch:|r account macro |cffffffff"
           .. CAMP_MACRO_NAME
-          .. "|r ready (campfire kit + /sit). Drag it onto a gamepad bar slot."
+          .. "|r → /click "
+          .. CAMP_BUTTON_NAME
+          .. " (fire + profession object + /sit). Drag onto a gamepad bar slot."
       )
     else
       print("|cffff6666ConsolePort Couch:|r could not create Campsite macro.")
     end
+  elseif msg == "campstatus" or msg == "campinv" then
+    campInventoryReport()
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -348,8 +561,11 @@ SlashCmdList.CPCOUCH = function(msg)
       "CursorAutoEnable=",
       tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
+    campInventoryReport()
   else
-    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | status")
+    print(
+      "|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | pincamp | campstatus | status"
+    )
   end
 end
 
