@@ -1,13 +1,12 @@
-# WoW Forever couch gaming (Bazzite / SteamOS-like)
+# WoW Forever couch gaming (Bazzite / SteamOS-like / Windows)
 
-Opinionated setup for playing **World of Warcraft: Forever** from the couch on **Bazzite** or **Steam Deck** (Gaming Mode + Desktop Mode):
+Opinionated setup for playing **World of Warcraft: Forever** from the couch:
 
-- Battle.net under **GE-Proton**
-- Steam **Gaming Mode** non-Steam shortcut
+- **Linux (Bazzite / Steam Deck):** Battle.net under **GE-Proton**, Gaming Mode shortcut, optional voice dictation
+- **Windows:** native Battle.net Forever path, same addon/pin stack, git auto-sync via Task Scheduler
 - **ConsolePort** + **Immersion** + **Forever Voiceover** (spoken quests)
-- Optional **voice → Whisper → auto-type into WoW chat** (mic + controller grip)
 
-Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same installer. Defaults assume `~/Games/battlenet` for the Proton prefix.
+Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same Linux installer. Windows uses PowerShell + shared Python helpers. Defaults assume `~/Games/battlenet` for the Proton prefix on Linux, and `%ProgramFiles(x86)%\World of Warcraft\_forever_` on Windows.
 
 > Not affiliated with Blizzard. Forever addons and voice packs come from their upstream authors (ConsolePort/Immersion, Forever Voiceover on CurseForge/GitHub).
 
@@ -22,6 +21,18 @@ curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/ins
 Then: log into Battle.net → install **Forever** → run the same command again → add the Steam shortcut (the script prints the path). Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
 
 Prefer a Desktop icon instead? Download [`Install WoW Forever Couch`](config/desktop/wow-forever-couch-bootstrap.desktop) → mark executable → Trust and Launch.
+
+## Windows — easiest install
+
+**PowerShell → paste** (Forever should already be installed via Battle.net):
+
+```powershell
+irm https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.ps1 | iex
+```
+
+Installs addons/pins, a 6h Scheduled Task, and a desktop shortcut. Needs Git + Python 3 (bootstrap can winget them). Full notes: [`docs/windows.md`](docs/windows.md).
+
+**Dictation: Linux only for now** (Windows Phase 2).
 
 ## Quick start (manual clone)
 
@@ -106,24 +117,25 @@ DICTATE_CHANNEL=party ./scripts/dictate-push-to-talk.sh        # manual /p overr
 
 | Path | Purpose |
 |------|---------|
-| `scripts/` | Install, launch, addons, dictation |
+| `scripts/` | Install, launch, addons, dictation (Linux); `*.ps1` for Windows |
+| `scripts/python/` | Shared CurseForge fetch / unzip / enable / pin helpers |
 | `addons/CouchDictateRoute/` | Sticky chat channel for voice dictation |
-| `docs/` | Install, addons, controller, dictation, troubleshooting |
+| `docs/` | Install, addons, controller, dictation, Windows, troubleshooting |
 | `config/steam-input/` | Steam Input bind notes (export your share codes here) |
 
-Environment variables used by scripts (via `scripts/lib.sh`):
+Environment variables used by scripts (via `scripts/lib.sh` / `scripts/lib.ps1`):
 
-| Variable | Default |
-|----------|---------|
-| `WOW_PREFIX` | `$HOME/Games/battlenet` |
-| `WOW_FOREVER` | `…/World of Warcraft/_forever_` under that prefix |
-| `REPO_ROOT` | Auto-detected from script location |
+| Variable | Linux default | Windows default |
+|----------|---------------|-----------------|
+| `WOW_PREFIX` | `$HOME/Games/battlenet` | n/a (native client) |
+| `WOW_FOREVER` | `…/World of Warcraft/_forever_` under that prefix | `%ProgramFiles(x86)%\World of Warcraft\_forever_` |
+| `REPO_ROOT` | Auto-detected from script location | same |
 
 ## Requirements
 
-- Bazzite / SteamOS-like host with Desktop Mode + Gaming Mode
-- Steam, GE-Proton (script installs **GE-Proton11-12** by default)
-- For dictation: `ffmpeg`, `espeak-ng` (sim tests), `python3` + `evdev`, `ydotool`/`ydotoold`, PipeWire (`pw-record`)
+- **Linux:** Bazzite / SteamOS-like host with Desktop Mode + Gaming Mode; Steam; GE-Proton (script installs **GE-Proton11-12** by default)
+- **Windows:** Forever via Battle.net; Git; Python 3
+- **Dictation (Linux only):** `ffmpeg`, `espeak-ng` (sim tests), `python3` + `evdev`, `ydotool`/`ydotoold`, PipeWire (`pw-record`)
 
 ## Safety
 

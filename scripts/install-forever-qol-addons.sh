@@ -19,55 +19,14 @@ cd "$STAGING"
 
 # Set FETCHED_NAME to newest CurseForge release/beta listing game version 1.60.x.
 # Optional 2nd arg: substring required in fileName (e.g. forever).
+# Shared with Windows via scripts/python/curseforge_fetch.py
 fetch_forever() {
   local project="$1"
   local name_filter="${2:-}"
-  local meta file_id file_name file_len hi lo url have
-  meta=$(curl -sL --fail \
-    -H "Accept: application/json" -H "User-Agent: ${UA}" \
-    "https://www.curseforge.com/api/v1/mods/${project}/files?pageSize=40&sortField=1&sortOrder=desc")
-  read -r file_id file_name file_len < <(printf '%s' "$meta" | NAME_FILTER="$name_filter" python3 -c '
-import json, sys, os
-files = json.load(sys.stdin)["data"]
-filt = os.environ.get("NAME_FILTER", "")
-
-def ok(f):
-    gvs = [str(v) for v in (f.get("gameVersions") or [])]
-    if not any(v.startswith("1.60") for v in gvs):
-        return False
-    if f.get("releaseType") not in (1, 2):
-        return False
-    if filt and filt.lower() not in (f.get("fileName") or "").lower():
-        return False
-    return True
-
-cand = [f for f in files if ok(f)]
-# Prefer Release over Beta, then newest upload (dateCreated desc).
-cand.sort(
-    key=lambda f: (1 if f.get("releaseType") == 1 else 0, f.get("dateCreated") or ""),
-    reverse=True,
-)
-if not cand:
-    raise SystemExit("no Forever 1.60.x file")
-f = cand[0]
-print(f["id"], f["fileName"], f.get("fileLength") or 0)
-')
-  hi=$((file_id / 1000))
-  lo=$((file_id % 1000))
-  url="https://edge.forgecdn.net/files/${hi}/${lo}/${file_name}"
-  if [[ -f "$file_name" ]]; then
-    have=$(stat -c%s "$file_name" 2>/dev/null || stat -f%z "$file_name" 2>/dev/null || echo 0)
-    if [[ "$have" == "$file_len" && "$file_len" != "0" ]]; then
-      echo "cached $file_name"
-    else
-      echo "Downloading $file_name"
-      curl -L --fail --retry 3 -A "$UA" -o "$file_name" "$url"
-    fi
-  else
-    echo "Downloading $file_name"
-    curl -L --fail --retry 3 -A "$UA" -o "$file_name" "$url"
-  fi
-  FETCHED_NAME="$file_name"
+  local path args=(python3 "${REPO_ROOT}/scripts/python/curseforge_fetch.py" --project "$project" --staging "$STAGING")
+  [[ -n "$name_filter" ]] && args+=(--name-filter "$name_filter")
+  path="$("${args[@]}")"
+  FETCHED_NAME="$(basename "$path")"
 }
 
 # Prefer Questie Forever build that includes the large DB (+v1.0) when available.
