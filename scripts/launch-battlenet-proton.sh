@@ -27,6 +27,11 @@ if [[ -x "${REPO_ROOT}/scripts/pin-forever-graphics.sh" ]]; then
   "${REPO_ROOT}/scripts/pin-forever-graphics.sh" || true
 fi
 
+# Quiet repo sync before Battle.net (ff-only pull + repo-owned addons). Timer does full mode.
+if [[ "${WOW_COUCH_LAUNCH_SYNC:-1}" == "1" && -x "${REPO_ROOT}/scripts/apply-repo-updates.sh" ]]; then
+  WOW_COUCH_UPDATE_MODE=quick "${REPO_ROOT}/scripts/apply-repo-updates.sh" >/tmp/wow-forever-couch-launch-sync.log 2>&1 || true
+fi
+
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasma* ]]; then
   echo "Note: Desktop/Plasma session detected. For fewer screen tears, play from Gaming Mode:" >&2
   echo "  steamos-session-select gamescope" >&2
