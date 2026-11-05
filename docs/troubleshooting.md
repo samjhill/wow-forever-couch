@@ -38,10 +38,11 @@ Also:
 
 ## Dictation
 
-- No capture → `./scripts/prefer-mic-source.sh` (uses Bluetooth mic if connected, else PC mic-in); confirm BT is paired/connected or jack is in **mic-in**, TX unmuted.
+- No capture / only “you” → Bose was on **A2DP** (music, no mic). Dictation switches to **Headset (HFP)** for the record then restores A2DP. `prefer-mic-source.sh` must print `bluez_input…`, not `*.monitor`.
+- Silent capture aborted → mic muted or wrong source (Whisper won’t hallucinate into chat).
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
-- Garbage drafts → lower mic gain / TV volume; use `DICTATE_NO_SEND=1` while tuning; left grip again sends, right grip cancels.
+- Garbage drafts → speak after the start beep (`DICTATE_SECS` default 6); `DICTATE_NO_SEND=1` while tuning.
 - Second grip starts a new recording instead of sending → draft expired (`DICTATE_DRAFT_TTL`, default 60s) or status wasn’t `draft`; check `config/dictate-status.json`.
 - Wrong chat channel → `/cdr status`; `/cdr say|party|raid` or `DICTATE_CHANNEL=...` override; ensure CouchDictateRoute is enabled.
 

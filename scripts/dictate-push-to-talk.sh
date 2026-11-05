@@ -10,7 +10,7 @@ WAV="/tmp/wow-dictate.wav"
 TXT="${WOW_COUCH_CONFIG}/last-dictation.txt"
 STATUS="${WOW_COUCH_CONFIG}/dictate-status.json"
 LOCK="/tmp/wow-dictate.lock"
-SECS="${DICTATE_SECS:-4}"
+SECS="${DICTATE_SECS:-6}"
 WHISPER_BIN="${WHISPER_BIN:-$HOME/.local/bin/whisper-cli}"
 MODEL="${WHISPER_MODEL:-$HOME/.local/share/whisper/ggml-base.en.bin}"
 START_SND="${WOW_COUCH_CONFIG}/sounds/dictate-start.wav"
@@ -19,6 +19,9 @@ DONE_SND="${WOW_COUCH_CONFIG}/sounds/dictate-done.wav"
 INJECT="${REPO_ROOT}/scripts/inject-wow-chat.sh"
 SEND_MODE="${DICTATE_SEND_MODE:-draft}"
 CHANNEL="${DICTATE_CHANNEL:-auto}"
+# Restore Bose/etc. to A2DP after capture (better game audio). Set 0 to stay on HFP.
+RESTORE_A2DP="${DICTATE_RESTORE_A2DP:-1}"
+SILENCE_DB="${DICTATE_SILENCE_DB:--45}"
 mkdir -p "${WOW_COUCH_CONFIG}/sounds"
 
 if [[ ! -f "$START_SND" ]] && command -v ffmpeg >/dev/null; then
@@ -82,15 +85,34 @@ if [[ -n "${DICTATE_WAV:-}" ]]; then
   echo "Using simulated/replay WAV: $DICTATE_WAV"
   cp -f "$DICTATE_WAV" "$WAV"
 else
-  "${REPO_ROOT}/scripts/prefer-mic-source.sh" || true
-  echo "Recording ${SECS}s from default source..."
-  timeout "$SECS" pw-record --target @DEFAULT_SOURCE@ "$WAV" || true
+  # Prefer Bose HFP mic (or analog). Never record a *.monitor loopback.
+  MIC_TARGET="$("${REPO_ROOT}/scripts/prefer-mic-source.sh" | tail -n1 || true)"
+  if [[ -z "${MIC_TARGET:-}" || "$MIC_TARGET" == *.monitor ]]; then
+    echo "No usable mic (Bose must allow Headset/HFP, or use analog mic-in)." >&2
+    write_status "error" "no mic source"
+    exit 3
+  fi
+  echo "Recording ${SECS}s from ${MIC_TARGET}..."
+  # pw-record can take a few hundred ms to start after HFP switch
+  sleep 0.3
+  timeout "$SECS" pw-record --target "$MIC_TARGET" "$WAV" || true
   beep "$STOP_SND"
+  if [[ "$RESTORE_A2DP" == "1" ]]; then
+    "${REPO_ROOT}/scripts/restore-bt-a2dp.sh" || true
+  fi
 fi
 
 if [[ ! -s "$WAV" ]]; then
   echo "No audio captured" >&2
   write_status "error" "no audio"
+  exit 3
+fi
+
+# Guard: silence → Whisper hallucinates words like "you" / "thank you"
+if ! python3 "${REPO_ROOT}/scripts/wav-energy.py" "$WAV" "$SILENCE_DB"; then
+  echo "Capture was silent (wrong source or mic muted). Nothing sent." >&2
+  write_status "error" "silent capture"
+  printf '' > "$TXT"
   exit 3
 fi
 
