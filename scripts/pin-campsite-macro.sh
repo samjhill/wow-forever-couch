@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create account macro "Campsite" — plain Forever-safe /use + /sit (no /run, no /click helpers).
+# Create account macro "Campsite" — plain Forever-safe /use only.
 # Forever should be fully quit so macros-cache is not overwritten.
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -9,7 +9,7 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="Campsite"
 MACRO_ICON="Spell_Fire_Fire"
-MACRO_BODY=$'#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit\n/sit'
+MACRO_BODY=$'#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit'
 
 if [[ ! -d "$ACCT" ]]; then
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then

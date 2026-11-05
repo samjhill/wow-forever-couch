@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create account macros EatBest + DrinkBest (scan bags for best restore food/drink).
+# Seed account macros EatBest + DrinkBest as plain /use (addon rewrites to best bag item).
 # Forever should be fully quit so macros-cache is not overwritten.
 set -euo pipefail
 # shellcheck source=lib.sh
@@ -61,8 +61,8 @@ path.write_text(text, encoding="utf-8")
 PY
 }
 
-upsert_macro "EatBest" "INV_Misc_Food_15" $'#showtooltip\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end'
-upsert_macro "DrinkBest" "INV_Drink_07" $'#showtooltip\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end'
+upsert_macro "EatBest" "INV_Misc_Food_15" $'#showtooltip\n/use Tough Jerky'
+upsert_macro "DrinkBest" "INV_Drink_07" $'#showtooltip\n/use Refreshing Spring Water'
 
 LIVE_MACROS="${WOW_COUCH_CONFIG}/live-setup/account/macros-cache.txt"
 if [[ -d "${WOW_COUCH_CONFIG}/live-setup/account" ]]; then
