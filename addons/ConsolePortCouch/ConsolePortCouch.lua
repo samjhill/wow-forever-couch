@@ -1,9 +1,15 @@
 -- Couch helpers for ConsolePort on Forever (Camelot):
 -- 1) Apply Xbox recommended bindings when shoulders/triggers are blank.
 -- 2) Pin Menu/Start → Escape game menu (not crosshair ↔ free-cursor flip).
+-- 3) Pin RB → account macro InviteNearest; park Interact on empty LT.
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
+
+local INVITE_MACRO_NAME = "InviteNearest"
+local INVITE_MACRO_ICON = "INV_Misc_GroupLooking"
+local INVITE_MACRO_BODY = "/click StaticPopup1Button1\n/targetfriendplayer\n/invite"
+local INVITE_BINDING = "MACRO " .. INVITE_MACRO_NAME
 
 local function getDb()
   if not ConsolePort then
@@ -106,6 +112,60 @@ local function pinGameMenuBindings(force)
   return true
 end
 
+-- Account-wide invite+accept: click party popup Accept, target nearest friend, invite.
+local function ensureInviteMacro()
+  if not CreateMacro or not EditMacro or not GetMacroIndexByName then
+    return false
+  end
+  local index = GetMacroIndexByName(INVITE_MACRO_NAME) or 0
+  if index > 0 then
+    EditMacro(index, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY)
+    return true
+  end
+  -- false = account macro (shared across characters)
+  local ok, created = pcall(CreateMacro, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY, false)
+  if ok and created then
+    return true
+  end
+  -- Fallback: character macro if account slots are full / API differs
+  ok, created = pcall(CreateMacro, INVITE_MACRO_NAME, INVITE_MACRO_ICON, INVITE_MACRO_BODY, true)
+  return ok and created and true or false
+end
+
+local function pinInviteNearestBindings(force)
+  if InCombatLockdown and InCombatLockdown() then
+    return false
+  end
+  if not ensureInviteMacro() then
+    return false
+  end
+
+  local dirty = false
+  local function ensure(button, action)
+    local current = GetBindingAction(button, true) or ""
+    if force or current ~= action then
+      if current ~= action and SetBinding(button, action) then
+        dirty = true
+      end
+    end
+  end
+
+  ensure("PADRSHOULDER", INVITE_BINDING)
+
+  local lt = GetBindingAction("PADLTRIGGER", true) or ""
+  if lt == "" or lt == "NONE" then
+    ensure("PADLTRIGGER", "INTERACTTARGET")
+  end
+
+  if dirty and SaveBindings and GetCurrentBindingSet then
+    SaveBindings(GetCurrentBindingSet())
+  end
+
+  ConsolePortCouchDB.invitePinned = true
+  ConsolePortCouchDB.inviteTs = time()
+  return true
+end
+
 local function applyPreset(force)
   local db = getDb()
   if not db then
@@ -119,10 +179,12 @@ local function applyPreset(force)
   end
   if not force and ConsolePortCouchDB.applied and not shouldersEmpty() then
     pinGameMenuBindings(false)
+    pinInviteNearestBindings(false)
     return true
   end
   if not force and not shouldersEmpty() and ConsolePortCouchDB.applied then
     pinGameMenuBindings(false)
+    pinInviteNearestBindings(false)
     return true
   end
 
@@ -138,6 +200,7 @@ local function applyPreset(force)
   ConsolePortCouchDB.device = device.Name or "Xbox"
   ConsolePortCouchDB.ts = time()
   pinGameMenuBindings(true)
+  pinInviteNearestBindings(true)
   print(
     "|cff66ff66ConsolePort Couch:|r applied |cffffffff"
       .. (device.Name or "Xbox")
@@ -172,6 +235,20 @@ SlashCmdList.CPCOUCH = function(msg)
       "|cff66ff66ConsolePort Couch:|r Menu/Start → TOGGLEGAMEMENU"
         .. " (PADFORWARD + PADSYSTEM); cursor auto-enable off."
     )
+  elseif msg == "invite" or msg == "pininvite" then
+    if InCombatLockdown and InCombatLockdown() then
+      print("|cffffaa00ConsolePort Couch:|r wait until out of combat, then /cpcouch invite")
+      return
+    end
+    if pinInviteNearestBindings(true) then
+      print(
+        "|cff66ff66ConsolePort Couch:|r RB → "
+          .. INVITE_BINDING
+          .. " (accept invite popup + target nearest friend + invite)."
+      )
+    else
+      print("|cffff6666ConsolePort Couch:|r could not create/pin InviteNearest macro.")
+    end
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -184,11 +261,15 @@ SlashCmdList.CPCOUCH = function(msg)
       tostring(GetBindingAction("PADFORWARD", true)),
       "PADSYSTEM=",
       tostring(GetBindingAction("PADSYSTEM", true)),
+      "PADRSHOULDER=",
+      tostring(GetBindingAction("PADRSHOULDER", true)),
+      "PADLTRIGGER=",
+      tostring(GetBindingAction("PADLTRIGGER", true)),
       "CursorAutoEnable=",
       tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
   else
-    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | status")
+    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | status")
   end
 end
 
@@ -202,6 +283,7 @@ boot:SetScript("OnEvent", function(self, event)
     C_Timer.After(5.0, function()
       if not InCombatLockdown or not InCombatLockdown() then
         pinGameMenuBindings(false)
+        pinInviteNearestBindings(true)
       end
     end)
   elseif event == "UPDATE_BINDINGS" then
@@ -209,6 +291,7 @@ boot:SetScript("OnEvent", function(self, event)
       tryApply(false)
     else
       pinGameMenuBindings(false)
+      pinInviteNearestBindings(false)
     end
   end
 end)

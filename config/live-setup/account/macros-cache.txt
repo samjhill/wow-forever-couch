@@ -1,0 +1,8 @@
+VER 3 0000000000000001 "TFL Save 1" "134400"
+/tfl data 2:tnyao0:1:0:0:::0:0:irm:0
+END
+VER 3 0000000000000002 "InviteNearest" "INV_Misc_GroupLooking"
+/click StaticPopup1Button1
+/targetfriendplayer
+/invite
+END
