@@ -1,0 +1,8 @@
+## Interface: 16001
+## Title: Couch Buff Reminder
+## Notes: Warns when important self-buffs are missing or about to expire (couch / Forever)
+## Author: wow-forever-couch
+## Version: 1.0.0
+## SavedVariables: CouchBuffReminderDB
+
+CouchBuffReminder.lua

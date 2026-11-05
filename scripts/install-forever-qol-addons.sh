@@ -212,11 +212,21 @@ NODESIGHT_ZIP="$FETCHED_NAME"
 # Gather Radar — live icons + remembered herb/ore pins on minimap & world map
 fetch_forever 1757790
 GATHER_ZIP="$FETCHED_NAME"
+# SelfBuffs — Forever self buff/debuff frames with countdown
+fetch_forever 1718593
+SELFBUFFS_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$SELFBUFFS_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
+# Couch missing/expiring self-buff banner
+if [[ -d "${REPO_ROOT}/addons/CouchBuffReminder" ]]; then
+  rm -rf "${DEST}/CouchBuffReminder"
+  mkdir -p "${DEST}/CouchBuffReminder"
+  cp -a "${REPO_ROOT}/addons/CouchBuffReminder/." "${DEST}/CouchBuffReminder/"
+  echo "installed CouchBuffReminder"
+fi
 # Immersion already covers controller quest/gossip; do not install DialogKey forks.
 rm -rf "${DEST}/DialogKey_Numy" "${DEST}/DialogKey_Aeonzara" "${DEST}/DialogKey"
 
@@ -252,6 +262,8 @@ done
   echo "- $SPARKLE_ZIP"
   echo "- $NODESIGHT_ZIP"
   echo "- $GATHER_ZIP"
+  echo "- $SELFBUFFS_ZIP"
+  echo "- CouchBuffReminder (repo addons/)"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $QUESTIE_ZIP"
