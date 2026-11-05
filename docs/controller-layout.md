@@ -24,7 +24,8 @@ Steam Input should manage both. Do not overwrite unrelated game profiles.
 | A / B / X / Y | ConsolePort primary bar face buttons |
 | LB / RB | Target / modifier (ConsolePort) |
 | LT / RT | Action layers |
-| Grip L / R | **Left grip → dictation** (F20 via Steam Input + host BTN_GRIPL); right grip free for ConsolePort |
+| Grip L / R (Steam Controller) | **Left grip → dictation** (F20 / `BTN_GRIPL`); right grip cancels draft |
+| R3 (Xbox) | **Dictation** (F20 / `BTN_THUMBR`) — see [`forever-xbox-r3-f20.md`](../config/steam-input/forever-xbox-r3-f20.md) |
 | Steam button | Steam overlay / chord |
 | Start / Select | Game menu / map (ConsolePort defaults) |
 
@@ -53,3 +54,4 @@ See [`config/steam-input/forever-left-grip-f20.md`](../config/steam-input/foreve
 | Profile | Share code / file | Date |
 |---------|-------------------|------|
 | Steam Controller Forever (grip→F20) | Pending export after apply | 2026-11-03 |
+| Xbox Forever (R3→F20) | Pending export after apply | 2026-11-05 |

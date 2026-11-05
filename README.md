@@ -64,7 +64,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ### 4. Controller
 
 - ConsolePort handles in-game bars/UI. Empty LB/RB/LT/RT → `./scripts/install-consoleport-couch.sh` then `/reload` ([`docs/controller-bindings.md`](docs/controller-bindings.md)).
-- Optional Steam Input: left grip → **F20** for dictation — [`config/steam-input/forever-left-grip-f20.md`](config/steam-input/forever-left-grip-f20.md).
+- Steam Input dictation: Steam Controller **left grip → F20**; Xbox **R3 → F20** — [`config/steam-input/`](config/steam-input/).
 - Draft layouts: [`docs/controller-layout.md`](docs/controller-layout.md), bear/PvP notes under `docs/`.
 
 ### 5. Voice → chat (optional)
@@ -79,7 +79,7 @@ Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the s
 ./scripts/test-dictate-harness.sh          # offline dictate checks
 ```
 
-**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type). **Left grip again** sends (no keyboard). Right grip cancels. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)). In-game sticky is **unverified** until you test in Forever.
+**Default behavior:** after Whisper, inject **drafts** into chat (`Esc` → `Enter` → type). Press the dictate bind again (SC left grip / Xbox R3) to send. SC right grip or Esc cancels. Channel sticky: solo/party-of-2 → Say; party-of-3+ → Party; raid → Raid (see [`docs/voice-dictation.md`](docs/voice-dictation.md)).
 
 ```bash
 DICTATE_NO_SEND=1 ./scripts/dictate-push-to-talk.sh          # clipboard only

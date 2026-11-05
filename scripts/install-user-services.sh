@@ -27,7 +27,7 @@ EOF
 
 cat > "${UNIT_DIR}/wow-dictate-daemon.service" <<EOF
 [Unit]
-Description=WoW Forever dictation trigger daemon (grip / F20 / FIFO)
+Description=WoW Forever dictation trigger daemon (SC grip / Xbox R3 / F20 / FIFO)
 After=default.target sound.target ydotoold.service
 
 [Service]

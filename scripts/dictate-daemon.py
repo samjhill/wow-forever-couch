@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Watch FIFO + Steam Controller left grip + KEY_F20; run dictate or confirm draft."""
+"""Watch FIFO + controller dictate binds + KEY_F20; run dictate or confirm draft.
+
+Binds (host / Steam Input):
+  Steam Controller — left grip (BTN_GRIPL) start/confirm; right grip cancel
+  Xbox / Xbox-via-Steam — R3 / right stick click (BTN_THUMBR); Steam Input → F20
+  Any path that emits KEY_F20 (Steam Input keyboard layer)
+"""
 from __future__ import annotations
 
 import json
@@ -30,7 +36,7 @@ STATUS = BASE / "config" / "dictate-status.json"
 COOLDOWN_S = float(os.environ.get("DICTATE_COOLDOWN", "1.5"))
 DRAFT_TTL_S = float(os.environ.get("DICTATE_DRAFT_TTL", "60"))
 
-# Linux BTN_GRIPL / BTN_GRIPR (newer) and fallbacks
+# Linux BTN_GRIPL / BTN_GRIPR (Steam Controller) and fallbacks
 GRIPL = getattr(ecodes, "BTN_GRIPL", 548)
 GRIPR = getattr(ecodes, "BTN_GRIPR", 549)
 GRIP_CODES = {
@@ -38,7 +44,20 @@ GRIP_CODES = {
     GRIPR,
     getattr(ecodes, "BTN_GEAR_DOWN", 336),  # sometimes left grip on older maps
 }
+# Xbox / DualSense-style right stick click (R3)
+THUMBR = getattr(ecodes, "BTN_THUMBR", 318)
+THUMBL = getattr(ecodes, "BTN_THUMBL", 317)  # unused for dictate; reserved
 F20 = getattr(ecodes, "KEY_F20", 190)
+
+XBOX_NAME_HINTS = (
+    "xbox",
+    "x-box",
+    "xpad",
+    "microsoft",
+    "8bitdo",
+    "gamepad",
+    "controller",
+)
 
 _last_fire = 0.0
 _lock = threading.Lock()
@@ -150,6 +169,16 @@ def ensure_fifo() -> None:
     log(f"FIFO ready: {FIFO}")
 
 
+def looks_like_xbox(name: str, caps: set) -> bool:
+    if THUMBR not in caps:
+        return False
+    if any(h in name for h in XBOX_NAME_HINTS):
+        return True
+    # Generic pads that expose stick-click + face buttons
+    face = {getattr(ecodes, "BTN_SOUTH", 304), getattr(ecodes, "BTN_EAST", 305)}
+    return bool(face & caps)
+
+
 def open_devices():
     devices = []
     for path in Path("/dev/input").glob("event*"):
@@ -158,11 +187,13 @@ def open_devices():
         except (OSError, PermissionError):
             continue
         name = (dev.name or "").lower()
-        caps = dev.capabilities().get(ecodes.EV_KEY, [])
+        caps = set(dev.capabilities().get(ecodes.EV_KEY, []))
         want = False
         if "steam controller" in name or "wireless steam controller" in name:
-            if GRIP_CODES & set(caps):
+            if GRIP_CODES & caps:
                 want = True
+        if looks_like_xbox(name, caps):
+            want = True
         if F20 in caps or "keyboard" in name or "steam" in name:
             if F20 in caps or "steam" in name:
                 want = True
@@ -230,13 +261,16 @@ def evdev_loop(devices) -> None:
                     if event.type != ecodes.EV_KEY or event.value != 1:
                         continue
                     if event.code == GRIPR:
-                        # Right grip discards an open draft (Esc)
+                        # Steam Controller right grip discards an open draft (Esc)
                         if pending_draft():
                             fire(f"gripR-cancel:{dev.name}", "cancel")
                         else:
                             log("right grip ignored (no draft)")
                     elif event.code in GRIP_CODES:
                         fire(f"grip:{dev.name}:{event.code}", "auto")
+                    elif event.code == THUMBR:
+                        # Xbox R3 — same as left grip / F20 (start or confirm draft)
+                        fire(f"R3:{dev.name}", "auto")
                     elif event.code == F20:
                         fire(f"F20:{dev.name}", "auto")
             except (OSError, BlockingIOError):
@@ -254,7 +288,10 @@ def main() -> int:
     t = threading.Thread(target=fifo_loop, name="fifo", daemon=True)
     t.start()
     devices = open_devices()
-    log(f"ready (draft confirm on 2nd grip; TTL={DRAFT_TTL_S:.0f}s)")
+    log(
+        "ready (SC left grip / Xbox R3 / F20 → dictate or confirm; "
+        f"TTL={DRAFT_TTL_S:.0f}s)"
+    )
     evdev_loop(devices)
     return 0
 

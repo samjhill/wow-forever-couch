@@ -43,4 +43,4 @@ Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/
 
 - Do not use blank slate unless you intend a full custom map.
 - Do not force Steam Proton on the Battle.net shortcut (GE-Proton via launch script).
-- Left grip stays reserved for dictation F20 (Steam Input), outside ConsolePort.
+- Dictation stays outside ConsolePort: Steam Controller **left grip** → F20; Xbox **R3** → F20 ([`forever-xbox-r3-f20.md`](../config/steam-input/forever-xbox-r3-f20.md)).
