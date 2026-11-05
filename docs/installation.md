@@ -25,8 +25,11 @@
 ```bash
 ./scripts/enable-forever-addons.sh
 ./scripts/pin-voiceover-prefs.sh
+./scripts/pin-forever-graphics.sh  # D3D11 + FPS cap for NVIDIA/Proton stability
 ./scripts/install-curseforge.sh    # Flatpak CurseForge for updates (Desktop Mode first-run)
 ```
+
+Play from **Gaming Mode** when possible. See [`troubleshooting.md`](troubleshooting.md#graphics--audio-nvidia--proton) for screen-tear / HDMI audio notes.
 
 Then character select → AddOns → enable ConsolePort*, Immersion, ForeverVO, and every `ForeverVO_Data_*`.
 
