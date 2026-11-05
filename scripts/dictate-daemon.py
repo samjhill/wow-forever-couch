@@ -237,7 +237,7 @@ def looks_like_xbox(name: str, caps: set) -> bool:
     return bool(face & caps)
 
 
-def open_devices():
+def open_devices(*, quiet: bool = False):
     devices = []
     for path in Path("/dev/input").glob("event*"):
         try:
@@ -257,7 +257,8 @@ def open_devices():
                 want = True
         if want:
             devices.append(dev)
-            log(f"watching {path} ({dev.name})")
+            if not quiet:
+                log(f"watching {path} ({dev.name})")
     return devices
 
 
@@ -304,14 +305,41 @@ def evdev_loop(devices) -> None:
         while True:
             time.sleep(3600)
     mapping = {dev.fd: dev for dev in devices}
+    last_refresh = time.time()
+    refresh_every = float(os.environ.get("DICTATE_DEVICE_REFRESH", "20"))
     while True:
         try:
-            r, _, _ = select.select(list(mapping), [], [], 5.0)
+            r, _, _ = select.select(list(mapping), [], [], min(5.0, refresh_every))
         except (OSError, ValueError):
             time.sleep(1)
             devices = open_devices()
             mapping = {dev.fd: dev for dev in devices}
+            last_refresh = time.time()
             continue
+        # Steam Input often recreates the virtual x360 pad on a new event*; refresh.
+        if time.time() - last_refresh >= refresh_every:
+            last_refresh = time.time()
+            new_devs = open_devices(quiet=True)
+            new_paths = {getattr(d, "path", None) or str(getattr(d, "fn", "")) for d in new_devs}
+            old_paths = {
+                getattr(d, "path", None) or str(getattr(d, "fn", "")) for d in mapping.values()
+            }
+            if new_paths != old_paths:
+                log(f"input devices changed ({len(old_paths)} → {len(new_paths)}); reopening")
+                for d in list(mapping.values()):
+                    try:
+                        d.close()
+                    except Exception:  # noqa: BLE001
+                        pass
+                for d in new_devs:
+                    log(f"watching {getattr(d, 'path', getattr(d, 'fn', '?'))} ({d.name})")
+                mapping = {dev.fd: dev for dev in new_devs}
+            else:
+                for d in new_devs:
+                    try:
+                        d.close()
+                    except Exception:  # noqa: BLE001
+                        pass
         for fd in r:
             dev = mapping.get(fd)
             if not dev:
