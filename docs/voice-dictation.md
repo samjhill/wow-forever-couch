@@ -157,13 +157,14 @@ DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/inject-wow-chat.sh <<< '
 | Draft confirm | Grip drafts; **second left grip** sends | Host Pass; on-screen Blocked |
 | Draft cancel | Right grip / FIFO `cancel` discards | Host Pass; on-screen Blocked |
 
-### Blockers observed 2026-11-03
+### Blockers observed 2026-11-03 (updated 2026-11-04)
 
-1. No character folders under `WTF/Account` — client has not entered the world on this install.
-2. Prior Forever login failed with `ERROR_GAME_UTILITY_SERVER_NO_SERVER (34200)` (realm utility unavailable).
+1. ~~No character folders~~ — account `SAMUHILL`, character `Chain-Milk` now present; host enable/pin scripts can run.
+2. Prior Forever login failed with `ERROR_GAME_UTILITY_SERVER_NO_SERVER (34200)` (realm utility unavailable) — superseded by successful login.
 3. Moonlight not paired to Sunshine; cannot stream the TV/gamescope view from this Mac session yet.
+4. Live grip → draft → confirm into Forever chat still needs in-game verification (Steam Input left grip → F20 on the Battle.net shortcut).
 
-Once realms are up: Gaming Mode → Forever → `/reload` → `/cdr status` → left grip → read draft → left grip to send.
+Once in-world: `/reload` → `/cdr status` → left grip → read draft → left grip to send.
 
 ## Limitations
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/DialogKey/Lore Forever/Fishing Log)
+# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/Lore Forever/Fishing Log)
 # and stage later-activation zips (Questie/BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
@@ -181,9 +181,6 @@ fetch_forever 94855 forever
 LEA_ZIP="$FETCHED_NAME"
 fetch_forever 100547
 PLA_ZIP="$FETCHED_NAME"
-# DialogKey - Numy Edition (do not also install DialogKey Aeonzara / other forks)
-fetch_forever 1098587
-DK_ZIP="$FETCHED_NAME"
 # Lore Forever (large zip; includes LoreForever + Default/Alliance/Horde narrator packs)
 fetch_forever 1715510
 LORE_ZIP="$FETCHED_NAME"
@@ -192,9 +189,11 @@ fetch_forever 1702832
 FISH_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$DK_ZIP" "$LORE_ZIP" "$FISH_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
+# Immersion already covers controller quest/gossip; do not install DialogKey forks.
+rm -rf "${DEST}/DialogKey_Numy" "${DEST}/DialogKey_Aeonzara" "${DEST}/DialogKey"
 
 echo "=== stage later-activation zips (not enabled) ==="
 fetch_questie
@@ -223,7 +222,6 @@ done
   echo "- $BAG_ZIP"
   echo "- $LEA_ZIP"
   echo "- $PLA_ZIP"
-  echo "- $DK_ZIP"
   echo "- $LORE_ZIP"
   echo "- $FISH_ZIP"
   echo

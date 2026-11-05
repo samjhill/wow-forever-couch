@@ -13,8 +13,7 @@ Steam Input should manage both. Do not overwrite unrelated game profiles.
 
 1. **Steam Input** outer profile for the non-Steam Battle.net / Forever entry (menu chords, dictation hotkey, desktop fallback).
 2. **ConsolePort** in-game action bars, targeting, UI navigation (Forever flavor).
-3. **Immersion** face-button bindings for quest gossip (independent of ConsolePort).
-4. **DialogKey (Numy)** — Space (keyboard) / mapped confirm advances gossip, quest Accept/Complete, and popups when a dialog is up; number keys pick options. Does not replace Immersion face buttons.
+3. **Immersion** face-button / gamepad bindings for quest gossip (`padaccept` = PAD1; ConsolePort hints).
 
 ## Steam Controller conceptual map (Forever + ConsolePort)
 
