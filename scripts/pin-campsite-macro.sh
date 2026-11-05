@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Create account macro "Campsite": use best campfire kit in bags, then /sit.
-# Forever camping buffs require resting (~1 min) near a campfire + objects.
+# Create account macro "Campsite": /click CPCCouchCamp (ConsolePortCouch).
+# The addon picks best campfire kit + profession camp object, errors on CD/combat,
+# then /sit. Forever camping buffs need ~1 min near the fire.
 #
 # Forever should be fully quit so macros-cache is not overwritten.
 # Does not steal gamepad bindings — drag Campsite onto a ConsolePort bar slot.
@@ -12,7 +13,7 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="Campsite"
 MACRO_ICON="Spell_Fire_Fire"
-MACRO_BODY=$'#showtooltip\n/use Expert Campfire Kit\n/use Journeyman Campfire Kit\n/use Basic Campfire Kit\n/sit'
+MACRO_BODY=$'#showtooltip\n/click CPCCouchCamp'
 
 if [[ ! -d "$ACCT" ]]; then
   # Fall back to first account folder that has macros-cache or any account dir

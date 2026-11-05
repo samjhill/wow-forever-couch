@@ -34,17 +34,22 @@ Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/
 
 ### Campsite macro (Forever camping)
 
-Account macro **Campsite** (created on login / `/cpcouch camp`):
+Account macro **Campsite** (created on login / `/cpcouch pincamp`):
 
 ```
 #showtooltip
-/use Expert Campfire Kit
-/use Journeyman Campfire Kit
-/use Basic Campfire Kit
-/sit
+/click CPCCouchCamp
 ```
 
-Uses the best campfire kit in your bags, then `/sit` so you can collect camping buffs (~1 min near the fire). Drag it onto a gamepad bar slot — it is **not** bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
+`ConsolePortCouch` picks, in order:
+
+1. Best **campfire kit** in bags (Expert → Journeyman → Basic)
+2. Best **profession camp object** in bags (e.g. Fishing Hut → Rack → Fish Bowl; same for other professions)
+3. `/sit` so camping buffs can tick (~1 min)
+
+Errors / warnings (chat + UIErrorsFrame): dead, in combat, item on cooldown (features share a 1h CD), missing fire or profession object. Visiting someone else’s camp with empty bags still sits, with a warning.
+
+In-game: `/cpcouch camp` runs it; `/cpcouch campstatus` lists what is in bags. Drag **Campsite** onto a gamepad bar slot — not bound over RB. Offline seed: `./scripts/pin-campsite-macro.sh` (quit Forever first).
 
 ## Apply (manual in-game)
 
