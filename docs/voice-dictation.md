@@ -59,7 +59,7 @@ Two cooperating pieces:
 ```bash
 ./scripts/setup-whisper.sh
 ./scripts/install-user-services.sh         # ydotoold + dictate daemon
-./scripts/prefer-mic-source.sh             # Bluetooth mic if connected, else PC mic-in
+./scripts/prefer-mic-source.sh             # Bose → HFP mic for capture, else analog mic-in
 ./scripts/install-couch-dictate-route.sh   # addon → Interface/AddOns
 ./scripts/enable-forever-addons.sh         # includes CouchDictateRoute
 ./scripts/test-channel-routing.sh          # offline policy tests
@@ -110,6 +110,8 @@ DICTATE_CHANNEL=party DICTATE_SEND_MODE=draft ./scripts/dictate-push-to-talk.sh
 | `DICTATE_DRAFT_TTL` | `60` | Seconds a draft stays confirmable via second grip |
 | `DICTATE_NO_SEND` | unset | Skip inject entirely |
 | `DICTATE_WAV` | unset | Replay file instead of mic |
+| `DICTATE_SECS` | `6` | Record length after start beep |
+| `DICTATE_RESTORE_A2DP` | `1` | After Bose HFP capture, restore A2DP music profile |
 
 Whisper capture/transcription is unchanged.
 
