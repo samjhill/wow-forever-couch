@@ -87,6 +87,8 @@ Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion al
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
 ./scripts/install-consoleport-couch.sh       # Xbox recommended bindings helper (empty LB/RB/LT/RT)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
+./scripts/snapshot-live-setup.sh             # save tuned prefs → config/live-setup/
+./scripts/restore-live-setup.sh              # apply config/live-setup/ (Forever quit)
 ```
 
 Zips cache under `config/addons-staging/` (gitignored). Backup before QoL install lived at `~/Backups/wow-addons-YYYYMMDD-HHMMSS/` on the couch host.
@@ -121,10 +123,10 @@ Exact Plater profile import is **untested** until Forever is playable.
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
 - [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; ForeverVO still speaks quests
 - [ ] `/tfl journal` opens The Fishing Log; casting/lure helpers usable while fishing
-- [ ] Immersion + ForeverVO only for quest VO; Immersion TTS off; ForeverVO showPanel off (`pin-voiceover-prefs.sh` after SV exists)
-- [ ] ConsolePort bars unchanged; no duplicate bag/quest dialogue UI
+- [x] Immersion + ForeverVO only for quest VO; Immersion TTS off; ForeverVO showPanel off (pinned in `config/live-setup/`)
+- [x] ConsolePortCouch + bindings cache captured in `config/live-setup/`
 - [ ] Built-in meter, Cooldown Manager, Edit Mode still usable
-- [ ] DX11 + maxFPS 60 after relaunch (`pin-forever-graphics.sh`)
+- [x] DX11 + maxFPS 60 in snapshot Config.wtf (`pin-forever-graphics.sh`)
 
 ## Compatibility evidence (research date 2026-11-03)
 

@@ -1,0 +1,15 @@
+{
+    "headerComments": [
+        "This is the AddOns GamePad config. Do not modify while game is running, it will get overwritten.",
+        "",
+        "You can create your own GamePadConfig_*.json config files, such as GamePadConfig_MyConfigs.json",
+        "Multiple config files will be loaded in alphabetical order. (Not counting the Default and AddOns files, which come first/last respectively)"
+    ],
+    "configVersion": 4,
+    "configs": [
+        {
+            "separator": "================================================================================",
+            "labelStyle": "Letters"
+        }
+    ]
+}

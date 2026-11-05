@@ -43,7 +43,11 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
 ./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
+# Optional: restore a known-good prefs snapshot from this repo
+./scripts/restore-live-setup.sh            # applies config/live-setup/ (quit Forever first)
 ```
+
+Refresh the snapshot from a tuned play box: `./scripts/snapshot-live-setup.sh` then commit `config/live-setup/`.
 
 In-game: enable the install set at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
 

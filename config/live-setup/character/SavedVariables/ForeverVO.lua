@@ -1,0 +1,4 @@
+
+ForeverVOCharDB = {
+["paused"] = false,
+}
