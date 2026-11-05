@@ -195,13 +195,14 @@ nice_cmd "$WHISPER_BIN" -t "$WHISPER_THREADS" -bs 1 -bo 1 -m "$MODEL" -f "$CONV"
   2>/dev/null > "$TXT" || true
 cat "$TXT"
 
+# Flatten whitespace and drop trailing periods — Whisper's formal punctuation is odd in WoW chat.
+TRIMMED="$(tr '\n\r\t' ' ' < "$TXT" | sed -E 's/  +/ /g; s/^ //; s/ $//; s/\.+$//')"
+printf '%s\n' "$TRIMMED" > "$TXT"
 if command -v wl-copy >/dev/null; then
-  wl-copy < "$TXT" || true
+  printf '%s' "$TRIMMED" | wl-copy || true
 elif command -v xclip >/dev/null; then
-  xclip -selection clipboard < "$TXT" || true
+  printf '%s' "$TRIMMED" | xclip -selection clipboard || true
 fi
-
-TRIMMED="$(tr '\n\r\t' ' ' < "$TXT" | sed -E 's/  +/ /g; s/^ //; s/ $//')"
 if [[ -z "$TRIMMED" ]]; then
   write_status "done" "empty transcript — not sent"
   echo "Empty transcript; nothing sent to chat."
