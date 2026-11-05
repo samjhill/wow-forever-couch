@@ -1,4 +1,4 @@
-stamp=2026-11-05T17:50Z
+stamp=2026-11-05T21:50Z
 source_account=50188345#4
 source_character=
 wow_forever=/home/sam/Games/battlenet/pfx/drive_c/Program Files (x86)/World of Warcraft/_forever_
