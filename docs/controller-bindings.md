@@ -59,6 +59,24 @@ Equip a pole (and lure) yourself; the macro only casts Fishing.
 
 Drag either macro onto a ConsolePort gamepad bar slot (not over RB). Offline seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh` (quit Forever first).
 
+### EatBest / DrinkBest
+
+Scans bags for the strongest health food / mana drink (tooltip “Restores N …”), skips alcohol, sits, then uses it:
+
+```
+#showtooltip
+/sit
+/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end
+```
+
+```
+#showtooltip
+/sit
+/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end
+```
+
+Created on login or `/cpcouch eat` / `/cpcouch drink`. Offline: `./scripts/pin-eat-drink-macros.sh`.
+
 ## Apply (manual in-game)
 
 1. `/consoleport`

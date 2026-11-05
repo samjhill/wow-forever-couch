@@ -10,6 +10,7 @@
 -- 2) Pin Menu/Start → Escape game menu.
 -- 3) Pin RB → InviteNearest; park Interact on empty LT.
 -- 4) Ensure simple Campsite + FishingCouch account macros.
+-- 5) EatBest / DrinkBest: /sit + /run picks highest restore food/drink in bags.
 local ADDON = ...
 
 ConsolePortCouchDB = ConsolePortCouchDB or {}
@@ -19,7 +20,8 @@ local INVITE_MACRO_ICON = "INV_Misc_GroupLooking"
 local INVITE_MACRO_BODY = "/click StaticPopup1Button1\n/targetfriendplayer\n/invite"
 local INVITE_BINDING = "MACRO " .. INVITE_MACRO_NAME
 
--- Plain Forever-safe macros (no /run, no nested /click SecureActionButton).
+-- Plain Forever-safe macros (no nested /click SecureActionButton).
+-- Eat/Drink need a short /run to scan bags; the /run itself uses the item (no second cast line).
 local CAMP_MACRO_NAME = "Campsite"
 local CAMP_MACRO_ICON = "Spell_Fire_Fire"
 local CAMP_MACRO_BODY =
@@ -28,6 +30,16 @@ local CAMP_MACRO_BODY =
 local FISH_MACRO_NAME = "FishingCouch"
 local FISH_MACRO_ICON = "Trade_Fishing"
 local FISH_MACRO_BODY = "#showtooltip Fishing\n/cast Fishing"
+
+local EAT_MACRO_NAME = "EatBest"
+local EAT_MACRO_ICON = "INV_Misc_Food_15"
+local EAT_MACRO_BODY =
+  "#showtooltip\n/sit\n/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end"
+
+local DRINK_MACRO_NAME = "DrinkBest"
+local DRINK_MACRO_ICON = "INV_Drink_07"
+local DRINK_MACRO_BODY =
+  "#showtooltip\n/sit\n/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end"
 
 -- Face + d-pad → ConsolePort gamepad bar (restored if wiped empty/JUMP).
 local GAMEPAD_BAR_CLICKS = {
@@ -204,6 +216,185 @@ local function ensureFishingMacro()
   return ok
 end
 
+local function ensureEatDrinkMacros()
+  local okEat = ensureAccountMacro(EAT_MACRO_NAME, EAT_MACRO_ICON, EAT_MACRO_BODY)
+  local okDrink = ensureAccountMacro(DRINK_MACRO_NAME, DRINK_MACRO_ICON, DRINK_MACRO_BODY)
+  if okEat then
+    ConsolePortCouchDB.eatPinned = true
+  end
+  if okDrink then
+    ConsolePortCouchDB.drinkPinned = true
+  end
+  return okEat and okDrink
+end
+
+-- Tooltip scan for "Restores N health/mana" (Forever Food & Drink). Avoid UnitHealth
+-- arithmetic — Forever may treat those as secret values.
+local scanTip = CreateFrame("GameTooltip", "ConsolePortCouchScanTip", nil, "GameTooltipTemplate")
+scanTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+local function containerNumSlots(bag)
+  if C_Container and C_Container.GetContainerNumSlots then
+    return C_Container.GetContainerNumSlots(bag) or 0
+  end
+  return GetContainerNumSlots and GetContainerNumSlots(bag) or 0
+end
+
+local function containerItemLink(bag, slot)
+  if C_Container and C_Container.GetContainerItemLink then
+    return C_Container.GetContainerItemLink(bag, slot)
+  end
+  return GetContainerItemLink and GetContainerItemLink(bag, slot)
+end
+
+local function useContainerItem(bag, slot)
+  if C_Container and C_Container.UseContainerItem then
+    C_Container.UseContainerItem(bag, slot)
+    return true
+  end
+  if UseContainerItem then
+    UseContainerItem(bag, slot)
+    return true
+  end
+  return false
+end
+
+local function itemOnCooldown(bag, slot)
+  if not GetContainerItemID and not (C_Container and C_Container.GetContainerItemID) then
+    return false
+  end
+  local id
+  if C_Container and C_Container.GetContainerItemID then
+    id = C_Container.GetContainerItemID(bag, slot)
+  else
+    id = GetContainerItemID(bag, slot)
+  end
+  if not id or not GetItemCooldown then
+    return false
+  end
+  local start, duration, enable = GetItemCooldown(id)
+  return enable ~= 0 and duration and duration > 0 and (start + duration - GetTime()) > 0
+end
+
+local function parseFoodDrinkScores(bag, slot)
+  scanTip:ClearLines()
+  scanTip:SetBagItem(bag, slot)
+  local health, mana = 0, 0
+  local seated = false
+  local alcohol = false
+  for i = 1, scanTip:NumLines() do
+    local fs = _G["ConsolePortCouchScanTipTextLeft" .. i]
+    local text = fs and fs:GetText()
+    if text then
+      local lower = text:lower()
+      if lower:find("alcoholic", 1, true) then
+        alcohol = true
+      end
+      if lower:find("seated while eating", 1, true) or lower:find("seated while drinking", 1, true) then
+        seated = true
+      end
+      local bothH, bothM = text:match("[Rr]estores (%d+) health and (%d+) mana")
+      if bothH then
+        health = math.max(health, tonumber(bothH) or 0)
+        mana = math.max(mana, tonumber(bothM) or 0)
+      else
+        local h = text:match("[Rr]estores (%d+) health")
+        local m = text:match("[Rr]estores (%d+) mana")
+        if h then
+          health = math.max(health, tonumber(h) or 0)
+        end
+        if m then
+          mana = math.max(mana, tonumber(m) or 0)
+        end
+      end
+      -- Percent foods (no UnitHealthMax math — Forever secret values).
+      local hpct = text:match("[Rr]estores (%d+)%% of your health")
+      local mpct = text:match("(%d+)%% of your mana")
+      if hpct then
+        health = math.max(health, (tonumber(hpct) or 0) * 80)
+      end
+      if mpct then
+        mana = math.max(mana, (tonumber(mpct) or 0) * 80)
+      end
+      local hps = text:match("(%d+)%% of your health per second")
+      local mps = text:match("(%d+)%% of your mana per second")
+      if hps then
+        health = math.max(health, (tonumber(hps) or 0) * 80 * 25)
+      end
+      if mps then
+        mana = math.max(mana, (tonumber(mps) or 0) * 80 * 25)
+      end
+    end
+  end
+  if alcohol then
+    return 0, 0
+  end
+  -- Require seated eat/drink text, or a restore line (covers most Forever food/drink).
+  if not seated and health == 0 and mana == 0 then
+    return 0, 0
+  end
+  return health, mana
+end
+
+local function findBestConsumable(want)
+  -- want: "food" (max health score) or "drink" (max mana score)
+  local bestBag, bestSlot, bestScore, bestName = nil, nil, -1, nil
+  local level = UnitLevel and UnitLevel("player") or 1
+  for bag = 0, 4 do
+    local slots = containerNumSlots(bag)
+    for slot = 1, slots do
+      local link = containerItemLink(bag, slot)
+      if link and not itemOnCooldown(bag, slot) then
+        local name, _, _, itemLevel, minLevel = GetItemInfo(link)
+        if name and (not minLevel or level >= minLevel) then
+          local health, mana = parseFoodDrinkScores(bag, slot)
+          local score = (want == "drink") and mana or health
+          -- Prefer pure-ish matches: food needs health, drink needs mana.
+          if score > bestScore and score > 0 then
+            bestBag, bestSlot, bestScore, bestName = bag, slot, score, name
+          elseif score == bestScore and score > 0 and itemLevel and bestBag then
+            local _, _, _, bestIlvl = GetItemInfo(containerItemLink(bestBag, bestSlot))
+            if (itemLevel or 0) > (bestIlvl or 0) then
+              bestBag, bestSlot, bestName = bag, slot, name
+            end
+          end
+        end
+      end
+    end
+  end
+  return bestBag, bestSlot, bestName, bestScore
+end
+
+function ConsolePortCouch_Eat()
+  if InCombatLockdown and InCombatLockdown() then
+    print("|cffffaa00EatBest:|r cannot eat in combat")
+    return
+  end
+  local bag, slot, name, score = findBestConsumable("food")
+  if not bag then
+    print("|cffff6666EatBest:|r no food in bags")
+    return
+  end
+  if useContainerItem(bag, slot) then
+    print("|cff66ff66EatBest:|r " .. (name or "?") .. " (score " .. tostring(score) .. ")")
+  end
+end
+
+function ConsolePortCouch_Drink()
+  if InCombatLockdown and InCombatLockdown() then
+    print("|cffffaa00DrinkBest:|r cannot drink in combat")
+    return
+  end
+  local bag, slot, name, score = findBestConsumable("drink")
+  if not bag then
+    print("|cffff6666DrinkBest:|r no drink in bags")
+    return
+  end
+  if useContainerItem(bag, slot) then
+    print("|cff66ff66DrinkBest:|r " .. (name or "?") .. " (score " .. tostring(score) .. ")")
+  end
+end
+
 local function pinInviteNearestBindings(force)
   if InCombatLockdown and InCombatLockdown() then
     return false
@@ -336,6 +527,16 @@ SlashCmdList.CPCOUCH = function(msg)
     else
       print("|cffff6666ConsolePort Couch:|r could not create FishingCouch macro.")
     end
+  elseif msg == "eat" or msg == "food" then
+    if ensureEatDrinkMacros() then
+      printMacroReady(EAT_MACRO_NAME, EAT_MACRO_BODY)
+    end
+    ConsolePortCouch_Eat()
+  elseif msg == "drink" then
+    if ensureEatDrinkMacros() then
+      printMacroReady(DRINK_MACRO_NAME, DRINK_MACRO_BODY)
+    end
+    ConsolePortCouch_Drink()
   elseif msg == "status" then
     print(
       "|cff66ff66ConsolePort Couch:|r applied=",
@@ -356,11 +557,15 @@ SlashCmdList.CPCOUCH = function(msg)
       tostring(GetMacroIndexByName and GetMacroIndexByName(CAMP_MACRO_NAME) or 0),
       "FishingMacro=",
       tostring(GetMacroIndexByName and GetMacroIndexByName(FISH_MACRO_NAME) or 0),
+      "EatMacro=",
+      tostring(GetMacroIndexByName and GetMacroIndexByName(EAT_MACRO_NAME) or 0),
+      "DrinkMacro=",
+      tostring(GetMacroIndexByName and GetMacroIndexByName(DRINK_MACRO_NAME) or 0),
       "CursorAutoEnable=",
       tostring(GetCVar and GetCVar("GamePadCursorAutoEnable"))
     )
   else
-    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | fish | status")
+    print("|cff66ff66ConsolePort Couch:|r /cpcouch apply | menu | invite | camp | fish | eat | drink | status")
   end
 end
 
@@ -372,6 +577,7 @@ boot:SetScript("OnEvent", function(self, event)
     tryApply(false)
     ensureCampsiteMacro()
     ensureFishingMacro()
+    ensureEatDrinkMacros()
     C_Timer.After(5.0, function()
       if not InCombatLockdown or not InCombatLockdown() then
         pinGameMenuBindings(false)
@@ -379,6 +585,7 @@ boot:SetScript("OnEvent", function(self, event)
         pinInviteNearestBindings(false)
         ensureCampsiteMacro()
         ensureFishingMacro()
+        ensureEatDrinkMacros()
       end
     end)
   elseif event == "UPDATE_BINDINGS" then
