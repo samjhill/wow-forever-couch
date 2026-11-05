@@ -1,5 +1,5 @@
-stamp=2026-11-05T09:49Z
-source_account=SAMUHILL
-source_character=91/Chain-Milk
+stamp=2026-11-05T13:50Z
+source_account=50188345#4
+source_character=
 wow_forever=/home/sam/Games/battlenet/pfx/drive_c/Program Files (x86)/World of Warcraft/_forever_
 hostname=bazzite

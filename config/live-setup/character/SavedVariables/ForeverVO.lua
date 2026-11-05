@@ -1,4 +1,0 @@
-
-ForeverVOCharDB = {
-["paused"] = false,
-}

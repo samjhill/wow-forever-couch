@@ -2,11 +2,11 @@ ConsolePort: enabled
 ConsolePort_Bar: enabled
 ConsolePort_Config: enabled
 ConsolePort_Cursor: enabled
-ConsolePort_Keyboard: disabled
 ConsolePort_Menu: enabled
 ConsolePort_Rings: enabled
 ConsolePort_Target: enabled
 ConsolePort_World: enabled
+ConsolePortCouch: enabled
 Immersion: enabled
 ForeverVO: enabled
 ForeverVO_Data_Classic_Quests: enabled
@@ -25,7 +25,9 @@ LoreForever_Voice_Default: enabled
 LoreForever_Voice_Default_Alliance: enabled
 LoreForever_Voice_Default_Horde: enabled
 TheFishingLog: enabled
+ForeverLootSparkles: enabled
 DialogKey_Numy: disabled
 DialogKey_Aeonzara: disabled
 DialogKey: disabled
-ConsolePortCouch: enabled
+NodeSight: enabled
+GatherRadar: enabled

@@ -1,6 +1,6 @@
 # Live couch setup snapshot
 
-Captured **2026-11-05T09:49Z** from account `SAMUHILL` / character `91/Chain-Milk`.
+Captured **2026-11-05T13:50Z** from account `50188345#4` / character `unknown`.
 
 ## Contents
 
