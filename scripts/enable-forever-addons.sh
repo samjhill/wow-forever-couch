@@ -20,6 +20,8 @@ ADDONS=(
   ForeverLootSparkles
   NodeSight
   GatherRadar
+  SelfBuffs
+  CouchBuffReminder
 )
 # Removed from couch stack (Immersion covers quest/gossip keys)
 DISABLE_ADDONS=(
