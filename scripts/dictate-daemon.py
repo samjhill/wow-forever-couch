@@ -2,10 +2,12 @@
 """Watch FIFO + controller dictate binds + Steam Input keyboard key.
 
 Binds (host / Steam Input):
-  Steam Controller — left grip (BTN_GRIPL) start/confirm; right grip cancel
-  Xbox — R3 (BTN_THUMBR); Steam Input → Insert (KEY_INSERT)
+  Steam Controller — left grip (BTN_GRIPL) hold-to-talk; right grip cancel
+  Xbox — R3 (BTN_THUMBR) hold-to-talk; Steam Input → Insert (KEY_INSERT)
   Steam keyboard layer — KEY_INSERT (preferred; shown in Steam's picker)
   Legacy — KEY_F20 still accepted if an old layout emits it
+
+Hold-to-talk: key/button down starts capture; release stops and runs Whisper.
 """
 from __future__ import annotations
 
@@ -34,11 +36,12 @@ DICTATE = BASE / "scripts" / "dictate-push-to-talk.sh"
 CONFIRM = BASE / "scripts" / "confirm-wow-chat.sh"
 FIFO = BASE / "config" / "dictate.trigger"
 STATUS = BASE / "config" / "dictate-status.json"
-COOLDOWN_S = float(os.environ.get("DICTATE_COOLDOWN", "1.5"))
+STOP_FILE = Path(os.environ.get("DICTATE_STOP_FILE", "/tmp/wow-dictate.stop"))
+COOLDOWN_S = float(os.environ.get("DICTATE_COOLDOWN", "0.8"))
 DRAFT_TTL_S = float(os.environ.get("DICTATE_DRAFT_TTL", "60"))
-# While capture/Whisper/inject runs, ignore extra R3 presses (they used to spawn
-# no-op "dictate" jobs and felt like the bind needed double taps).
-BUSY_STATES = frozenset({"recording", "transcribing", "injecting", "busy"})
+# While Whisper/inject runs, ignore extra presses. Recording accepts release→stop.
+BUSY_STATES = frozenset({"transcribing", "injecting", "busy"})
+RECORDING_STATES = frozenset({"recording"})
 
 # Linux BTN_GRIPL / BTN_GRIPR (Steam Controller) and fallbacks
 GRIPL = getattr(ecodes, "BTN_GRIPL", 548)
@@ -55,6 +58,9 @@ THUMBL = getattr(ecodes, "BTN_THUMBL", 317)  # unused for dictate; reserved
 INSERT = getattr(ecodes, "KEY_INSERT", 110)
 F20 = getattr(ecodes, "KEY_F20", 190)  # legacy
 STEAM_KEYS = {INSERT, F20}
+HOLD_CODES = GRIP_CODES | {THUMBR, THUMBL} | STEAM_KEYS
+# Right grip is cancel-only, not hold-to-talk
+HOLD_START_CODES = (GRIP_CODES - {GRIPR}) | {THUMBR} | STEAM_KEYS
 
 XBOX_NAME_HINTS = (
     "xbox",
@@ -68,6 +74,7 @@ XBOX_NAME_HINTS = (
 
 _last_fire = 0.0
 _lock = threading.Lock()
+_hold_active = False
 
 
 def log(msg: str) -> None:
@@ -100,6 +107,10 @@ def pipeline_busy() -> bool:
     return load_status().get("state") in BUSY_STATES
 
 
+def is_recording() -> bool:
+    return load_status().get("state") in RECORDING_STATES or _hold_active
+
+
 def run_script(script: Path, args: list[str] | None = None, env_extra: dict | None = None) -> None:
     env = os.environ.copy()
     if env_extra:
@@ -115,7 +126,27 @@ def run_script(script: Path, args: list[str] | None = None, env_extra: dict | No
     )
 
 
-def fire_dictate(reason: str) -> None:
+def clear_stop() -> None:
+    try:
+        STOP_FILE.unlink(missing_ok=True)
+    except OSError:
+        pass
+
+
+def signal_stop(reason: str) -> None:
+    global _hold_active
+    try:
+        STOP_FILE.parent.mkdir(parents=True, exist_ok=True)
+        STOP_FILE.touch()
+    except OSError as exc:
+        log(f"stop touch failed: {exc}")
+        return
+    _hold_active = False
+    log(f"stop record: {reason}")
+
+
+def fire_dictate(reason: str, *, hold: bool = True) -> None:
+    global _hold_active
     env = os.environ.copy()
     # Harness can drop a sidecar env file for one-shot DICTATE_WAV
     env_file = BASE / "config" / "dictate-env"
@@ -130,7 +161,14 @@ def fire_dictate(reason: str) -> None:
             env_file.unlink()
         except OSError:
             pass
-    log(f"dictate: {reason}")
+    if hold:
+        clear_stop()
+        env["DICTATE_HOLD"] = "1"
+        _hold_active = True
+    else:
+        env.setdefault("DICTATE_HOLD", "0")
+        _hold_active = False
+    log(f"dictate{' hold' if hold else ''}: {reason}")
     run_script(DICTATE, env_extra=env)
 
 
@@ -152,10 +190,15 @@ def fire(reason: str, action: str = "auto") -> None:
         if now - _last_fire < COOLDOWN_S:
             log(f"cooldown skip ({reason})")
             return
-        # Cancel always wins; confirm/dictate wait out an in-flight pipeline.
-        if action != "cancel" and pipeline_busy():
-            log(f"busy skip ({reason}) — wait for stop/done beep")
-            return
+        # Cancel always wins; confirm/dictate wait out Whisper/inject.
+        # Recording: another press is ignored (release stops instead).
+        if action != "cancel":
+            if is_recording() and action in {"auto", "dictate"}:
+                log(f"already recording ({reason}) — hold until release")
+                return
+            if pipeline_busy():
+                log(f"busy skip ({reason}) — wait for stop/done beep")
+                return
         _last_fire = now
 
     if action == "cancel":
@@ -165,14 +208,14 @@ def fire(reason: str, action: str = "auto") -> None:
         fire_confirm(reason)
         return
     if action == "dictate":
-        fire_dictate(reason)
+        fire_dictate(reason, hold=True)
         return
 
     # auto: second bind press confirms an open draft instead of re-recording
     if pending_draft():
         fire_confirm(reason)
     else:
-        fire_dictate(reason)
+        fire_dictate(reason, hold=True)
 
 
 def ensure_fifo() -> None:
@@ -238,7 +281,9 @@ def fifo_loop() -> None:
                 else:
                     line, buf = buf, b""
                 data = line.decode("utf-8", "replace").strip().lower()
-                if data in {"", "fire", "dictate", "1", "auto"}:
+                if data in {"stop", "release", "end"}:
+                    signal_stop("fifo:stop")
+                elif data in {"", "fire", "dictate", "1", "auto", "start", "hold"}:
                     fire("fifo", "auto")
                 elif data in {"confirm", "send", "enter"}:
                     fire("fifo:confirm", "confirm")
@@ -273,18 +318,30 @@ def evdev_loop(devices) -> None:
                 continue
             try:
                 for event in dev.read():
-                    if event.type != ecodes.EV_KEY or event.value != 1:
+                    if event.type != ecodes.EV_KEY:
+                        continue
+                    # 1 = down, 0 = up, 2 = repeat (ignore)
+                    if event.value == 2:
+                        continue
+                    if event.value == 0:
+                        # Release → stop hold-to-talk capture
+                        if event.code in HOLD_START_CODES and is_recording():
+                            signal_stop(f"release:{event.code}:{dev.name}")
+                        continue
+                    if event.value != 1:
                         continue
                     if event.code == GRIPR:
                         # Steam Controller right grip discards an open draft (Esc)
-                        if pending_draft():
+                        if is_recording():
+                            signal_stop(f"gripR-abort:{dev.name}")
+                            fire_cancel(f"gripR-cancel-while-rec:{dev.name}")
+                        elif pending_draft():
                             fire(f"gripR-cancel:{dev.name}", "cancel")
                         else:
                             log("right grip ignored (no draft)")
                     elif event.code in GRIP_CODES:
                         fire(f"grip:{dev.name}:{event.code}", "auto")
                     elif event.code == THUMBR:
-                        # Xbox R3 — same as left grip / Insert (start or confirm draft)
                         fire(f"R3:{dev.name}", "auto")
                     elif event.code in STEAM_KEYS:
                         fire(f"key{event.code}:{dev.name}", "auto")
@@ -300,11 +357,12 @@ def main() -> int:
         log(f"missing confirm script: {CONFIRM}")
         return 2
     ensure_fifo()
+    clear_stop()
     t = threading.Thread(target=fifo_loop, name="fifo", daemon=True)
     t.start()
     devices = open_devices()
     log(
-        "ready (SC left grip / Xbox R3 / Insert → dictate+send; "
+        "ready (hold SC left grip / Xbox R3 / Insert to talk; release to send; "
         f"draft TTL={DRAFT_TTL_S:.0f}s if DICTATE_SEND_MODE=draft)"
     )
     evdev_loop(devices)
