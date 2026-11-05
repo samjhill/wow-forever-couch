@@ -57,18 +57,16 @@ Account macro **FishingCouch** (created on login / `/cpcouch pinfish`):
 
 ```
 #showtooltip Fishing
-/click CPCCouchFish LeftButton
+/run if ConsolePortCouch_PreFish then ConsolePortCouch_PreFish() end
+/cast Fishing
 ```
 
 Each press (out of combat):
 
-1. Equips the best **fishing pole** in bags if better than what’s equipped
-2. Applies the best **lure** if present and the pole has none
-3. Eats Forever **+Fishing food** if present and not already Well Fed
-4. Places **Fishing Hut / Rack / Bowl** (+ campfire kit) when those items are in bags
-5. Always `/cast Fishing` — missing lure/food/camp objects are skipped quietly
+1. `/run` optionally equips a better pole, applies lure/food, places Hut/Rack/Bowl
+2. `/cast Fishing` always runs on the same bar press (works on Forever; nested `/click` did not)
 
-Hard errors only for dead, combat, or no pole / no Fishing skill. `/cpcouch fish` runs it; `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
+Missing lure/food/camp objects are skipped quietly. `/cpcouch fishstatus` lists bags. Offline seed: `./scripts/pin-fishing-macro.sh`.
 
 ## Apply (manual in-game)
 

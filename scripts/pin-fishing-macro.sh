@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Create account macro "FishingCouch": /click CPCCouchFish (ConsolePortCouch).
-# The addon equips best pole, applies lure/food, places Fishing Hut/Rack/Bowl (+ fire),
-# then /cast Fishing — with chat/UI errors when something is wrong.
+# Create account macro "FishingCouch": /run PreFish + /cast Fishing (ConsolePortCouch).
+# The /run applies optional pole/lure/food/camp items; /cast Fishing does the cast.
 #
 # Forever should be fully quit so macros-cache is not overwritten.
 set -euo pipefail
@@ -12,7 +11,7 @@ ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 MACRO_NAME="FishingCouch"
 MACRO_ICON="Trade_Fishing"
-MACRO_BODY=$'#showtooltip Fishing\n/click CPCCouchFish LeftButton'
+MACRO_BODY=$'#showtooltip Fishing\n/run if ConsolePortCouch_PreFish then ConsolePortCouch_PreFish() end\n/cast Fishing'
 
 if [[ ! -d "$ACCT" ]]; then
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
