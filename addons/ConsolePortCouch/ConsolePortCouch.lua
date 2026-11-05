@@ -68,11 +68,12 @@ local FISH_MACRO_ICON = "Trade_Fishing"
 local FISH_BUTTON_NAME = "CPCCouchFish"
 local FISH_MACRO_BODY = "#showtooltip Fishing\n/click " .. FISH_BUTTON_NAME
 
--- Best-first poles (+skill).
+-- Best-first poles (+skill). Include Forever extras (Darkwood, Ravaged).
 local FISH_POLES = {
   "Arcanite Fishing Pole",
   "Nat Pagle's Extreme Angler FC-5000",
   "Big Iron Fishing Pole",
+  "Darkwood Fishing Pole",
   "Ravaged Fishing Pole",
   "Strong Fishing Pole",
   "Blump Family Fishing Pole",
@@ -298,26 +299,107 @@ local function campPrint(kind, msg)
   end
 end
 
-local function itemCount(name)
-  if not name or name == "" then
-    return 0
+local function containerNumSlots(bag)
+  if C_Container and C_Container.GetContainerNumSlots then
+    return C_Container.GetContainerNumSlots(bag) or 0
   end
-  if GetItemCount then
-    local n = GetItemCount(name, false, false)
-    if type(n) == "number" then
-      return n
+  if GetContainerNumSlots then
+    return GetContainerNumSlots(bag) or 0
+  end
+  return 0
+end
+
+local function containerItemLink(bag, slot)
+  if C_Container and C_Container.GetContainerItemLink then
+    return C_Container.GetContainerItemLink(bag, slot)
+  end
+  if GetContainerItemLink then
+    return GetContainerItemLink(bag, slot)
+  end
+  return nil
+end
+
+local function containerItemInfo(bag, slot)
+  if C_Container and C_Container.GetContainerItemInfo then
+    local info = C_Container.GetContainerItemInfo(bag, slot)
+    if type(info) == "table" then
+      return info.stackCount or info.quantity or 1
+    end
+  end
+  if GetContainerItemInfo then
+    local texture, count = GetContainerItemInfo(bag, slot)
+    if texture then
+      return count or 1
     end
   end
   return 0
 end
 
-local function itemCooldownRemaining(name)
-  if not GetItemInfo or not GetItemCooldown then
+local function linkItemName(link)
+  if not link then
+    return nil
+  end
+  return link:match("%[(.-)%]")
+end
+
+-- Forever/Classic: GetItemCount(name) often returns 0 until the item is cached.
+-- Count by scanning bag item links (and equipped main-hand for poles).
+local function itemCount(name)
+  if not name or name == "" then
     return 0
   end
-  local _, _, _, _, _, _, _, _, _, _, itemId = GetItemInfo(name)
+  local total = 0
+  if GetItemCount then
+    local n = GetItemCount(name, false, false)
+    if type(n) == "number" and n > 0 then
+      total = n
+    end
+  end
+  if total > 0 then
+    return total
+  end
+  for bag = 0, 4 do
+    local slots = containerNumSlots(bag)
+    for slot = 1, slots do
+      local link = containerItemLink(bag, slot)
+      local linkName = linkItemName(link)
+      if linkName == name then
+        total = total + (containerItemInfo(bag, slot) or 1)
+      end
+    end
+  end
+  return total
+end
+
+local function itemCooldownRemaining(name)
+  if not GetItemCooldown then
+    return 0
+  end
+  local itemId = nil
+  if GetItemInfo then
+    local _
+    _, _, _, _, _, _, _, _, _, _, itemId = GetItemInfo(name)
+  end
+  -- Resolve id from a bag link when name isn't cached yet.
   if not itemId then
-    -- Name may still work as GetItemCooldown arg on some clients
+    for bag = 0, 4 do
+      local slots = containerNumSlots(bag)
+      for slot = 1, slots do
+        local link = containerItemLink(bag, slot)
+        if linkItemName(link) == name then
+          itemId = link:match("item:(%d+)")
+          if itemId then
+            itemId = tonumber(itemId)
+          end
+          break
+        end
+      end
+      if itemId then
+        break
+      end
+    end
+  end
+  if not itemId then
     itemId = name
   end
   local start, duration, enable = GetItemCooldown(itemId)
@@ -654,17 +736,39 @@ local function knowsFishing()
   return false
 end
 
-local function equippedPoleName()
-  local link = GetInventoryItemLink and GetInventoryItemLink("player", 16)
+-- Prefer link + item subtype ("Fishing Pole") and known names.
+local function fishingPoleNameFromLink(link)
   if not link then
     return nil
   end
-  for _, name in ipairs(FISH_POLES) do
-    if link:find(name, 1, true) then
+  local name = linkItemName(link)
+  if name then
+    for _, pole in ipairs(FISH_POLES) do
+      if name == pole then
+        return pole
+      end
+    end
+  end
+  if GetItemInfo then
+    local itemName, _, _, _, _, _, itemSubType = GetItemInfo(link)
+    local sub = itemSubType and tostring(itemSubType) or ""
+    local subLower = sub:lower()
+    if subLower == "fishing pole" or subLower == "fishing poles" or subLower:find("fishing", 1, true) then
+      return itemName or name
+    end
+  end
+  if name then
+    local lower = name:lower()
+    if lower:find("fishing pole", 1, true) or lower:find("angler", 1, true) then
       return name
     end
   end
   return nil
+end
+
+local function equippedPoleName()
+  local link = GetInventoryItemLink and GetInventoryItemLink("player", 16)
+  return fishingPoleNameFromLink(link)
 end
 
 local function poleRank(name)
@@ -676,12 +780,32 @@ local function poleRank(name)
       return i
     end
   end
-  return 999
+  -- Unknown Forever pole: prefer over the vendor stick, worse than named list.
+  return #FISH_POLES
+end
+
+local function findBestPoleInBags()
+  local bestName, bestRank = nil, 999
+  -- 0=backpack, 1-4=bags (Classic/Forever). Bank not needed for fishing cast.
+  for bag = 0, 4 do
+    local slots = containerNumSlots(bag)
+    for slot = 1, slots do
+      local link = containerItemLink(bag, slot)
+      local name = fishingPoleNameFromLink(link)
+      if name then
+        local rank = poleRank(name)
+        if rank < bestRank then
+          bestName, bestRank = name, rank
+        end
+      end
+    end
+  end
+  return bestName
 end
 
 local function bestPoleToEquip()
   local equipped = equippedPoleName()
-  local bagPole = pickFirstOwned(FISH_POLES)
+  local bagPole = findBestPoleInBags()
   if not bagPole then
     return nil, equipped
   end
@@ -716,7 +840,8 @@ local function isWellFed()
 end
 
 local function fishInventoryReport()
-  local equipPole, wantPole = equippedPoleName(), pickFirstOwned(FISH_POLES)
+  local equipPole = equippedPoleName()
+  local wantPole = findBestPoleInBags()
   local lure = pickFirstOwned(FISH_LURES)
   local food = pickFirstOwned(FISH_FOOD)
   local feat = pickFirstOwned(FISH_CAMP_FEATURES)
@@ -757,13 +882,12 @@ local function buildFishMacrotext()
   if equipPole then
     table.insert(lines, "/equip " .. equipPole)
     fishPrint("ok", "equipping " .. equipPole)
-  elseif not currentPole and not equippedPoleName() then
-    -- May still fish with fists on some clients, but Forever needs a pole.
-    if not pickFirstOwned(FISH_POLES) then
+  elseif not currentPole then
+    if not findBestPoleInBags() then
       fishPrint("error", "no fishing pole equipped or in bags")
       return nil
     end
-  elseif currentPole then
+  else
     fishPrint("ok", "using " .. currentPole)
   end
 
