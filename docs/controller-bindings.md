@@ -32,9 +32,9 @@ Class abilities are **not** pre-slotted — after the preset loads, put spells o
 
 Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once), then pins **RB → InviteNearest**. Force: `/cpcouch apply`. Re-pin invite only: `/cpcouch invite`. Offline file seed: `./scripts/pin-invite-nearest-macro.sh` (quit Forever first for cache writes).
 
-### Campsite / FishingCouch (plain Forever macros)
+### Couch macros (plain `/use` / `/cast` only)
 
-Forever’s secure-snippet path is broken, so these stay **plain account macros** (same idea as InviteNearest) — no `/run`, no SecureActionButton `/click`.
+Forever cannot use items from `/run`. Every couch macro is a normal account macro — same style as InviteNearest.
 
 **Campsite** (`/cpcouch camp`):
 
@@ -43,37 +43,23 @@ Forever’s secure-snippet path is broken, so these stay **plain account macros*
 /use Expert Campfire Kit
 /use Journeyman Campfire Kit
 /use Basic Campfire Kit
-/sit
 ```
-
-Uses the first kit present in bags, then sits. Craft kits in Cooking beforehand if you have none.
 
 **FishingCouch** (`/cpcouch fish`):
 
 ```
-#showtooltip Fishing
+#showtooltip
 /cast Fishing
 ```
 
-Equip a pole (and lure) yourself; the macro only casts Fishing.
-
-Drag either macro onto a ConsolePort gamepad bar slot (not over RB). Offline seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh` (quit Forever first).
-
-### EatBest / DrinkBest
-
-Scans bags for the strongest health food / mana drink (tooltip “Restores N …”), skips alcohol, then uses it:
+**EatBest / DrinkBest** — addon rewrites these out of combat to the strongest food/drink in bags:
 
 ```
 #showtooltip
-/run if ConsolePortCouch_Eat then ConsolePortCouch_Eat() end
+/use <best food or drink name>
 ```
 
-```
-#showtooltip
-/run if ConsolePortCouch_Drink then ConsolePortCouch_Drink() end
-```
-
-Created on login or `/cpcouch eat` / `/cpcouch drink`. Offline: `./scripts/pin-eat-drink-macros.sh`.
+`/cpcouch eat` or `/cpcouch drink` rescans and prints the current target. Offline seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh`, `./scripts/pin-eat-drink-macros.sh` (quit Forever first).
 
 ## Apply (manual in-game)
 
