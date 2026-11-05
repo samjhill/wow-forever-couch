@@ -56,11 +56,11 @@ esac
 PAYLOAD="${PREFIX}${TEXT}"
 
 "$EMIT" key esc
-sleep 0.05
+sleep 0.03
 "$EMIT" key enter
-sleep 0.05
+sleep 0.03
 "$EMIT" type "$PAYLOAD"
-sleep 0.05
+sleep 0.03
 
 case "$SEND_MODE_LC" in
   draft|confirm)
