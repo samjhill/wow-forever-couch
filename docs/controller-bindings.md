@@ -28,6 +28,13 @@ These are normal account macros. Drag them onto the gamepad bar. Quit Forever be
 /cast Fishing
 ```
 
+**Wand** (`./scripts/pin-wand-macro.sh`) — start wand auto-shot. `!Shoot` keeps it going if the button is pressed again:
+
+```
+#showtooltip
+/cast !Shoot
+```
+
 **Food / drink** — Forever **AutoFeed** (not a couch macro):
 
 | Macro | Does |
