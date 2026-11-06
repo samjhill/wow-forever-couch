@@ -76,4 +76,5 @@ fi
 echo "Restored. Launch Forever (full restart). Re-run pin scripts if you want policy overlays:"
 echo "  ./scripts/pin-voiceover-prefs.sh"
 echo "  ./scripts/pin-forever-graphics.sh"
+echo "  ./scripts/pin-wand-macro.sh"
 echo "  ./scripts/enable-forever-addons.sh"

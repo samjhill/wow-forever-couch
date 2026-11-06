@@ -84,6 +84,7 @@ if forever_client_ready; then
   if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
     "${REPO_ROOT}/scripts/enable-forever-addons.sh" || true
     "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" || true
+    "${REPO_ROOT}/scripts/pin-wand-macro.sh" || true
   else
     echo "No WTF/Account yet — first in-game login creates it; launch script will enable addons after that."
   fi

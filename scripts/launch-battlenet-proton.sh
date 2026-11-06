@@ -56,6 +56,9 @@ if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
   if [[ -x "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" ]]; then
     "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" >/tmp/wow-forever-couch-pin-voiceover.log 2>&1 || true
   fi
+  if [[ -x "${REPO_ROOT}/scripts/pin-wand-macro.sh" ]]; then
+    "${REPO_ROOT}/scripts/pin-wand-macro.sh" >/tmp/wow-forever-couch-pin-wand.log 2>&1 || true
+  fi
 fi
 
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasma* ]]; then
