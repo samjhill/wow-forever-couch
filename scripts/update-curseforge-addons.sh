@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Refresh Forever CurseForge addons (1.60.x files only).
-# Skips when Forever is running. Safe to run from the launch hook and the 6h timer.
+# Skips when Forever is running. Runs from the daily timer, not Battle.net launch.
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"

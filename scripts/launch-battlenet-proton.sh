@@ -35,17 +35,9 @@ if [[ -x "${REPO_ROOT}/scripts/pin-forever-graphics.sh" ]]; then
 fi
 
 # Quiet repo sync before Battle.net (ff-only pull + repo-owned addons). Timer does full mode.
+# CurseForge addon zips refresh on the daily timer, not here, so launch does not wait on downloads.
 if [[ "${WOW_COUCH_LAUNCH_SYNC:-1}" == "1" && -x "${REPO_ROOT}/scripts/apply-repo-updates.sh" ]]; then
   WOW_COUCH_UPDATE_MODE=quick "${REPO_ROOT}/scripts/apply-repo-updates.sh" >/tmp/wow-forever-couch-launch-sync.log 2>&1 || true
-fi
-
-# CurseForge Forever files before the client starts. Skip with WOW_COUCH_CURSEFORGE_UPDATE=0.
-if [[ "${WOW_COUCH_CURSEFORGE_UPDATE:-1}" == "1" && -x "${REPO_ROOT}/scripts/update-curseforge-addons.sh" ]]; then
-  if command -v timeout >/dev/null 2>&1; then
-    timeout 600 "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || true
-  else
-    "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || true
-  fi
 fi
 
 # After first in-game login, WTF/Account exists — enable couch addons without a second bootstrap.

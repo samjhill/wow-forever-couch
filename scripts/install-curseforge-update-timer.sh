@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# systemd --user timer: refresh Forever CurseForge addons every 6 hours.
+# systemd --user timer: refresh Forever CurseForge addons once a day.
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
@@ -24,13 +24,12 @@ EOF
 
 cat > "${UNIT_DIR}/wow-curseforge-addons.timer" <<EOF
 [Unit]
-Description=CurseForge addon update for WoW Forever (every 6h)
+Description=CurseForge addon update for WoW Forever (daily)
 
 [Timer]
-OnBootSec=3min
-OnUnitActiveSec=6h
+OnCalendar=04:00
 Persistent=true
-RandomizedDelaySec=5min
+RandomizedDelaySec=20min
 
 [Install]
 WantedBy=timers.target

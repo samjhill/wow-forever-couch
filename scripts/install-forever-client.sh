@@ -24,8 +24,8 @@ fi
 echo "Opening Battle.net on WoW Forever install (--game=WoWF --install)."
 echo "Log in if asked (and approve authenticator). Leave the window open until Forever finishes."
 
-# Skip launch-hook sync/curseforge spam while we only care about client download.
-WOW_COUCH_LAUNCH_SYNC=0 WOW_COUCH_CURSEFORGE_UPDATE=0 \
+# Skip the launch-hook repo sync while we only care about the client download.
+WOW_COUCH_LAUNCH_SYNC=0 \
   "${REPO_ROOT}/scripts/launch-battlenet-proton.sh" --game=WoWF --install &
 disown || true
 

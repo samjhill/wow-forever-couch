@@ -8,9 +8,8 @@ Flavor: **WoW Forever** client under `_forever_`, interface **`16001`** (game ve
 
 Forever files are refreshed from the CurseForge file list (game version `1.60.x` only):
 
-- **Before Battle.net starts**, when you launch through `launch-battlenet-proton.sh` (skip with `WOW_COUCH_CURSEFORGE_UPDATE=0`)
-- **Every 6 hours** via the user timer `wow-curseforge-addons.timer`
-- **Full repo sync** (`WOW_COUCH_UPDATE_MODE=full`) also runs the same update
+- **Once a day**, around 04:00, via the user timer `wow-curseforge-addons.timer` (catches up after boot if the machine was off)
+- Battle.net launch does not download addons. A full repo sync only refreshes that timer.
 
 ```bash
 ./scripts/install-curseforge-update-timer.sh
