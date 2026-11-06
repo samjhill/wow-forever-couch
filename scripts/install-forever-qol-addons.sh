@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/Lore Forever/Fishing Log/Questie)
+# Install Forever-tagged QoL addons (Leatrix/Plater/Lore Forever/Fishing Log/Questie)
 # and stage later-activation zips (BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch Immersion, Spoken*, or CouchDictateRoute.
@@ -100,10 +100,6 @@ PY
 }
 
 echo "=== download install set ==="
-fetch_forever 988370
-SYN_ZIP="$FETCHED_NAME"
-fetch_forever 914482
-BAG_ZIP="$FETCHED_NAME"
 fetch_forever 94855 forever
 LEA_ZIP="$FETCHED_NAME"
 fetch_forever 100547
@@ -134,9 +130,11 @@ path="$(python3 "${REPO_ROOT}/scripts/python/curseforge_fetch.py" --project 3343
 QUESTIE_ZIP="$(basename "$path")"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
+for z in "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
+# Built-in bags replace Baganator; Syndicator only indexed inventory for it.
+rm -rf "${DEST}/Baganator" "${DEST}/Syndicator"
 # Drop previous custom buff stack
 rm -rf "${DEST}/CouchBuffReminder" "${DEST}/SelfBuffs"
 # Immersion already covers controller quest/gossip; do not install DialogKey forks.
@@ -163,8 +161,6 @@ done
   echo "addons_dir=$DEST"
   echo
   echo "## installed (enable via enable-forever-addons.sh)"
-  echo "- $SYN_ZIP"
-  echo "- $BAG_ZIP"
   echo "- $LEA_ZIP"
   echo "- $PLA_ZIP"
   echo "- $LORE_ZIP"

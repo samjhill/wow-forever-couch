@@ -67,7 +67,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ```bash
 ./scripts/install-forever-addons.sh        # Immersion, Spoken + English voice packs
 ./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
-./scripts/install-forever-qol-addons.sh    # Baganator/…/Questie; stages BigWigs/GTFO/…
+./scripts/install-forever-qol-addons.sh    # Leatrix/…/Questie; stages BigWigs/GTFO/…
 ./scripts/install-curseforge-update-timer.sh  # refresh CurseForge Forever files every 6h
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists (also on Battle.net launch)
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; Spoken voice only
