@@ -11,6 +11,50 @@ export WOW_PREFIX="${WOW_PREFIX:-$HOME/Games/battlenet}"
 export WOW_FOREVER="${WOW_FOREVER:-$WOW_PREFIX/pfx/drive_c/Program Files (x86)/World of Warcraft/_forever_}"
 export WOW_ADDONS="${WOW_ADDONS:-$WOW_FOREVER/Interface/AddOns}"
 export WOW_COMPAT_TOOL="${WOW_COMPAT_TOOL:-$HOME/.local/share/Steam/compatibilitytools.d/GE-Proton11-12}"
+export STEAM_COMPAT_TOOLS_DIR="${STEAM_COMPAT_TOOLS_DIR:-$HOME/.local/share/Steam/compatibilitytools.d}"
+
+# Resolve GE-Proton binary: prefer WOW_COMPAT_TOOL when present, else newest GE-Proton*/proton.
+resolve_ge_proton() {
+  local preferred="${WOW_COMPAT_TOOL}/proton"
+  if [[ -x "$preferred" ]]; then
+    printf '%s' "$preferred"
+    return
+  fi
+  local newest=""
+  local candidate
+  # shellcheck disable=SC2012
+  for candidate in $(ls -1d "${STEAM_COMPAT_TOOLS_DIR}"/GE-Proton*/proton 2>/dev/null | sort -V); do
+    if [[ -x "$candidate" ]]; then
+      newest="$candidate"
+    fi
+  done
+  if [[ -n "$newest" ]]; then
+    printf '%s' "$newest"
+    return
+  fi
+  printf ''
+}
+
+export WOW_PROTON="$(resolve_ge_proton)"
+if [[ -n "$WOW_PROTON" ]]; then
+  export WOW_COMPAT_TOOL="$(cd "$(dirname "$WOW_PROTON")" && pwd)"
+fi
+
+find_battlenet_exe() {
+  local default_exe="${WOW_PREFIX}/pfx/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
+  if [[ -f "$default_exe" ]]; then
+    printf '%s' "$default_exe"
+    return
+  fi
+  find "${WOW_PREFIX}/pfx" -name 'Battle.net.exe' 2>/dev/null | head -1 || true
+}
+
+forever_client_ready() {
+  [[ -f "${WOW_FOREVER}/Wow.exe" ]] \
+    || [[ -f "${WOW_FOREVER}/WowClassic.exe" ]] \
+    || [[ -f "${WOW_FOREVER}/WowForever.exe" ]] \
+    || [[ -d "${WOW_FOREVER}/Interface/AddOns" ]]
+}
 
 # Host profile: explicit WOW_COUCH_PROFILE wins; else auto-detect Steam Deck.
 detect_couch_profile() {

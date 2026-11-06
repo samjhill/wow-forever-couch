@@ -12,16 +12,10 @@ Same couch stack as the living-room Bazzite box. On Deck the **`deck`** profile 
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash
 ```
 
-4. When it finishes, start **Battle.net** from the script prompt / `./scripts/launch-battlenet-proton.sh`, log in, install **Forever** (not Retail), launch Forever once.
-5. Paste the same `curl … | bash` line **again** (or double-click **Install WoW Forever Couch** on the Desktop) so addons enable against your account folder.
-6. Steam (Desktop) → **Games** → **Add a Non-Steam Game** → browse to:
+4. When Battle.net opens on the **WoW Forever** install page, **log in** (and approve the authenticator if asked). Leave the window open; the script waits until `_forever_` appears. Click **Install** only if the page still shows a button.
+5. When the script finishes, **Return to Gaming Mode** and launch **Battle.net (WoW Forever)** (Steam Input is already on; do not force Steam Proton).
 
-   `~/Projects/wow-forever-couch/scripts/launch-battlenet-lutris.sh`
-
-   Rename to **Battle.net (WoW Forever)**. Do **not** force Steam Proton. Enable **Steam Input**.
-7. **Return to Gaming Mode** and launch that shortcut.
-
-That’s the whole discoverability path: one URL, one paste. No need to find GitHub folders first.
+That’s the whole discoverability path: one URL, one paste, one Battle.net login. No second bootstrap, no hand-made shortcut.
 
 ## Alternative: Desktop icon
 
@@ -44,12 +38,18 @@ Or after any clone/install, regenerate the icon:
 
 | Step | Automatic? |
 |------|------------|
-| Clone repo, GE-Proton, Battle.net prefix, Forever addons, couch helpers | Yes |
+| Clone repo, GE-Proton, silent Battle.net setup | Yes |
+| Open Forever install page + wait for `_forever_` | Yes (login still manual) |
+| Forever addons, couch helpers, timers | Yes (once client exists) |
+| Non-Steam shortcut + Steam Input | Yes (`add-steam-shortcut.sh`) |
 | Periodic `git pull` + safe addon re-apply | Yes (timer + launch hook) |
 | CurseForge Forever addon updates | Yes (6h timer + before Battle.net launch) |
-| Battle.net login + install Forever | Manual once |
-| Steam non-Steam shortcut + Steam Input | Manual once (~2 minutes) |
+| Battle.net login (+ rare Install click) | Manual once |
 | Personal `config/live-setup` bindings snapshot | Opt-in (`WOW_COUCH_RESTORE_LIVE=1`) |
+
+Addon enable against `WTF/Account` runs on the next Battle.net launch after your first in-game login (no second `curl | bash`).
+
+If the shortcut helper fails (no Steam userdata yet), sign into Steam once and re-run `./scripts/add-steam-shortcut.sh`, or follow the manual steps in [`scripts/add-steam-shortcut.md`](../scripts/add-steam-shortcut.md).
 
 ## Auto-sync when this repo updates
 

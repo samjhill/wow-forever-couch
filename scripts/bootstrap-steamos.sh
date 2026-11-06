@@ -2,11 +2,12 @@
 # One-shot Steam Deck / Bazzite / SteamOS-like couch bootstrap.
 #
 # Desktop Mode recommended. After this finishes:
-#   1) Launch Battle.net, log in, install Forever (not Retail)
-#   2) Run this script again (or apply-repo-updates) once _forever_ exists
-#   3) Gaming Mode → non-Steam "Battle.net (WoW Forever)" → enable Steam Input
+#   1) Log into Battle.net if the window asks (only typing step)
+#   2) Wait for Forever download (script polls _forever_)
+#   3) Gaming Mode → "Battle.net (WoW Forever)" (shortcut written automatically)
 #
 # Can also be invoked after: git clone … && ./scripts/bootstrap-steamos.sh
+# Or: curl …/install.sh | bash
 set -euo pipefail
 
 DEFAULT_CLONE="${HOME}/Projects/wow-forever-couch"
@@ -35,7 +36,7 @@ if [[ -z "$REPO" ]]; then
 fi
 
 cd "$REPO"
-chmod +x scripts/*.sh 2>/dev/null || true
+chmod +x scripts/*.sh scripts/*.py 2>/dev/null || true
 # shellcheck source=lib.sh
 source "${REPO}/scripts/lib.sh"
 
@@ -56,17 +57,26 @@ fi
 
 echo "=== GE-Proton ==="
 "${REPO_ROOT}/scripts/install-ge-proton.sh"
-
-echo "=== Battle.net prefix ==="
-if ! find "${WOW_PREFIX}/pfx" -name 'Battle.net.exe' 2>/dev/null | grep -q .; then
-  "${REPO_ROOT}/scripts/install-battlenet-desktop.sh" || {
-    echo "Battle.net installer needs Desktop Mode interaction. Re-run bootstrap after it finishes." >&2
-  }
-else
-  echo "Battle.net already present under $WOW_PREFIX"
+# Refresh resolver after install may have added a new tool.
+WOW_PROTON="$(resolve_ge_proton)"
+if [[ -n "$WOW_PROTON" ]]; then
+  export WOW_COMPAT_TOOL="$(cd "$(dirname "$WOW_PROTON")" && pwd)"
+  export WOW_PROTON
 fi
 
-if [[ -d "$WOW_FOREVER" ]]; then
+echo "=== Battle.net prefix ==="
+"${REPO_ROOT}/scripts/install-battlenet-desktop.sh"
+
+echo "=== WoW Forever client ==="
+if forever_client_ready; then
+  echo "Forever already present: $WOW_FOREVER"
+else
+  "${REPO_ROOT}/scripts/install-forever-client.sh" || {
+    echo "Forever not ready yet. Log into Battle.net, install Forever, then re-run bootstrap." >&2
+  }
+fi
+
+if forever_client_ready; then
   echo "=== Forever client found — installing addons ==="
   "${REPO_ROOT}/scripts/install-forever-addons.sh" || true
   "${REPO_ROOT}/scripts/install-forever-qol-addons.sh" || true
@@ -75,16 +85,14 @@ if [[ -d "$WOW_FOREVER" ]]; then
     "${REPO_ROOT}/scripts/enable-forever-addons.sh" || true
     "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" || true
   else
-    echo "No WTF/Account yet — log into Forever once, then re-run bootstrap or:"
-    echo "  ./scripts/enable-forever-addons.sh && ./scripts/pin-voiceover-prefs.sh"
+    echo "No WTF/Account yet — first in-game login creates it; launch script will enable addons after that."
   fi
   "${REPO_ROOT}/scripts/pin-forever-graphics.sh" || true
   if [[ "${WOW_COUCH_RESTORE_LIVE:-0}" == "1" ]]; then
     "${REPO_ROOT}/scripts/restore-live-setup.sh" || true
   fi
 else
-  echo "=== Forever not installed yet ==="
-  echo "Next: ./scripts/launch-battlenet-proton.sh → log in → install Forever → re-run this bootstrap."
+  echo "=== Forever not installed yet — skipping addon install ==="
 fi
 
 echo "=== Auto-update timer ==="
@@ -103,10 +111,18 @@ fi
 # Desktop + app-menu launcher for re-runs
 "${REPO_ROOT}/scripts/install-desktop-launcher.sh" || true
 
+echo "=== Steam Gaming Mode shortcut ==="
+if [[ "${WOW_COUCH_SKIP_STEAM_SHORTCUT:-0}" == "1" ]]; then
+  echo "Skipped (WOW_COUCH_SKIP_STEAM_SHORTCUT=1)."
+else
+  "${REPO_ROOT}/scripts/add-steam-shortcut.sh" || {
+    echo "Shortcut helper failed — manual steps: ${REPO_ROOT}/scripts/add-steam-shortcut.md" >&2
+  }
+fi
+
 echo
 echo "=== Done ==="
-echo "Steam shortcut (Desktop Mode): Games → Add Non-Steam Game →"
-echo "  ${REPO_ROOT}/scripts/launch-battlenet-lutris.sh"
-echo "Rename to: Battle.net (WoW Forever). Do NOT force Steam Proton. Enable Steam Input."
+echo "Only typing left: Battle.net login (if the window is still open)."
+echo "Gaming Mode → launch: Battle.net (WoW Forever)"
 echo "Docs: ${REPO_ROOT}/docs/steam-deck.md"
 echo "Sync now:  WOW_COUCH_UPDATE_MODE=full ${REPO_ROOT}/scripts/apply-repo-updates.sh"
