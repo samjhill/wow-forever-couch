@@ -39,6 +39,7 @@ VOICE_PACKS = [
 
 # Folders removed on install/sync. Globs are matched with Path.glob.
 # SpokenQuests/SpokenZones/SpokenBooks are retired module names, not Spoken_Quests.
+# Baganator is the bag UI; Syndicator is only its inventory backend.
 REMOVED_GLOBS = (
     "ConsolePort",
     "ConsolePort_*",
@@ -49,11 +50,11 @@ REMOVED_GLOBS = (
     "SpokenQuests",
     "SpokenZones",
     "SpokenBooks",
+    "Baganator",
+    "Syndicator",
 )
 
 QOL = [
-    CurseForgeProject(988370, "Syndicator"),
-    CurseForgeProject(914482, "Baganator"),
     CurseForgeProject(94855, "Leatrix Plus", name_filter="forever"),
     CurseForgeProject(100547, "Plater"),
     CurseForgeProject(1715510, "Lore Forever"),
@@ -78,7 +79,7 @@ def update_projects() -> list[CurseForgeProject]:
 
 
 def remove_replaced_addons(addons_dir: Path) -> None:
-    """Delete ConsolePort, Forever Voiceover, and retired Spoken module folders."""
+    """Delete replaced addons: ConsolePort, Forever Voiceover, Baganator, and retired Spoken modules."""
     if not addons_dir.is_dir():
         return
     seen: set[Path] = set()

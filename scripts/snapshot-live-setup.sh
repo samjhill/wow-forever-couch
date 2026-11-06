@@ -51,10 +51,10 @@ mkdir -p \
 
 ACCOUNT_SV=(
   Immersion.lua Spoken.lua CouchDictateRoute.lua
-  Leatrix_Plus.lua Baganator.lua Syndicator.lua Plater.lua LoreForever.lua TheFishingLog.lua
+  Leatrix_Plus.lua Plater.lua LoreForever.lua TheFishingLog.lua
 )
 CHAR_SV=(
-  Baganator.lua Spoken.lua Plater.lua TheFishingLog.lua
+  Spoken.lua Plater.lua TheFishingLog.lua
 )
 
 copy_if() {

@@ -13,7 +13,7 @@ ADDONS=(
   SpokenPlacesAudio SpokenReadablesAudio SpokenBossesAudio
   CouchDictateRoute
   # QoL install set (Forever-tagged); staged addons intentionally omitted
-  Syndicator Baganator Leatrix_Plus Plater PlaterQuestPin
+  Leatrix_Plus Plater PlaterQuestPin
   LoreForever LoreForever_Voice_Default LoreForever_Voice_Default_Alliance LoreForever_Voice_Default_Horde
   TheFishingLog
   ForeverLootSparkles
@@ -35,6 +35,7 @@ DISABLE_ADDONS=(
   ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
   SpokenPlayer SpokenQuests SpokenZones SpokenBooks
+  Baganator Syndicator
 )
 
 if [[ ! -d "$WTF" ]]; then
