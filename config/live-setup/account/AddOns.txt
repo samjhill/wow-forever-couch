@@ -43,7 +43,7 @@ DialogKey_Numy: disabled
 DialogKey_Aeonzara: disabled
 DialogKey: disabled
 NodeSight: enabled
-GatherRadar: enabled
+GatherRadar: disabled
 PlaterQuestPin: enabled
 SelfBuffs: disabled
 CouchBuffReminder: disabled

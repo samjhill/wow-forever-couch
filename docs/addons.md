@@ -69,8 +69,6 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 
 **NodeSight:** Live herb/ore (and chest) icons on minimap tracking dots — needs Find Herbs / Find Minerals on. Optional nearest-node arrow + sparkles. Controller-friendly. `/nodesight` or Options → AddOns.
 
-**Gather Radar:** Live gathering icons plus remembered herb/ore pins on minimap and world map; optional GatherMate2_Data import. `/gr` for settings. Turn on Find Herbs (or minerals/treasure/fish) to feed it.
-
 ### Staged only (zip on disk, **not** in `Interface/AddOns`, **not** enabled)
 
 Path: `config/addons-staging/staged/` (on the couch box under the project `config/`).
@@ -92,14 +90,14 @@ Forever already ships tools that replace common Classic addons:
 - **Combined bags** — use Forever’s built-in bags
 - **Controller / click-cast** — Blizzard’s controller UI owns couch input (skip ConsolePort and Clique)
 
-Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), Baganator/Syndicator, AdiBags/Bagnon/BetterBags, or a second nameplate addon beside Plater.
+Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), Baganator/Syndicator, Gather Radar, AdiBags/Bagnon/BetterBags, or a second nameplate addon beside Plater.
 
 ## Install commands
 
 ```bash
 ./scripts/install-forever-addons.sh          # Immersion / Spoken + English audio
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Gather Radar + Questie; stages the rest
+./scripts/install-forever-qol-addons.sh      # Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Questie; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged); disables ConsolePort and ForeverVO
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ./scripts/snapshot-live-setup.sh             # save tuned prefs → config/live-setup/
@@ -130,7 +128,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, GatherRadar, QuestieDB, Questie (DialogKey, ConsolePort, ForeverVO, Baganator, and Syndicator removed)
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, QuestieDB, Questie (DialogKey, ConsolePort, ForeverVO, Baganator, Syndicator, and GatherRadar removed)
 - [x] Staged addons (BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Forever’s built-in bag UI
 - [ ] `/leatrix` options open

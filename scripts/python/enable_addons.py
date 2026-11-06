@@ -16,7 +16,7 @@ DEFAULT_ENABLE = [
     "Leatrix_Plus", "Plater", "PlaterQuestPin",
     "LoreForever", "LoreForever_Voice_Default", "LoreForever_Voice_Default_Alliance",
     "LoreForever_Voice_Default_Horde",
-    "TheFishingLog", "ForeverLootSparkles", "NodeSight", "GatherRadar",
+    "TheFishingLog", "ForeverLootSparkles", "NodeSight",
     "AutoFeed", "SmartRebuff",
     "QuestieDB", "Questie",
 ]
@@ -32,6 +32,7 @@ DEFAULT_DISABLE = [
     "ForeverVO_Data_Forever_Quests", "ForeverVO_Data_Forever_Gossip", "ForeverVO_Data_Books",
     "SpokenPlayer", "SpokenQuests", "SpokenZones", "SpokenBooks",
     "Baganator", "Syndicator",
+    "GatherRadar",
 ]
 
 
