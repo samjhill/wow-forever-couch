@@ -92,30 +92,40 @@ local function auraMatches(auraName, names)
 end
 
 -- Returns remaining seconds for first matching buff, or nil if missing.
+-- Forever treats many aura fields as secret while tainted — never let that spam errors.
 local function findBuffRemaining(names)
   if C_UnitAuras and C_UnitAuras.GetBuffDataByIndex then
     local i = 1
-    while true do
-      local data = C_UnitAuras.GetBuffDataByIndex("player", i)
+    while i <= 80 do
+      local ok, data = pcall(C_UnitAuras.GetBuffDataByIndex, "player", i)
+      if not ok then
+        return nil
+      end
       if not data then
         break
       end
-      if auraMatches(data.name, names) then
-        if data.expirationTime and data.expirationTime > 0 then
-          return data.expirationTime - GetTime()
+      local nameOk, auraName = pcall(function()
+        return data.name
+      end)
+      if nameOk and auraMatches(auraName, names) then
+        local expOk, expirationTime = pcall(function()
+          return data.expirationTime
+        end)
+        if expOk and expirationTime and expirationTime > 0 then
+          return expirationTime - GetTime()
         end
-        return 99999 -- permanent / no timer
+        return 99999 -- permanent / no timer / secret expiry
       end
       i = i + 1
-      if i > 80 then
-        break
-      end
     end
     return nil
   end
 
   for i = 1, 40 do
-    local name, _, _, _, _, expirationTime = UnitBuff("player", i)
+    local ok, name, _, _, _, _, expirationTime = pcall(UnitBuff, "player", i)
+    if not ok then
+      return nil
+    end
     if not name then
       break
     end

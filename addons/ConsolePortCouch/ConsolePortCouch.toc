@@ -2,7 +2,7 @@
 ## Title: ConsolePort Couch
 ## Notes: ConsolePort couch bindings + Campsite/FishingCouch; food/drink via AutoFeed
 ## Author: wow-forever-couch
-## Version: 1.6.1
+## Version: 1.6.2
 ## Dependencies: ConsolePort
 ## LoadWith: ConsolePort
 ## SavedVariables: ConsolePortCouchDB
