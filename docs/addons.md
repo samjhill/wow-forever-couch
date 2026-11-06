@@ -44,9 +44,8 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 | Leatrix Plus | 94855 | `Leatrix_Plus-1.60.25-forever.zip` (`## Interface: 16001`) | — | QoL toggles |
 | Plater | 100547 | `Plater-v662.zip` (`## Version: Plater-v662-Forever`, `## Interface: 16001`) | — | Tank nameplates |
 | PlaterQuestPin | repo `addons/` | Forces **Track Quests Progress** + **Use Quest Color** on enemy/friendly NPCs; sets `showQuestTrackingTooltips` so kill N/M lines appear for Plater to scan (`/platerquestpin`) |
-| SelfBuffs | 1718593 | `SelfBuffs-v1.0.1-forever.zip` | — | Movable self buff/debuff icon strip + countdown (`/sb`) |
 | AutoFeed | 1703450 | `AutoFeed-v1.4.0.zip` | — | Self-updating `AutoFeed` (eat) + `AutoDrink` macros (`/af`) |
-| CouchBuffReminder | repo `addons/` | Banner when class self-buffs are **missing** or &lt;60s left (`/cbr`) — pairs with SelfBuffs |
+| SmartRebuff | 1728015 | `SmartRebuff_1.60.zip` | — | Forever class/group buff monitor + renewal reminders (replaces SelfBuffs / CouchBuffReminder) |
 | Lore Forever | 1715510 | `LoreForever.zip` (`## Version: 0.37.0`, `## Interface: 16001`) | ships `LoreForever_Voice_Default*` | Zone/NPC/quest lore panel + optional story narration (`/lore`) |
 | The Fishing Log | 1702832 | `TheFishingLog-1.0.0.zip` (`## Version: 1.0.0`, `## Interface: 16001`) | optional Auctionator/TSM for catch value | Catch log, journal, spot records, matches (`/tfl`) |
 

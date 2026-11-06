@@ -47,13 +47,13 @@ QOL = [
     (1729017, ""),  # Loot Sparkles
     (1731463, ""),  # NodeSight
     (1757790, ""),  # Gather Radar
-    (1718593, ""),  # SelfBuffs
     (1703450, ""),  # AutoFeed (AutoFeed + AutoDrink macros)
+    (1728015, ""),  # SmartRebuff (Forever buff monitor)
 ]
 
 
 def sync_repo_addons(repo: Path, addons_dir: Path) -> None:
-    for name in ("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin", "CouchBuffReminder"):
+    for name in ("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin"):
         src = repo / "addons" / name
         if not src.is_dir():
             print(f"skip missing repo addon: {name}")
