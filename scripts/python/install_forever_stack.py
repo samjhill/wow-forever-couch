@@ -36,19 +36,20 @@ GITHUB = [
 # ForeverVO voice packs
 FVO_PACKS = [1705100, 1709884, 1729567, 1705094, 1729570, 1729514]
 
-# QoL CurseForge projects: (id, optional name filter)
+# QoL CurseForge projects: (id, optional name filter, optional filename preference)
 QOL = [
-    (988370, ""),  # Syndicator
-    (914482, ""),  # Baganator
-    (94855, "forever"),  # Leatrix Plus
-    (100547, ""),  # Plater
-    (1715510, ""),  # Lore Forever
-    (1702832, ""),  # Fishing Log
-    (1729017, ""),  # Loot Sparkles
-    (1731463, ""),  # NodeSight
-    (1757790, ""),  # Gather Radar
-    (1703450, ""),  # AutoFeed (AutoFeed + AutoDrink macros)
-    (1728015, ""),  # SmartRebuff (Forever buff monitor)
+    (988370, "", ""),  # Syndicator
+    (914482, "", ""),  # Baganator
+    (94855, "forever", ""),  # Leatrix Plus
+    (100547, "", ""),  # Plater
+    (1715510, "", ""),  # Lore Forever
+    (1702832, "", ""),  # Fishing Log
+    (1729017, "", ""),  # Loot Sparkles
+    (1731463, "", ""),  # NodeSight
+    (1757790, "", ""),  # Gather Radar
+    (1703450, "", ""),  # AutoFeed (AutoFeed + AutoDrink macros)
+    (1728015, "", ""),  # SmartRebuff (Forever buff monitor)
+    (334372, "", "+v1.0"),  # Questie + QuestieDB (prefer DB bundle)
 ]
 
 
@@ -97,9 +98,11 @@ def main() -> None:
         unzip_addons.unzip_to(z, addons)
 
     if not args.core_only:
-        for project, filt in QOL:
+        for project, filt, prefer in QOL:
             try:
-                z = curseforge_fetch.fetch_project(project, staging, name_filter=filt)
+                z = curseforge_fetch.fetch_project(
+                    project, staging, name_filter=filt, prefer=prefer
+                )
                 unzip_addons.unzip_to(z, addons, preserve_couch=True)
             except SystemExit as e:
                 print(f"warn: project {project}: {e}", file=sys.stderr)

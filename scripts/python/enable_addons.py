@@ -18,6 +18,7 @@ DEFAULT_ENABLE = [
     "LoreForever_Voice_Default_Horde",
     "TheFishingLog", "ForeverLootSparkles", "NodeSight", "GatherRadar",
     "AutoFeed", "SmartRebuff",
+    "QuestieDB", "Questie",
 ]
 
 DEFAULT_DISABLE = [
