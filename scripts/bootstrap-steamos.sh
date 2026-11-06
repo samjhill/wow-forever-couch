@@ -89,6 +89,7 @@ fi
 
 echo "=== Auto-update timer ==="
 "${REPO_ROOT}/scripts/install-repo-update-timer.sh"
+"${REPO_ROOT}/scripts/install-curseforge-update-timer.sh"
 
 if [[ "${WOW_COUCH_DICTATION:-0}" == "1" ]]; then
   echo "=== Dictation (opt-in) ==="

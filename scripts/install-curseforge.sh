@@ -53,6 +53,9 @@ echo
 echo "Launcher: $LAUNCHER"
 echo "Forever path note: ${WOW_COUCH_CONFIG}/curseforge-forever-path.txt"
 echo
+echo "Automatic Forever updates: ./scripts/install-curseforge-update-timer.sh"
+echo "  (also runs before Battle.net launch; the Flatpak app does not update in the background)"
+echo
 echo "First-run (Desktop Mode):"
 echo "  1. steamos-session-select desktop   # if in Gaming Mode"
 echo "  2. curseforge-wow"

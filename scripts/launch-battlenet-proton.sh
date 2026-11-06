@@ -32,6 +32,15 @@ if [[ "${WOW_COUCH_LAUNCH_SYNC:-1}" == "1" && -x "${REPO_ROOT}/scripts/apply-rep
   WOW_COUCH_UPDATE_MODE=quick "${REPO_ROOT}/scripts/apply-repo-updates.sh" >/tmp/wow-forever-couch-launch-sync.log 2>&1 || true
 fi
 
+# CurseForge Forever files before the client starts. Skip with WOW_COUCH_CURSEFORGE_UPDATE=0.
+if [[ "${WOW_COUCH_CURSEFORGE_UPDATE:-1}" == "1" && -x "${REPO_ROOT}/scripts/update-curseforge-addons.sh" ]]; then
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 600 "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || true
+  else
+    "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || true
+  fi
+fi
+
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasma* ]]; then
   echo "Note: Desktop/Plasma session detected. For fewer screen tears, play from Gaming Mode:" >&2
   echo "  steamos-session-select gamescope" >&2

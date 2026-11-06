@@ -46,6 +46,7 @@ Or after any clone/install, regenerate the icon:
 |------|------------|
 | Clone repo, GE-Proton, Battle.net prefix, Forever addons, couch helpers | Yes |
 | Periodic `git pull` + safe addon re-apply | Yes (timer + launch hook) |
+| CurseForge Forever addon updates | Yes (6h timer + before Battle.net launch) |
 | Battle.net login + install Forever | Manual once |
 | Steam non-Steam shortcut + Steam Input | Manual once (~2 minutes) |
 | Personal `config/live-setup` bindings snapshot | Opt-in (`WOW_COUCH_RESTORE_LIVE=1`) |
@@ -54,8 +55,8 @@ Or after any clone/install, regenerate the icon:
 
 After install:
 
-1. **systemd user timer** (~every 6h) → full apply  
-2. **Battle.net launch** → quiet quick pull + repo addon sync  
+1. **systemd user timer** (~every 6h) → full apply, plus CurseForge addon refresh  
+2. **Battle.net launch** → quiet quick pull + repo addon sync + CurseForge Forever files  
 
 Manual:
 
