@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Inject text into focused WoW chat: Enter → [optional /channel] type → [Enter if send].
-# Do NOT send Esc first — with ConsolePort, Escape is TOGGLEGAMEMENU and opens the game menu.
+# Do NOT send Esc first — Escape opens the game menu.
 #
 # Env:
 #   DICTATE_SEND_MODE=send|draft   send (default): final Enter after typing

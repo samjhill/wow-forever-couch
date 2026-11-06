@@ -22,5 +22,5 @@ Hold R3 through your phrase; release to stop capture and send.
 ## Why Insert
 
 - Visible in Steam’s keyboard list (unlike F13–F24 / F20).
-- Unused by ConsolePort couch play; WoW rarely needs Insert on a gamepad.
+- Unused by couch play; WoW rarely needs Insert on a gamepad.
 - Under Steam Input, native `BTN_THUMBR` often never reaches the host — the keyboard bind is the reliable path.

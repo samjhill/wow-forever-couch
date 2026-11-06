@@ -9,7 +9,7 @@ Separate character from the Tauren Bear + Ashley Hunter duo. Focus: BGs and duel
 - One major defensive on D-pad
 - CC on modifier+face
 - Camera + kiting on sticks/pads
-- Focus target if Forever/ConsolePort exposes it
+- Focus target if the Blizzard controller UI exposes it
 
 ## Warlock (primary PvP candidate)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Food/drink macros come from the AutoFeed addon (not ConsolePortCouch).
+# Food/drink macros come from the AutoFeed addon.
 # Install: scripts/install-forever-qol-addons.sh (project 1703450)
 # Enable:  scripts/enable-forever-addons.sh
 # In-game: /af → create AutoFeed + AutoDrink → drag onto a bar

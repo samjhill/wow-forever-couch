@@ -1,6 +1,6 @@
 # Periodic live-setup autosave
 
-While you tune ConsolePort bindings and couch prefs, this Mac pulls a snapshot from the Bazzite box every **4 hours** and pushes `config/live-setup/` when it changed.
+While you tune controller bindings and couch prefs, this Mac pulls a snapshot from the Bazzite box every **4 hours** and pushes `config/live-setup/` when it changed.
 
 ## How it works
 

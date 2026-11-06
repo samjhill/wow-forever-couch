@@ -10,7 +10,7 @@ if (-not (Test-WowForeverInstalled)) {
 $addons = $env:WOW_ADDONS
 New-Item -ItemType Directory -Force -Path $addons | Out-Null
 
-foreach ($name in @("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin")) {
+foreach ($name in @("CouchDictateRoute", "PlaterQuestPin")) {
     $src = Join-Path $env:REPO_ROOT "addons\$name"
     if (-not (Test-Path $src)) {
         Write-Host "skip missing repo addon: $name"
@@ -22,8 +22,16 @@ foreach ($name in @("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin")) 
     Write-Host "synced $name → $dest"
 }
 
-# Remove previous custom buff stack; install SmartRebuff
-foreach ($legacy in @("CouchBuffReminder", "SelfBuffs")) {
+# Remove ConsolePort, Forever Voiceover, and the old buff stack.
+$removeCode = @"
+import sys
+from pathlib import Path
+sys.path.insert(0, r'$($env:REPO_ROOT)\scripts\python')
+import curseforge_projects
+curseforge_projects.remove_replaced_addons(Path(r'$addons'))
+"@
+Invoke-RepoPython @("-c", $removeCode) | Out-Null
+foreach ($legacy in @("CouchBuffReminder", "SelfBuffs", "ConsolePortCouch")) {
     $legacyDest = Join-Path $addons $legacy
     if (Test-Path $legacyDest) {
         Remove-Item -Recurse -Force $legacyDest

@@ -25,15 +25,13 @@ install_local() {
   echo "synced $name → $dest"
 }
 
-install_local ConsolePortCouch
 install_local CouchDictateRoute
 install_local PlaterQuestPin
-rm -rf "${WOW_ADDONS}/CouchBuffReminder" "${WOW_ADDONS}/SelfBuffs"
+rm -rf "${WOW_ADDONS}/CouchBuffReminder" "${WOW_ADDONS}/SelfBuffs" "${WOW_ADDONS}/ConsolePortCouch"
+python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, str(Path(sys.argv[1]) / "scripts" / "python")); import curseforge_projects; curseforge_projects.remove_replaced_addons(Path(sys.argv[2]))' \
+  "$REPO_ROOT" "$WOW_ADDONS"
 
 # Prefer dedicated installers when present (enable AddOns.txt, SmartRebuff zip, etc.)
-if [[ -x "${REPO_ROOT}/scripts/install-consoleport-couch.sh" ]]; then
-  "${REPO_ROOT}/scripts/install-consoleport-couch.sh" || true
-fi
 if [[ -x "${REPO_ROOT}/scripts/install-couch-dictate-route.sh" ]]; then
   "${REPO_ROOT}/scripts/install-couch-dictate-route.sh" || true
 fi

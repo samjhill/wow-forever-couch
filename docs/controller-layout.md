@@ -12,30 +12,28 @@ Steam Input should manage both. Do not overwrite unrelated game profiles.
 ## Layers
 
 1. **Steam Input** outer profile for the non-Steam Battle.net / Forever entry (menu chords, dictation hotkey, desktop fallback).
-2. **ConsolePort** in-game action bars, targeting, UI navigation (Forever flavor).
-3. **Immersion** face-button / gamepad bindings for quest gossip (`padaccept` = PAD1; ConsolePort hints).
+2. **Blizzard controller UI** for in-game action bars, targeting, and menus.
+3. **Immersion** face-button / gamepad bindings for quest gossip (`padaccept` = PAD1).
 
-## Steam Controller conceptual map (Forever + ConsolePort)
+## Steam Controller conceptual map (Forever + Blizzard controller UI)
 
 | Input | Role |
 |-------|------|
 | Left pad / stick | Movement |
 | Right pad | Camera (mouse-look style if needed) |
-| A / B / X / Y | ConsolePort primary bar face buttons |
-| LB / RB | Target / modifier (ConsolePort) |
+| A / B / X / Y | Gamepad action bar face buttons |
+| LB / RB | Target / modifier |
 | LT / RT | Action layers |
 | Grip L / R (Steam Controller) | **Left grip → dictation** (Insert / `BTN_GRIPL`); right grip cancels draft |
 | R3 (Xbox) | **Dictation** (Insert / `BTN_THUMBR`) — see [`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md) |
 | Steam button | Steam overlay / chord |
-| Start / Select | Game menu / map (ConsolePort defaults) |
+| Start / Select | Game menu / map |
 
-Exact ConsolePort slot → ability mapping: see `bear-tank-bindings.md`.
-
-Recommended device preset (Xbox / Steam Input): [`controller-bindings.md`](controller-bindings.md) — install `ConsolePortCouch` or use `/consoleport` → Defaults → **Apply recommended bindings** (not blank slate).
+Ability placement: [`bear-tank-bindings.md`](bear-tank-bindings.md) and [`controller-bindings.md`](controller-bindings.md).
 
 ## Xbox alternate
 
-Simpler bumper/trigger layout; no trackpad radials. Same ConsolePort class loadout; Steam Input profile named `WoW Forever Xbox` once exported.
+Simpler bumper/trigger layout; no trackpad radials. Same class loadout on the Blizzard gamepad bar; Steam Input profile named `WoW Forever Xbox` once exported.
 
 ## Export
 

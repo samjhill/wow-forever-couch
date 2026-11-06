@@ -89,4 +89,4 @@ WOW_COUCH_DICTATION=1 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-
 
 ## Controller
 
-Steam Input notes: [`config/steam-input/`](../config/steam-input/). ConsolePort helpers ship with addon sync; empty shoulders → `/cpcouch apply` ([`controller-bindings.md`](controller-bindings.md)).
+Steam Input notes: [`config/steam-input/`](../config/steam-input/). In-game control is Blizzard’s controller UI ([`controller-bindings.md`](controller-bindings.md)).

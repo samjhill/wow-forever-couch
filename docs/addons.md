@@ -17,7 +17,7 @@ Forever files are refreshed from the CurseForge file list (game version `1.60.x`
 ./scripts/update-curseforge-addons.sh
 ```
 
-The job skips while Forever is running, leaves repo addons (`ConsolePortCouch`, `CouchDictateRoute`, `PlaterQuestPin`) alone, and does not install the staged set. A changed zip is extracted; an unchanged one is left in place. SavedVariables are not touched.
+The job skips while Forever is running, leaves repo addons (`CouchDictateRoute`, `PlaterQuestPin`) alone, and does not install the staged set. A changed zip is extracted; an unchanged one is left in place. SavedVariables are not touched.
 
 The Overwolf CurseForge Flatpak is optional browsing. It has no headless update command, and Gaming Mode will not keep that window running.
 
@@ -40,10 +40,8 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 
 | Addon | Version / evidence | Role |
 |-------|-------------------|------|
-| ConsolePort (+ modules) | 3.3.13 (`Interface` includes `16001`) | Controller / couch UI |
-| ConsolePortCouch | repo `addons/` | Applies Xbox recommended bindings once (Steam Input / Xbox) |
 | Immersion | 1.4.61 | Quest/gossip UI (**TTS off**) |
-| ForeverVO + `ForeverVO_Data_*` | v0.1.10 packs | Spoken quests/gossip |
+| Spoken + `Spoken_*` + English audio packs | CurseForge Spoken 3.8.x | Quest, gossip, places, books, and boss narration (**Voice Only**) |
 | CouchDictateRoute | repo addon | Sticky say/party/raid for dictation |
 
 ### Install + enable (2026-11-03)
@@ -65,7 +63,7 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 
 **DialogKey:** Not installed. Immersion already owns keyboard/gamepad quest + gossip confirms (`padaccept` = PAD1); DialogKey would only add StaticPopup Space-click and overlaps Immersion’s baked-in numbers.
 
-**Lore Forever:** Complements ForeverVO — lore Q&A and zone primers, not a quest-dubber. Leave **Speak quest dialogue** off (addon default). Do **not** install Lore Forever Quest Dialogue packs or Spoken/Chatty Little NPC alongside ForeverVO. Optional extra narrator language packs are fine; male English packs ship in the main zip. Untested in live Forever until launch checklist.
+**Lore Forever:** Lore Q&A and zone primers, not the quest dubber. Leave **Speak quest dialogue** off (addon default). Do **not** install Lore Forever Quest Dialogue packs or Chatty Little NPC alongside Spoken. Spoken already narrates places; turn off one of the two if zone stories play twice. Optional extra narrator language packs are fine; male English packs ship in the main zip. Untested in live Forever until launch checklist.
 
 **The Fishing Log:** Forever-only fishing tracker. No overlap with the couch stack (profession QoL). Optional Auctionator pricing stays available once Auctionator is activated from staging. Untested in live Forever until launch checklist.
 
@@ -94,18 +92,17 @@ Forever already ships tools that replace common Classic addons:
 - **Cooldown Manager** — Options → Gameplay Enhancement
 - **Built-in damage meter** — skip Details!/Skada unless you prefer them later
 - **Combined bags** — optional; Baganator is an enhancement, not a requirement
-- **Controller / click-cast** — ConsolePort owns couch input (skip Clique)
+- **Controller / click-cast** — Blizzard’s controller UI owns couch input (skip ConsolePort and Clique)
 
 Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), AdiBags/Bagnon/BetterBags (overlaps Baganator), or a second nameplate addon beside Plater.
 
 ## Install commands
 
 ```bash
-./scripts/install-forever-addons.sh          # ConsolePort / Immersion / ForeverVO
+./scripts/install-forever-addons.sh          # Immersion / Spoken + English audio
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
 ./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Gather Radar + Questie; stages the rest
-./scripts/enable-forever-addons.sh           # enables install set only (not staged)
-./scripts/install-consoleport-couch.sh       # Xbox recommended bindings helper (empty LB/RB/LT/RT)
+./scripts/enable-forever-addons.sh           # enables install set only (not staged); disables ConsolePort and ForeverVO
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ./scripts/snapshot-live-setup.sh             # save tuned prefs → config/live-setup/
 ./scripts/restore-live-setup.sh              # apply config/live-setup/ (Forever quit)
@@ -115,7 +112,7 @@ Zips cache under `config/addons-staging/` (gitignored). Backup before QoL instal
 
 ## Voiceover policy
 
-Use **ForeverVO** for spoken quest/gossip lines. Keep **Immersion TTS off**. Keep ForeverVO **Show the panel** off (`pin-voiceover-prefs.sh`) so Immersion alone draws the quest UI. Keep Lore Forever **Speak quest dialogue** off. Do not install Storyline or Lore Forever Quest Dialogue packs.
+Use **Spoken** for spoken quest, gossip, place, book, and boss lines. Keep **Immersion TTS off**. Keep Spoken’s narrator style on **Voice Only** (`pin-voiceover-prefs.sh`, `Frame.Style = "none"`) so Immersion alone draws the quest UI. Keep Lore Forever **Speak quest dialogue** off. Do not install Storyline, Forever Voiceover, or Lore Forever Quest Dialogue packs.
 
 ## Bear tank / Plater recommendations (config only — untested)
 
@@ -124,27 +121,27 @@ Priorities once in-world:
 1. Threat coloring (you tank vs not)
 2. Enemy cast bars readable at TV distance
 3. Important debuffs on nameplates
-4. Personal defensive CD visibility (pair with Forever Cooldown Manager / ConsolePort bars)
-5. Party health via Blizzard/ConsolePort frames — avoid a second raid-frame suite for now
+4. Personal defensive CD visibility (pair with Forever Cooldown Manager / the Blizzard gamepad bar)
+5. Party health via Blizzard frames — avoid a second raid-frame suite for now
 
 Exact Plater profile import is **untested** until Forever is playable.
 
 ## Leatrix / Baganator notes (recommendations — untested)
 
-- Leatrix: enable only QoL you need (auto-sell junk, gossip shortcuts); avoid anything that fights ConsolePort cursor focus.
+- Leatrix: enable only QoL you need (auto-sell junk, gossip shortcuts); avoid anything that fights the controller cursor.
 - Baganator: categories or single view; Syndicator powers tooltip “have on alts” counts.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, GatherRadar, QuestieDB, Questie (DialogKey removed)
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, GatherRadar, QuestieDB, Questie (DialogKey, ConsolePort, and ForeverVO removed)
 - [x] Staged addons (BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Baganator UI; tooltip counts via Syndicator
 - [ ] `/leatrix` options open
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
-- [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; ForeverVO still speaks quests
+- [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; Spoken still speaks quests
 - [ ] `/tfl journal` opens The Fishing Log; casting/lure helpers usable while fishing
-- [x] Immersion + ForeverVO only for quest VO; Immersion TTS off; ForeverVO showPanel off (pinned in `config/live-setup/`)
-- [x] ConsolePortCouch + bindings cache captured in `config/live-setup/`
+- [x] Immersion + Spoken for quest VO; Immersion TTS off; Spoken narrator Voice Only (pinned in `config/live-setup/`)
+- [x] Blizzard controller UI; ConsolePort left disabled in `config/live-setup/`
 - [ ] Built-in meter, Cooldown Manager, Edit Mode still usable
 - [x] DX11 + maxFPS 60 in snapshot Config.wtf (`pin-forever-graphics.sh`)
 
@@ -156,4 +153,4 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## In-game commands (after first login)
 
-`/consoleport`, `/immersion`, `/fvo`, `/fvo status`, `/cdr status`, `/leatrix`, `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC), Baganator bag bind.
+`/immersion`, `/sp options`, `/cdr status`, `/leatrix`, `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC), Baganator bag bind.

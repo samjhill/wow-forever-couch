@@ -50,13 +50,11 @@ mkdir -p \
   "$DEST/wtf"
 
 ACCOUNT_SV=(
-  ConsolePort.lua ConsolePort_Bar.lua ConsolePort_Cursor.lua ConsolePort_Rings.lua
-  ConsolePortCouch.lua Immersion.lua ForeverVO.lua CouchDictateRoute.lua
+  Immersion.lua Spoken.lua CouchDictateRoute.lua
   Leatrix_Plus.lua Baganator.lua Syndicator.lua Plater.lua LoreForever.lua TheFishingLog.lua
 )
 CHAR_SV=(
-  ConsolePort.lua ConsolePort_Bar.lua ConsolePort_Rings.lua ConsolePort_Target.lua
-  Baganator.lua ForeverVO.lua Plater.lua TheFishingLog.lua
+  Baganator.lua Spoken.lua Plater.lua TheFishingLog.lua
 )
 
 copy_if() {
@@ -90,28 +88,15 @@ copy_if "$WTF/gamecontrollerdb.txt" "$DEST/wtf/gamecontrollerdb.txt"
 copy_if "$WTF/GamePadConfig_Addons.json" "$DEST/wtf/GamePadConfig_Addons.json"
 copy_if "$WTF/GamePadConfig_Default.json" "$DEST/wtf/GamePadConfig_Default.json"
 
-# Drop ForeverVO capture tables; keep showPanel off (Immersion owns quest UI).
-python3 - "$DEST" <<'PY'
-import pathlib, re, sys
-root = pathlib.Path(sys.argv[1])
-for path in root.rglob("ForeverVO.lua"):
-    text = path.read_text(encoding="utf-8", errors="replace")
-    orig = text
-    text = re.sub(
-        r"\nForeverVOCaptureDB\s*=\s*\{.*?\n\}\s*",
-        "\n",
-        text,
-        flags=re.S,
-    )
-    text = re.sub(
-        r'(\["showPanel"\]|showPanel)\s*=\s*[^,\n}]+',
-        r"\1 = false",
-        text,
-    )
-    if text != orig:
-        path.write_text(text, encoding="utf-8")
-        print(f"  sanitized ForeverVO prefs in {path.relative_to(root)}")
-PY
+# Spoken: voice only so Immersion owns the quest UI.
+python3 -c 'import sys; from pathlib import Path; root=Path(sys.argv[1]); sys.path.insert(0, str(Path(sys.argv[2])/"scripts"/"python")); import pin_prefs
+for path in root.rglob("Spoken.lua"):
+    text=path.read_text(encoding="utf-8", errors="replace")
+    updated=pin_prefs.pin_spoken_text(text)
+    if updated!=text:
+        path.write_text(updated, encoding="utf-8")
+        print(f"  pinned Spoken voice only in {path.relative_to(root)}")
+' "$DEST" "$REPO_ROOT"
 
 # Manifest for restore
 {
@@ -130,9 +115,9 @@ Captured **$STAMP** from account \`$ACCT_NAME\` / character \`${CHAR_REL:-unknow
 ## Contents
 
 - \`account/AddOns.txt\` — enabled couch addons
-- \`account/SavedVariables/\` — ConsolePort, Immersion, ForeverVO (audio prefs), QoL
+- \`account/SavedVariables/\` — Immersion, Spoken (voice only), QoL
 - \`account/bindings-cache.wtf\` — gamepad/key bindings cache
-- \`character/\` — per-character ConsolePort bar/target + related SVs
+- \`character/\` — per-character Spoken and QoL SavedVariables
 - \`wtf/Config.wtf\` — graphics pins (DX11, 60 FPS, vsync, …)
 - \`wtf/GamePadConfig_*.json\` — client gamepad configs
 

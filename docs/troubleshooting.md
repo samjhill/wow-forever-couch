@@ -32,9 +32,9 @@ Also:
 ## Addons
 
 - Addons missing in-game → character select → AddOns list; run `./scripts/enable-forever-addons.sh` after `WTF/Account` exists.
-- ForeverVO silent → ensure `ForeverVO_Data_*` packs are enabled; `/fvo status`.
-- Double speech → turn off Immersion TTS (`./scripts/pin-voiceover-prefs.sh`).
-- Duplicate quest UI (modern Immersion + parchment/classic underneath) → ForeverVO’s talking-head panel is also on. Run `./scripts/pin-voiceover-prefs.sh` (sets `showPanel = false`) or `/forevervo` → Display → clear **Show the panel**. Keep Immersion for the dialogue UI; ForeverVO for audio only.
+- Spoken silent → enable Spoken, `Spoken_Quests`, and the English audio packs (`SpokenQuestsAudioAlliance`, `Horde`, `Shared`, `Gossip`). `/sp options`.
+- Double speech → turn off Immersion TTS (`./scripts/pin-voiceover-prefs.sh`). Leave Lore Forever **Speak quest dialogue** off.
+- Duplicate quest UI → Spoken’s narrator window is on as well as Immersion. Run `./scripts/pin-voiceover-prefs.sh` (Voice Only) or `/sp options` → Narrator Style → **Voice Only**. Immersion draws the dialogue; Spoken plays the audio.
 
 ## Dictation
 
@@ -46,15 +46,13 @@ Also:
 - FPS dip while dictating → Whisper is `nice`’d (2 threads); Bose HFP switch hitch only on the first press after A2DP.
 - `ydotoold socket missing` → `./scripts/install-user-services.sh`.
 - Types but not into WoW → Forever must be focused; test under the same session you play (Gaming Mode vs Desktop).
-- Inject opens Escape game menu → fixed: inject no longer sends Esc (ConsolePort maps Esc → menu). Update `inject-wow-chat.sh` / restart not needed (script is read each fire).
+- Inject opens Escape game menu → fixed: inject no longer sends Esc (Escape opens the game menu). Update `inject-wow-chat.sh` / restart not needed (script is read each fire).
 - Want preview before send → `DICTATE_SEND_MODE=draft` (bind again to send).
 - Garbage capture → speak after the start beep while holding; `DICTATE_NO_SEND=1` while tuning.
 - Wrong chat channel → `/cdr status`; `/cdr say|party|raid` or `DICTATE_CHANNEL=...` override; ensure CouchDictateRoute is enabled.
 
 ## Controller
 
-- ConsolePort not binding → enable ConsolePort* modules; `/consoleport`.
-- Empty shoulders/triggers (blank slate) → `./scripts/install-consoleport-couch.sh` then `/reload`, or `/consoleport` → Defaults → **Apply recommended bindings** (Xbox). Force: `/cpcouch apply`. See [`controller-bindings.md`](controller-bindings.md).
-- ConsolePort face/dpad dead after a Couch pin → Forever gamepad abilities live in action slots **185–360** (not 1–120). Partial `SaveBindings` from Couch rewrote `ConsolePortShared` and wiped `CLICK ConsolePortGamepadBar*` binds — fixed in Couch (no `SaveBindings` on pin; won’t re-apply Xbox preset unless shoulders are empty). Prefer `/reload` only; **quit Forever before** editing `WTF`/`SavedVariables` (running client flushes memory over disk on exit).
-- Menu/Start (☰) flips crosshair ↔ mouse instead of Escape menu → Forever was treating Escape as cursor toggle. `./scripts/pin-forever-graphics.sh` + `/cpcouch menu` (or `/reload` after updating ConsolePortCouch). Check `/cpcouch status` shows `PADFORWARD=TOGGLEGAMEMENU` and `CursorAutoEnable=0`.
+- Controller bars missing → enable Blizzard’s controller UI in the game options. ConsolePort stays disabled.
+- Menu/Start (☰) flips crosshair ↔ mouse instead of the game menu → `./scripts/pin-forever-graphics.sh` sets `GamePadCursorAutoEnable` off. Quit Forever fully, then relaunch. See [`controller-bindings.md`](controller-bindings.md).
 - Dictate bind does nothing → Steam Controller: left grip → Insert; Xbox: **R3 → Insert** ([`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)). Ensure `wow-dictate-daemon.service` is active (`systemctl --user restart wow-dictate-daemon`).

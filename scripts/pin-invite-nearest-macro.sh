@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Create account macro "InviteNearest" and bind it to Xbox RB (PADRSHOULDER).
+# Create account macro "InviteNearest" and bind it to Xbox RB (PADRSHOULDER)
+# in the Blizzard bindings cache.
 # Also parks INTERACTTARGET on LT if that bind is empty (RB previously held Interact).
 #
 # Forever should be fully quit so macros-cache / bindings-cache are not overwritten.
@@ -10,7 +11,6 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 ACCT="${WOW_FOREVER}/WTF/Account/SAMUHILL"
 MACROS="${ACCT}/macros-cache.txt"
 BINDINGS="${ACCT}/bindings-cache.wtf"
-CP_SV="${ACCT}/SavedVariables/ConsolePort.lua"
 MACRO_NAME="InviteNearest"
 MACRO_ICON="INV_Misc_GroupLooking"
 MACRO_BODY=$'/click StaticPopup1Button1\n/targetfriendplayer\n/invite'
@@ -87,69 +87,6 @@ path.write_text(text, encoding="utf-8")
 print(f"pinned PADRSHOULDER {action}")
 PY
 
-if [[ -f "$CP_SV" ]]; then
-  python3 - "$CP_SV" "$BINDING_ACTION" <<'PY'
-import pathlib, re, sys
-path = pathlib.Path(sys.argv[1])
-action = sys.argv[2]
-text = path.read_text(encoding="utf-8", errors="replace")
-
-def set_empty_mod_action(button: str, act: str, src: str) -> tuple[str, int]:
-    """Set [""] = "act" inside each ["BUTTON"] = { ... } block that has an empty-modifier slot."""
-    n = 0
-    def repl(m: re.Match) -> str:
-        nonlocal n
-        block = m.group(0)
-        new_block, c = re.subn(
-            r'(\[""\]\s*=\s*")[^"]*(")',
-            rf'\1{act}\2',
-            block,
-            count=1,
-        )
-        if c:
-            n += 1
-        return new_block
-    # Only touch ConsolePortShared character Bindings, not device Generators,
-    # by limiting to after ConsolePortShared =
-    parts = re.split(r'(ConsolePortShared\s*=\s*\{)', src, maxsplit=1)
-    if len(parts) < 3:
-        return src, 0
-    head, mid, tail = parts[0], parts[1], parts[2]
-    pat = re.compile(
-        rf'(\["{re.escape(button)}"\]\s*=\s*\{{.*?\n\}})',
-        re.S,
-    )
-    tail2, _ = pat.subn(repl, tail)
-    return head + mid + tail2, n
-
-text2, n = set_empty_mod_action("PADRSHOULDER", action, text)
-print(f"ConsolePortShared PADRSHOULDER updates: {n}")
-# If PADLTRIGGER empty-mod is blank, set INTERACTTARGET
-def fill_empty_lt(src: str) -> tuple[str, int]:
-    n = 0
-    parts = re.split(r'(ConsolePortShared\s*=\s*\{)', src, maxsplit=1)
-    if len(parts) < 3:
-        return src, 0
-    head, mid, tail = parts[0], parts[1], parts[2]
-    def repl(m: re.Match) -> str:
-        nonlocal n
-        block = m.group(0)
-        if re.search(r'\[""\]\s*=\s*""', block):
-            block2, c = re.subn(r'(\[""\]\s*=\s*")(")', r'\1INTERACTTARGET\2', block, count=1)
-            if c:
-                n += 1
-            return block2
-        return block
-    pat = re.compile(r'(\["PADLTRIGGER"\]\s*=\s*\{.*?\n\})', re.S)
-    tail2 = pat.sub(repl, tail)
-    return head + mid + tail2, n
-
-text3, nlt = fill_empty_lt(text2)
-print(f"ConsolePortShared PADLTRIGGER interact fills: {nlt}")
-path.write_text(text3, encoding="utf-8")
-PY
-fi
-
 # Mirror into live-setup snapshot when present
 LIVE_MACROS="${WOW_COUCH_CONFIG}/live-setup/account/macros-cache.txt"
 LIVE_BIND="${WOW_COUCH_CONFIG}/live-setup/account/bindings-cache.wtf"
@@ -160,6 +97,6 @@ if [[ -d "${WOW_COUCH_CONFIG}/live-setup/account" ]]; then
 fi
 
 echo "Done. Fully quit Forever if it was open, then relaunch."
-echo "In-game check: /cpcouch status  (RB should stay InviteNearest after /cpcouch apply)"
+echo "In-game check: RB should be InviteNearest on the Blizzard gamepad bindings."
 echo "Macro: ${MACRO_NAME}"
 echo "$MACRO_BODY"

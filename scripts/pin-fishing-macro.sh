@@ -70,4 +70,4 @@ fi
 
 echo "Done. Macro body:"
 echo "$MACRO_BODY"
-echo "Drag FishingCouch onto a gamepad bar. In-game: /cpcouch fish"
+echo "Drag FishingCouch onto the Blizzard gamepad bar."

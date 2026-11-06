@@ -6,12 +6,12 @@ import argparse
 from pathlib import Path
 
 DEFAULT_ENABLE = [
-    "ConsolePort", "ConsolePort_Bar", "ConsolePort_Config", "ConsolePort_Cursor",
-    "ConsolePort_Menu", "ConsolePort_Rings", "ConsolePort_Target", "ConsolePort_World",
-    "ConsolePortCouch",
-    "Immersion", "ForeverVO",
-    "ForeverVO_Data_Classic_Quests", "ForeverVO_Data_Classic_Endgame", "ForeverVO_Data_Classic_Gossip",
-    "ForeverVO_Data_Forever_Quests", "ForeverVO_Data_Forever_Gossip", "ForeverVO_Data_Books",
+    "Immersion",
+    "Spoken", "Spoken_Quests", "Spoken_Places", "Spoken_Readables", "Spoken_Bosses",
+    "SpokenContributions",
+    "SpokenQuestsAudioAlliance", "SpokenQuestsAudioHorde", "SpokenQuestsAudioShared",
+    "SpokenQuestsAudioGossip",
+    "SpokenPlacesAudio", "SpokenReadablesAudio", "SpokenBossesAudio",
     "CouchDictateRoute",
     "Syndicator", "Baganator", "Leatrix_Plus", "Plater", "PlaterQuestPin",
     "LoreForever", "LoreForever_Voice_Default", "LoreForever_Voice_Default_Alliance",
@@ -24,6 +24,13 @@ DEFAULT_ENABLE = [
 DEFAULT_DISABLE = [
     "DialogKey_Numy", "DialogKey_Aeonzara", "DialogKey",
     "SelfBuffs", "CouchBuffReminder",
+    "ConsolePort", "ConsolePort_Bar", "ConsolePort_Config", "ConsolePort_Cursor",
+    "ConsolePort_Menu", "ConsolePort_Rings", "ConsolePort_Target", "ConsolePort_World",
+    "ConsolePort_Keyboard", "ConsolePortCouch",
+    "ForeverVO",
+    "ForeverVO_Data_Classic_Quests", "ForeverVO_Data_Classic_Endgame", "ForeverVO_Data_Classic_Gossip",
+    "ForeverVO_Data_Forever_Quests", "ForeverVO_Data_Forever_Gossip", "ForeverVO_Data_Books",
+    "SpokenPlayer", "SpokenQuests", "SpokenZones", "SpokenBooks",
 ]
 
 
