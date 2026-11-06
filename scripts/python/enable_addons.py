@@ -65,6 +65,19 @@ def sync_file(path: Path, enable: list[str], disable: list[str]) -> None:
     )
 
 
+def enable_names(root: Path, names: list[str]) -> None:
+    """Mark addon folders enabled. Leaves every other AddOns.txt row alone."""
+    if not root.is_dir() or not names:
+        return
+    files = list(root.glob("*/AddOns.txt")) + list(root.glob("*/*/AddOns.txt")) + list(
+        root.glob("*/*/*/AddOns.txt")
+    )
+    for path in files:
+        if "SavedVariables" in path.parts:
+            continue
+        sync_file(path, names, [])
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--wtf-account", required=True, type=Path)

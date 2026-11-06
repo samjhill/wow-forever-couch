@@ -25,7 +25,12 @@ def is_preserved(name: str) -> bool:
     return False
 
 
-def unzip_to(zip_path: Path, dest: Path, preserve_couch: bool = False) -> list[str]:
+def unzip_to(
+    zip_path: Path,
+    dest: Path,
+    preserve_couch: bool = False,
+    skip: set[str] | None = None,
+) -> list[str]:
     installed: list[str] = []
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -43,6 +48,7 @@ def unzip_to(zip_path: Path, dest: Path, preserve_couch: bool = False) -> list[s
         # Descend single wrapper dir without toc
         entries = [p for p in root.iterdir()]
         extract_root = root
+        skipped = skip or set()
         if len(entries) == 1 and entries[0].is_dir():
             if not list(entries[0].glob("*.toc")) and list(entries[0].rglob("*.toc")):
                 extract_root = entries[0]
@@ -51,7 +57,7 @@ def unzip_to(zip_path: Path, dest: Path, preserve_couch: bool = False) -> list[s
         flat_tocs = list(extract_root.glob("*.toc"))
         if flat_tocs and not any(p.is_dir() and list(p.glob("*.toc")) for p in extract_root.iterdir() if p.is_dir()):
             base = flat_tocs[0].stem
-            if preserve_couch and is_preserved(base):
+            if base in skipped or (preserve_couch and is_preserved(base)):
                 print(f"skip preserved {base}")
             else:
                 target = dest / base
@@ -72,7 +78,7 @@ def unzip_to(zip_path: Path, dest: Path, preserve_couch: bool = False) -> list[s
             if not d.is_dir():
                 continue
             base = d.name
-            if preserve_couch and is_preserved(base):
+            if base in skipped or (preserve_couch and is_preserved(base)):
                 print(f"skip preserved {base}")
                 continue
             if not list(d.glob("*.toc")) and not list(d.rglob("*.toc")):

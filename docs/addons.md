@@ -4,9 +4,22 @@ Flavor: **WoW Forever** client under `_forever_`, interface **`16001`** (game ve
 
 **None of the new QoL addons are claimed working in-game until tested in a live Forever session.**
 
-## CurseForge app (updates)
+## CurseForge updates
 
-Official Overwolf CurseForge is installed as a **user Flatpak** (`com.overwolf.curseforge`) with filesystem access to `$WOW_PREFIX` (default `~/Games/battlenet`).
+Forever files are refreshed from the CurseForge file list (game version `1.60.x` only):
+
+- **Before Battle.net starts**, when you launch through `launch-battlenet-proton.sh` (skip with `WOW_COUCH_CURSEFORGE_UPDATE=0`)
+- **Every 6 hours** via the user timer `wow-curseforge-addons.timer`
+- **Full repo sync** (`WOW_COUCH_UPDATE_MODE=full`) also runs the same update
+
+```bash
+./scripts/install-curseforge-update-timer.sh
+./scripts/update-curseforge-addons.sh
+```
+
+The job skips while Forever is running, leaves repo addons (`ConsolePortCouch`, `CouchDictateRoute`, `PlaterQuestPin`) alone, and does not install the staged set. A changed zip is extracted; an unchanged one is left in place. SavedVariables are not touched.
+
+The Overwolf CurseForge Flatpak is optional browsing. It has no headless update command, and Gaming Mode will not keep that window running.
 
 ```bash
 ./scripts/install-curseforge.sh   # install/update Flatpak + overrides + launcher
@@ -20,8 +33,6 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 3. Add/scan the Forever client folder (contains `Wow.exe`) — path is written to `config/curseforge-forever-path.txt`. Do **not** select `Interface/AddOns`.
 4. Install/update only Forever / `1.60.x` files.
 5. `steamos-session-select gamescope` when done.
-
-Repo install scripts remain the reproducible baseline; CurseForge is for ongoing updates after that.
 
 ## Stack overview
 

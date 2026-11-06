@@ -89,4 +89,9 @@ if [[ "$MODE" == "full" ]]; then
   fi
 fi
 
+if [[ "$MODE" == "full" && -x "${REPO_ROOT}/scripts/update-curseforge-addons.sh" ]]; then
+  log "CurseForge addon update"
+  "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || log "CurseForge addon update reported errors"
+fi
+
 log "done (mode=${MODE} profile=${WOW_COUCH_PROFILE:-default})"

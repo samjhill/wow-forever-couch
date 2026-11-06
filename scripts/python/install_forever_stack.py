@@ -16,6 +16,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 import curseforge_fetch  # noqa: E402
+import curseforge_projects  # noqa: E402
 import unzip_addons  # noqa: E402
 
 GITHUB = [
@@ -32,26 +33,6 @@ GITHUB = [
         "https://github.com/quinn-dougherty/forever-vo/releases/download/v0.1.10/forever-vo-v0.1.10-forever.zip",
     ),
 ]
-
-# ForeverVO voice packs
-FVO_PACKS = [1705100, 1709884, 1729567, 1705094, 1729570, 1729514]
-
-# QoL CurseForge projects: (id, optional name filter, optional filename preference)
-QOL = [
-    (988370, "", ""),  # Syndicator
-    (914482, "", ""),  # Baganator
-    (94855, "forever", ""),  # Leatrix Plus
-    (100547, "", ""),  # Plater
-    (1715510, "", ""),  # Lore Forever
-    (1702832, "", ""),  # Fishing Log
-    (1729017, "", ""),  # Loot Sparkles
-    (1731463, "", ""),  # NodeSight
-    (1757790, "", ""),  # Gather Radar
-    (1703450, "", ""),  # AutoFeed (AutoFeed + AutoDrink macros)
-    (1728015, "", ""),  # SmartRebuff (Forever buff monitor)
-    (334372, "", "+v1.0"),  # Questie + QuestieDB (prefer DB bundle)
-]
-
 
 def sync_repo_addons(repo: Path, addons_dir: Path) -> None:
     for name in ("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin"):
@@ -93,19 +74,22 @@ def main() -> None:
     for z in core_zips:
         unzip_addons.unzip_to(z, addons)
 
-    for project in FVO_PACKS:
-        z = curseforge_fetch.fetch_project(project, staging)
+    for project in curseforge_projects.VOICE_PACKS:
+        z = curseforge_fetch.fetch_project(project.project_id, staging)
         unzip_addons.unzip_to(z, addons)
 
     if not args.core_only:
-        for project, filt, prefer in QOL:
+        for project in curseforge_projects.QOL:
             try:
                 z = curseforge_fetch.fetch_project(
-                    project, staging, name_filter=filt, prefer=prefer
+                    project.project_id,
+                    staging,
+                    name_filter=project.name_filter,
+                    prefer=project.prefer,
                 )
                 unzip_addons.unzip_to(z, addons, preserve_couch=True)
             except SystemExit as e:
-                print(f"warn: project {project}: {e}", file=sys.stderr)
+                print(f"warn: project {project.label}: {e}", file=sys.stderr)
 
     sync_repo_addons(repo, addons)
 
