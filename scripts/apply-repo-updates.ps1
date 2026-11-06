@@ -47,22 +47,17 @@ try {
         Log "Forever missing — skip addon sync"
     }
 
-    if ($Mode -eq "full" -and (Test-WowForeverInstalled) -and -not $running) {
-        $updatePy = Join-Path $env:REPO_ROOT "scripts\python\update_curseforge_addons.py"
-        $staging = Join-Path $env:WOW_COUCH_CONFIG "addons-staging"
-        $updateArgs = @(
-            $updatePy,
-            "--addons", $env:WOW_ADDONS,
-            "--staging", $staging
-        )
-        $wtfAccount = Join-Path $env:WOW_FOREVER "WTF\Account"
-        if (Test-Path $wtfAccount) {
-            $updateArgs += @("--wtf-account", $wtfAccount)
-        }
-        try {
-            Invoke-RepoPython $updateArgs
-        } catch {
-            Log "CurseForge addon update reported errors: $_"
+    if ($Mode -eq "full") {
+        # Addon zips update on their own daily task. Refresh that task so an
+        # already-installed box picks up the schedule without a second bootstrap.
+        $timer = Join-Path $PSScriptRoot "install-curseforge-update-task.ps1"
+        if (Test-Path $timer) {
+            Log "refresh daily CurseForge addon task"
+            try {
+                & $timer
+            } catch {
+                Log "CurseForge task install reported errors: $_"
+            }
         }
     }
 

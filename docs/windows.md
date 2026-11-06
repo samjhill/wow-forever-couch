@@ -41,7 +41,7 @@ When Forever is present:
 2. Syncs repo-owned addons (`PlaterQuestPin`, `CouchDictateRoute`) + SmartRebuff
 3. Enables AddOns.txt entries after first login (`WTF\Account`)
 4. Pins Spoken / Immersion prefs and graphics (`Config.wtf`)
-5. Registers Scheduled Task **WoWForeverCouchUpdate** (every ~6h, full mode, including CurseForge addon refresh when Forever is quit)
+5. Registers Scheduled Task **WoWForeverCouchUpdate** (every ~6h, git pull and prefs) and **WoWForeverCurseForgeUpdate** (daily, CurseForge addon refresh when Forever is quit)
 6. Creates Start Menu + Desktop shortcut **Update WoW Forever Couch**
 
 Manual sync anytime:

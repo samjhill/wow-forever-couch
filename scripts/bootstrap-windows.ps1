@@ -103,8 +103,9 @@ if (Test-WowForeverInstalled) {
     Write-Host "Or set `$env:WOW_FOREVER to your _forever_ folder before re-running."
 }
 
-Write-Host "=== Auto-update Scheduled Task ==="
+Write-Host "=== Auto-update Scheduled Tasks ==="
 & (Join-Path $env:REPO_ROOT "scripts\install-repo-update-task.ps1")
+& (Join-Path $env:REPO_ROOT "scripts\install-curseforge-update-task.ps1")
 
 # Start Menu + Desktop shortcut
 $shortcutName = "Update WoW Forever Couch.lnk"

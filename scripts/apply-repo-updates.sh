@@ -3,7 +3,7 @@
 #
 # Modes:
 #   WOW_COUCH_UPDATE_MODE=quick   (default for launch hook) — git pull + repo addons
-#   WOW_COUCH_UPDATE_MODE=full    (timer / manual) — also re-pin prefs; optional live-setup restore
+#   WOW_COUCH_UPDATE_MODE=full    (timer / manual) — also re-pin prefs, refresh the daily CurseForge timer; optional live-setup restore
 #
 # Env:
 #   WOW_COUCH_RESTORE_LIVE=1  — also run restore-live-setup.sh (Forever should be quit)
@@ -89,9 +89,11 @@ if [[ "$MODE" == "full" ]]; then
   fi
 fi
 
-if [[ "$MODE" == "full" && -x "${REPO_ROOT}/scripts/update-curseforge-addons.sh" ]]; then
-  log "CurseForge addon update"
-  "${REPO_ROOT}/scripts/update-curseforge-addons.sh" || log "CurseForge addon update reported errors"
+# Addon zips update on their own daily timer. Refresh that unit so an
+# already-installed box picks up the schedule without a second bootstrap.
+if [[ "$MODE" == "full" && -x "${REPO_ROOT}/scripts/install-curseforge-update-timer.sh" ]]; then
+  log "refresh daily CurseForge addon timer"
+  "${REPO_ROOT}/scripts/install-curseforge-update-timer.sh" || log "CurseForge timer install reported errors"
 fi
 
 log "done (mode=${MODE} profile=${WOW_COUCH_PROFILE:-default})"

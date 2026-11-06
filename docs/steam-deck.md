@@ -43,7 +43,7 @@ Or after any clone/install, regenerate the icon:
 | Forever addons, couch helpers, timers | Yes (once client exists) |
 | Non-Steam shortcut + Steam Input | Yes (`add-steam-shortcut.sh`) |
 | Periodic `git pull` + safe addon re-apply | Yes (timer + launch hook) |
-| CurseForge Forever addon updates | Yes (6h timer + before Battle.net launch) |
+| CurseForge Forever addon updates | Yes (daily timer; not on Battle.net launch) |
 | Battle.net login (+ rare Install click) | Manual once |
 | Personal `config/live-setup` bindings snapshot | Opt-in (`WOW_COUCH_RESTORE_LIVE=1`) |
 
@@ -55,8 +55,9 @@ If the shortcut helper fails (no Steam userdata yet), sign into Steam once and r
 
 After install:
 
-1. **systemd user timer** (~every 6h) → full apply, plus CurseForge addon refresh  
-2. **Battle.net launch** → quiet quick pull + repo addon sync + CurseForge Forever files  
+1. **systemd user timer** (~every 6h) → full apply (git pull, repo addons, prefs). It also refreshes the CurseForge timer unit.
+2. **CurseForge addon timer** (daily, ~04:00) → Forever addon zips. Skips while the game is running.
+3. **Battle.net launch** → quiet quick pull + repo addon sync. It does not download CurseForge addons.  
 
 Manual:
 

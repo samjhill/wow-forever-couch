@@ -30,7 +30,7 @@ Prefer a Desktop icon instead? Download [`Install WoW Forever Couch`](config/des
 irm https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.ps1 | iex
 ```
 
-Installs addons/pins, a 6h Scheduled Task, and a desktop shortcut. Needs Git + Python 3 (bootstrap can winget them). Full notes: [`docs/windows.md`](docs/windows.md).
+Installs addons/pins, a 6h repo-sync task, a daily CurseForge addon task, and a desktop shortcut. Needs Git + Python 3 (bootstrap can winget them). Full notes: [`docs/windows.md`](docs/windows.md).
 
 **Dictation: Linux only for now** (Windows Phase 2).
 
@@ -68,7 +68,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ./scripts/install-forever-addons.sh        # Immersion, Spoken + English voice packs
 ./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
 ./scripts/install-forever-qol-addons.sh    # Leatrix/…/Questie; stages BigWigs/GTFO/…
-./scripts/install-curseforge-update-timer.sh  # refresh CurseForge Forever files every 6h
+./scripts/install-curseforge-update-timer.sh  # refresh CurseForge Forever files daily
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists (also on Battle.net launch)
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; Spoken voice only
 ./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
