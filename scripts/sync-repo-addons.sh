@@ -28,9 +28,9 @@ install_local() {
 install_local ConsolePortCouch
 install_local CouchDictateRoute
 install_local PlaterQuestPin
-install_local CouchBuffReminder
+rm -rf "${WOW_ADDONS}/CouchBuffReminder" "${WOW_ADDONS}/SelfBuffs"
 
-# Prefer dedicated installers when present (enable AddOns.txt, SelfBuffs zip, etc.)
+# Prefer dedicated installers when present (enable AddOns.txt, SmartRebuff zip, etc.)
 if [[ -x "${REPO_ROOT}/scripts/install-consoleport-couch.sh" ]]; then
   "${REPO_ROOT}/scripts/install-consoleport-couch.sh" || true
 fi
@@ -40,9 +40,8 @@ fi
 if [[ -x "${REPO_ROOT}/scripts/install-plater-quest-pin.sh" ]] && [[ -d "${WOW_ADDONS}/Plater" ]]; then
   "${REPO_ROOT}/scripts/install-plater-quest-pin.sh" || true
 fi
-if [[ -x "${REPO_ROOT}/scripts/install-selfbuffs.sh" ]]; then
-  # SelfBuffs reuses CurseForge cache when present
-  "${REPO_ROOT}/scripts/install-selfbuffs.sh" || true
+if [[ -x "${REPO_ROOT}/scripts/install-smartrebuff.sh" ]]; then
+  "${REPO_ROOT}/scripts/install-smartrebuff.sh" || true
 fi
 
 if [[ -x "${REPO_ROOT}/scripts/enable-forever-addons.sh" ]] && [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then

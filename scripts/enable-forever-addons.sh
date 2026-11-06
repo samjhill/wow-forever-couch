@@ -20,13 +20,13 @@ ADDONS=(
   ForeverLootSparkles
   NodeSight
   GatherRadar
-  SelfBuffs
   AutoFeed
-  CouchBuffReminder
+  SmartRebuff
 )
-# Removed from couch stack (Immersion covers quest/gossip keys)
+# Removed from couch stack (Immersion covers quest/gossip; SmartRebuff replaced custom buffs)
 DISABLE_ADDONS=(
   DialogKey_Numy DialogKey_Aeonzara DialogKey
+  SelfBuffs CouchBuffReminder
 )
 
 if [[ ! -d "$WTF" ]]; then

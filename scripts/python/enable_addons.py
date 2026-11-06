@@ -17,10 +17,13 @@ DEFAULT_ENABLE = [
     "LoreForever", "LoreForever_Voice_Default", "LoreForever_Voice_Default_Alliance",
     "LoreForever_Voice_Default_Horde",
     "TheFishingLog", "ForeverLootSparkles", "NodeSight", "GatherRadar",
-    "SelfBuffs", "AutoFeed", "CouchBuffReminder",
+    "AutoFeed", "SmartRebuff",
 ]
 
-DEFAULT_DISABLE = ["DialogKey_Numy", "DialogKey_Aeonzara", "DialogKey"]
+DEFAULT_DISABLE = [
+    "DialogKey_Numy", "DialogKey_Aeonzara", "DialogKey",
+    "SelfBuffs", "CouchBuffReminder",
+]
 
 
 def sync_file(path: Path, enable: list[str], disable: list[str]) -> None:

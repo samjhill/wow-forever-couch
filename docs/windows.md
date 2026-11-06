@@ -38,7 +38,7 @@ If Forever is missing, bootstrap prints a clear message: install Forever via Bat
 When Forever is present:
 
 1. Installs ConsolePort / Immersion / ForeverVO + voice packs + QoL set (`scripts/python/install_forever_stack.py`)
-2. Syncs repo-owned addons (`ConsolePortCouch`, `PlaterQuestPin`, `CouchBuffReminder`, `CouchDictateRoute`)
+2. Syncs repo-owned addons (`ConsolePortCouch`, `PlaterQuestPin`, `CouchDictateRoute`) + SmartRebuff
 3. Enables AddOns.txt entries after first login (`WTF\Account`)
 4. Pins ForeverVO / Immersion prefs and graphics (`Config.wtf`)
 5. Registers Scheduled Task **WoWForeverCouchUpdate** (every ~6h, full mode)
