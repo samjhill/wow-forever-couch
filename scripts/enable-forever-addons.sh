@@ -18,7 +18,6 @@ ADDONS=(
   TheFishingLog
   ForeverLootSparkles
   NodeSight
-  GatherRadar
   AutoFeed
   SmartRebuff
   QuestieDB
@@ -36,6 +35,7 @@ DISABLE_ADDONS=(
   ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
   SpokenPlayer SpokenQuests SpokenZones SpokenBooks
   Baganator Syndicator
+  GatherRadar
 )
 
 if [[ ! -d "$WTF" ]]; then

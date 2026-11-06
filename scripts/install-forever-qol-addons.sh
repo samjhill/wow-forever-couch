@@ -116,9 +116,6 @@ SPARKLE_ZIP="$FETCHED_NAME"
 # NodeSight — live herb/ore icons on minimap tracking dots (controller-friendly)
 fetch_forever 1731463
 NODESIGHT_ZIP="$FETCHED_NAME"
-# Gather Radar — live icons + remembered herb/ore pins on minimap & world map
-fetch_forever 1757790
-GATHER_ZIP="$FETCHED_NAME"
 # AutoFeed — self-updating AutoFeed (eat) + AutoDrink macros
 fetch_forever 1703450
 AUTOFEED_ZIP="$FETCHED_NAME"
@@ -130,11 +127,12 @@ path="$(python3 "${REPO_ROOT}/scripts/python/curseforge_fetch.py" --project 3343
 QUESTIE_ZIP="$(basename "$path")"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
+for z in "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 # Built-in bags replace Baganator; Syndicator only indexed inventory for it.
 rm -rf "${DEST}/Baganator" "${DEST}/Syndicator"
+rm -rf "${DEST}/GatherRadar"
 # Drop previous custom buff stack
 rm -rf "${DEST}/CouchBuffReminder" "${DEST}/SelfBuffs"
 # Immersion already covers controller quest/gossip; do not install DialogKey forks.
@@ -167,7 +165,6 @@ done
   echo "- $FISH_ZIP"
   echo "- $SPARKLE_ZIP"
   echo "- $NODESIGHT_ZIP"
-  echo "- $GATHER_ZIP"
   echo "- $AUTOFEED_ZIP"
   echo "- $SMARTREBUFF_ZIP"
   echo "- $QUESTIE_ZIP"

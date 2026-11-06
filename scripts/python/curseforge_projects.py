@@ -40,6 +40,7 @@ VOICE_PACKS = [
 # Folders removed on install/sync. Globs are matched with Path.glob.
 # SpokenQuests/SpokenZones/SpokenBooks are retired module names, not Spoken_Quests.
 # Baganator is the bag UI; Syndicator is only its inventory backend.
+# GatherRadar is the remembered herb/ore map; NodeSight stays.
 REMOVED_GLOBS = (
     "ConsolePort",
     "ConsolePort_*",
@@ -52,6 +53,7 @@ REMOVED_GLOBS = (
     "SpokenBooks",
     "Baganator",
     "Syndicator",
+    "GatherRadar",
 )
 
 QOL = [
@@ -61,7 +63,6 @@ QOL = [
     CurseForgeProject(1702832, "The Fishing Log"),
     CurseForgeProject(1729017, "Forever Loot Sparkles"),
     CurseForgeProject(1731463, "NodeSight"),
-    CurseForgeProject(1757790, "Gather Radar"),
     CurseForgeProject(1703450, "AutoFeed"),
     CurseForgeProject(1728015, "SmartRebuff"),
     CurseForgeProject(334372, "Questie", prefer="+v1.0"),
