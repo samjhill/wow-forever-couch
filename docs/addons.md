@@ -46,6 +46,7 @@ Repo install scripts remain the reproducible baseline; CurseForge is for ongoing
 | PlaterQuestPin | repo `addons/` | Forces **Track Quests Progress** + **Use Quest Color** on enemy/friendly NPCs; sets `showQuestTrackingTooltips` so kill N/M lines appear for Plater to scan (`/platerquestpin`) |
 | AutoFeed | 1703450 | `AutoFeed-v1.4.0.zip` | — | Self-updating `AutoFeed` (eat) + `AutoDrink` macros (`/af`) |
 | SmartRebuff | 1728015 | `SmartRebuff_1.60.zip` | — | Forever class/group buff monitor + renewal reminders (replaces SelfBuffs / CouchBuffReminder) |
+| Questie | 334372 | `Questie-v12.3.1+v1.0.9.zip` | **QuestieDB** (same zip) | Quest tracker, map pins, and arrow. Forever TOC is `Questie_Camelot.toc` (`16001`). Some Forever quests are still missing upstream |
 | Lore Forever | 1715510 | `LoreForever.zip` (`## Version: 0.37.0`, `## Interface: 16001`) | ships `LoreForever_Voice_Default*` | Zone/NPC/quest lore panel + optional story narration (`/lore`) |
 | The Fishing Log | 1702832 | `TheFishingLog-1.0.0.zip` (`## Version: 1.0.0`, `## Interface: 16001`) | optional Auctionator/TSM for catch value | Catch log, journal, spot records, matches (`/tfl`) |
 
@@ -69,7 +70,6 @@ Path: `config/addons-staging/staged/` (on the couch box under the project `confi
 
 | Addon | Project | Staged file | Notes |
 |-------|---------|-------------|-------|
-| Questie | 334372 | `Questie-v12.3.1+v1.0.9.zip` | Forever file; open Forever quest-coverage issues upstream — activate later |
 | BigWigs | 2382 | `BigWigs-v427.8.zip` | Preferred boss mod for couch (lighter). DBM also has Forever (`12.1.19`) but needs Classic modules pack — do not enable both |
 | GTFO | 20697 | `GTFO-6.12.2.zip` | Bad-ground audio |
 | Talents Forever | 1700435 | `TalentsForeverBook-0.38.14.zip` | Beta Forever talent planner (`/tf`) |
@@ -92,7 +92,7 @@ Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion al
 ```bash
 ./scripts/install-forever-addons.sh          # ConsolePort / Immersion / ForeverVO
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Gather Radar; stages the rest
+./scripts/install-forever-qol-addons.sh      # Baganator + Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Gather Radar + Questie; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged)
 ./scripts/install-consoleport-couch.sh       # Xbox recommended bindings helper (empty LB/RB/LT/RT)
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
@@ -125,8 +125,8 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, GatherRadar (DialogKey removed)
-- [x] Staged addons (Questie, BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables ConsolePort*, Immersion, ForeverVO*, CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, GatherRadar, QuestieDB, Questie (DialogKey removed)
+- [x] Staged addons (BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Baganator UI; tooltip counts via Syndicator
 - [ ] `/leatrix` options open
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
@@ -141,7 +141,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 - CurseForge files API: Forever candidates selected when `gameVersions` contains `1.60.x`
 - Installed TOC checks on box after unzip: Syndicator/Baganator include `16001`; Leatrix_Plus and Plater Forever builds are `16001`-only; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only
-- Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files; Questie called out for remaining Forever quest bugs — hence staged
+- Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files. Questie `v12.3.1+v1.0.9` lists `1.60.1` and is installed; some Forever-only quests can still be missing upstream
 
 ## In-game commands (after first login)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/Lore Forever/Fishing Log)
-# and stage later-activation zips (Questie/BigWigs/GTFO/Talents Forever/Auctionator).
+# Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/Lore Forever/Fishing Log/Questie)
+# and stage later-activation zips (BigWigs/GTFO/Talents Forever/Auctionator).
 #
 # Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
 # Does NOT enable staged addons. Does NOT overwrite SavedVariables/profiles.
@@ -13,7 +13,6 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 STAGING="${WOW_COUCH_CONFIG}/addons-staging"
 STAGED_ZIPS="${STAGING}/staged"
 DEST="${WOW_ADDONS}"
-UA="wow-forever-couch-qol"
 mkdir -p "$STAGING" "$STAGED_ZIPS" "$DEST"
 cd "$STAGING"
 
@@ -27,53 +26,6 @@ fetch_forever() {
   [[ -n "$name_filter" ]] && args+=(--name-filter "$name_filter")
   path="$("${args[@]}")"
   FETCHED_NAME="$(basename "$path")"
-}
-
-# Prefer Questie Forever build that includes the large DB (+v1.0) when available.
-fetch_questie() {
-  local meta file_id file_name file_len hi lo url have
-  meta=$(curl -sL --fail \
-    -H "Accept: application/json" -H "User-Agent: ${UA}" \
-    "https://www.curseforge.com/api/v1/mods/334372/files?pageSize=40&sortField=1&sortOrder=desc")
-  read -r file_id file_name file_len < <(printf '%s' "$meta" | python3 -c '
-import json, sys
-files = json.load(sys.stdin)["data"]
-
-def ok(f):
-    gvs = [str(v) for v in (f.get("gameVersions") or [])]
-    return any(v.startswith("1.60") for v in gvs) and f.get("releaseType") in (1, 2)
-
-cand = [f for f in files if ok(f)]
-# Prefer DB bundles (+v1.0), then newest upload, then largest
-cand.sort(
-    key=lambda f: (
-        "+v1.0" in (f.get("fileName") or ""),
-        f.get("dateCreated") or "",
-        f.get("fileLength") or 0,
-    ),
-    reverse=True,
-)
-if not cand:
-    raise SystemExit("no Forever Questie file")
-f = cand[0]
-print(f["id"], f["fileName"], f.get("fileLength") or 0)
-')
-  hi=$((file_id / 1000))
-  lo=$((file_id % 1000))
-  url="https://edge.forgecdn.net/files/${hi}/${lo}/${file_name}"
-  if [[ -f "$file_name" ]]; then
-    have=$(stat -c%s "$file_name" 2>/dev/null || stat -f%z "$file_name" 2>/dev/null || echo 0)
-    if [[ "$have" == "$file_len" && "$file_len" != "0" ]]; then
-      echo "cached $file_name"
-    else
-      echo "Downloading $file_name"
-      curl -L --fail --retry 3 -A "$UA" -o "$file_name" "$url"
-    fi
-  else
-    echo "Downloading $file_name"
-    curl -L --fail --retry 3 -A "$UA" -o "$file_name" "$url"
-  fi
-  FETCHED_NAME="$file_name"
 }
 
 is_preserved() {
@@ -177,9 +129,12 @@ AUTOFEED_ZIP="$FETCHED_NAME"
 # SmartRebuff — Forever class/group buff monitor (replaces SelfBuffs + CouchBuffReminder)
 fetch_forever 1728015
 SMARTREBUFF_ZIP="$FETCHED_NAME"
+# Questie Forever build that includes the large DB (+v1.0) when available.
+path="$(python3 "${REPO_ROOT}/scripts/python/curseforge_fetch.py" --project 334372 --prefer "+v1.0" --staging "$STAGING")"
+QUESTIE_ZIP="$(basename "$path")"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP"; do
+for z in "$SYN_ZIP" "$BAG_ZIP" "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$GATHER_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 # Drop previous custom buff stack
@@ -188,8 +143,6 @@ rm -rf "${DEST}/CouchBuffReminder" "${DEST}/SelfBuffs"
 rm -rf "${DEST}/DialogKey_Numy" "${DEST}/DialogKey_Aeonzara" "${DEST}/DialogKey"
 
 echo "=== stage later-activation zips (not enabled) ==="
-fetch_questie
-QUESTIE_ZIP="$FETCHED_NAME"
 fetch_forever 2382
 BW_ZIP="$FETCHED_NAME"
 fetch_forever 20697
@@ -199,7 +152,7 @@ TF_ZIP="$FETCHED_NAME"
 fetch_forever 6124
 AUC_ZIP="$FETCHED_NAME"
 
-for z in "$QUESTIE_ZIP" "$BW_ZIP" "$GTFO_ZIP" "$TF_ZIP" "$AUC_ZIP"; do
+for z in "$BW_ZIP" "$GTFO_ZIP" "$TF_ZIP" "$AUC_ZIP"; do
   [[ -f "$z" ]] || { echo "missing stage zip $z" >&2; exit 2; }
   cp -f "$z" "$STAGED_ZIPS/"
   echo "staged $z → $STAGED_ZIPS/"
@@ -221,9 +174,9 @@ done
   echo "- $GATHER_ZIP"
   echo "- $AUTOFEED_ZIP"
   echo "- $SMARTREBUFF_ZIP"
+  echo "- $QUESTIE_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
-  echo "- $QUESTIE_ZIP"
   echo "- $BW_ZIP"
   echo "- $GTFO_ZIP"
   echo "- $TF_ZIP"

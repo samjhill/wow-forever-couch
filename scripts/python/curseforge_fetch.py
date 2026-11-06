@@ -38,7 +38,7 @@ def http_download(url: str, dest: Path) -> None:
             out.write(chunk)
 
 
-def pick_forever_file(files: list, name_filter: str = "") -> dict:
+def pick_forever_file(files: list, name_filter: str = "", prefer: str = "") -> dict:
     def ok(f: dict) -> bool:
         gvs = [str(v) for v in (f.get("gameVersions") or [])]
         if not any(v.startswith("1.60") for v in gvs):
@@ -49,9 +49,15 @@ def pick_forever_file(files: list, name_filter: str = "") -> dict:
             return False
         return True
 
+    needle = prefer.lower()
     cand = [f for f in files if ok(f)]
     cand.sort(
-        key=lambda f: (1 if f.get("releaseType") == 1 else 0, f.get("dateCreated") or ""),
+        key=lambda f: (
+            1 if needle and needle in (f.get("fileName") or "").lower() else 0,
+            1 if f.get("releaseType") == 1 else 0,
+            f.get("dateCreated") or "",
+            f.get("fileLength") or 0,
+        ),
         reverse=True,
     )
     if not cand:
@@ -64,11 +70,11 @@ def forgecdn_url(file_id: int, file_name: str) -> str:
     return f"https://edge.forgecdn.net/files/{hi}/{lo}/{file_name}"
 
 
-def fetch_project(project: int, staging: Path, name_filter: str = "") -> Path:
+def fetch_project(project: int, staging: Path, name_filter: str = "", prefer: str = "") -> Path:
     meta = http_json(
         f"https://www.curseforge.com/api/v1/mods/{project}/files?pageSize=40&sortField=1&sortOrder=desc"
     )
-    f = pick_forever_file(meta.get("data") or [], name_filter=name_filter)
+    f = pick_forever_file(meta.get("data") or [], name_filter=name_filter, prefer=prefer)
     file_id = int(f["id"])
     file_name = f["fileName"]
     file_len = int(f.get("fileLength") or 0)
@@ -96,6 +102,11 @@ def main() -> None:
     ap.add_argument("--project", type=int, help="CurseForge project id")
     ap.add_argument("--name-filter", default="", help="Substring required in fileName")
     ap.add_argument(
+        "--prefer",
+        default="",
+        help="Prefer a filename containing this substring (e.g. +v1.0 for Questie DB)",
+    )
+    ap.add_argument(
         "--staging",
         default=os.environ.get("WOW_COUCH_STAGING", ""),
         help="Download directory",
@@ -115,7 +126,7 @@ def main() -> None:
         raise SystemExit("provide --project or --url")
     staging = Path(args.staging or Path.cwd())
     staging.mkdir(parents=True, exist_ok=True)
-    path = fetch_project(args.project, staging, name_filter=args.name_filter)
+    path = fetch_project(args.project, staging, name_filter=args.name_filter, prefer=args.prefer)
     print(path)
 
 
