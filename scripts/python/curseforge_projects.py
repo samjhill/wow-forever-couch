@@ -50,6 +50,9 @@ QOL = [
 # Repo-owned helpers. CurseForge zips must not replace these.
 REPO_OWNED = ("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin")
 
+# Installed with ConsolePort, but the couch leaves this one to the player.
+DO_NOT_AUTO_ENABLE = ("ConsolePort_Keyboard",)
+
 
 def update_projects() -> list[CurseForgeProject]:
     return [*CORE, *VOICE_PACKS, *QOL]

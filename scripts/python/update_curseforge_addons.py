@@ -115,7 +115,11 @@ def main() -> int:
             print(f"fail {label}: {exc}", file=sys.stderr)
             continue
         state[key] = stamp
-        enabled.extend(installed)
+        enabled.extend(
+            name
+            for name in installed
+            if name not in curseforge_projects.DO_NOT_AUTO_ENABLE
+        )
         print(f"updated {label}: {', '.join(installed) or zip_path.name}")
 
     if not args.dry_run:
