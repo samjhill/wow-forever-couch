@@ -1,42 +1,18 @@
-# ConsolePort recommended bindings (couch)
+# Blizzard controller UI (couch)
 
-## What was wrong
+In-game bars, targeting, and menu navigation use **Forever’s built-in controller UI**. ConsolePort is not installed.
 
-Choosing ConsolePort’s **“Start from a blank slate”** clears all gamepad bindings (including Blizzard defaults). Face buttons may still show Forever gamepad-bar clicks while **LB/RB/LT/RT stay empty** — that matches an unfinished manual setup.
+Put class abilities on the Blizzard gamepad action bar. Conceptual bear layout: [`bear-tank-bindings.md`](bear-tank-bindings.md).
 
-## Recommended preset
+`./scripts/pin-forever-graphics.sh` turns off gamepad cursor auto-enable so Menu/Start opens the game menu instead of only flipping the crosshair.
 
-Use ConsolePort’s built-in **Xbox** device preset:
+## Couch macros
 
-- Steam Controller / Steam Input emulates Xbox 360 — CP’s own Xbox device blurb recommends this for Steam Input.
-- Xbox Wireless controller uses the same layout.
+These are normal account macros. Drag them onto the gamepad bar. Quit Forever before the offline seeds write `WTF`.
 
-| Button | Default role (Xbox preset) |
-|--------|----------------------------|
-| A (PAD1) | Jump (+ Shift/Ctrl utility layers) |
-| B / X / Y | Action buttons (place ST/AoE/taunt spells on the gamepad bar) |
-| LB | Interact / loot target (Xbox preset) |
-| LT | Target nearest enemy; if empty, Couch parks **Interact** here when RB is remapped |
-| RB | **InviteNearest** account macro (accept party popup + target nearest friend + invite) — pinned by ConsolePortCouch |
-| RT | Primary action buttons + modifier layers |
-| D-pad | Extra action bar slots |
-| Back / Start | Bags / **Escape game menu** (ConsolePortCouch pins Start + System → `TOGGLEGAMEMENU`; cursor auto-enable off so Menu doesn’t only flip crosshair ↔ mouse) |
+**InviteNearest** (`./scripts/pin-invite-nearest-macro.sh`) — accept a party popup, target the nearest friend, invite. The script binds it to **RB** (`PADRSHOULDER`) in `bindings-cache.wtf`, and parks **Interact** on LT when that bind is empty.
 
-Class abilities are **not** pre-slotted — after the preset loads, put spells on the ConsolePort gamepad action bar (drag in `/consoleport` or use the action placer). Conceptual bear layout: [`bear-tank-bindings.md`](bear-tank-bindings.md).
-
-## Apply (automatic)
-
-```bash
-./scripts/install-consoleport-couch.sh
-```
-
-Then `/reload`. Addon `ConsolePortCouch` applies the Xbox preset when shoulders/triggers are empty (or once), then pins **RB → InviteNearest**. Force: `/cpcouch apply`. Re-pin invite only: `/cpcouch invite`. Offline file seed: `./scripts/pin-invite-nearest-macro.sh` (quit Forever first for cache writes).
-
-### Couch macros (plain `/use` / `/cast` only)
-
-Forever cannot use items from `/run`. Every couch macro is a normal account macro — same style as InviteNearest.
-
-**Campsite** (`/cpcouch camp`):
+**Campsite** (`./scripts/pin-campsite-macro.sh`):
 
 ```
 #showtooltip
@@ -45,32 +21,22 @@ Forever cannot use items from `/run`. Every couch macro is a normal account macr
 /use Basic Campfire Kit
 ```
 
-**FishingCouch** (`/cpcouch fish`):
+**FishingCouch** (`./scripts/pin-fishing-macro.sh`):
 
 ```
 #showtooltip
 /cast Fishing
 ```
 
-**Food / drink** — use the Forever **AutoFeed** addon (CurseForge 1703450), not custom couch macros:
+**Food / drink** — Forever **AutoFeed** (not a couch macro):
 
 | Macro | Does |
 | --- | --- |
 | `AutoFeed` | Eat best food in bags |
 | `AutoDrink` | Drink best water in bags |
 
-Create with `/af` (or the AutoFeed welcome UI), then drag onto a bar. Offline campsite/fishing seeds: `./scripts/pin-campsite-macro.sh`, `./scripts/pin-fishing-macro.sh` (quit Forever first).
+Create with `/af`, then drag onto a bar.
 
-## Apply (manual in-game)
+## Dictation
 
-1. `/consoleport`
-2. Open **Defaults** (or Bindings → presets)
-3. Choose **Apply recommended bindings** — **not** “blank slate”
-4. Confirm device is **Xbox** (Steam Input / Xbox pad)
-5. `/reload` if bars look stale
-
-## Do not
-
-- Do not use blank slate unless you intend a full custom map.
-- Do not force Steam Proton on the Battle.net shortcut (GE-Proton via launch script).
-- Dictation stays outside ConsolePort: Steam Controller **left grip** → Insert; Xbox **R3** → Insert ([`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)).
+Dictation stays outside the gamepad bars: Steam Controller **left grip** → Insert; Xbox **R3** → Insert ([`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)).

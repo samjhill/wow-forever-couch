@@ -1,6 +1,6 @@
 # Bear tank bindings (Tauren Guardian / Bear)
 
-Draft for **WoW: Forever** level-together content. Verify ability names and ConsolePort interface version in-game after Forever is live — Forever may rename or rebalance Classic-era bear toolkit.
+Draft for **WoW: Forever** level-together content. Verify ability names on the Blizzard gamepad bar in-game — Forever may rename or rebalance the Classic-era bear toolkit.
 
 ## Design goals
 
@@ -12,7 +12,7 @@ Draft for **WoW: Forever** level-together content. Verify ability names and Cons
 - Form swap / travel escape
 - Marks for Ashley (Hunter) pulls
 
-## Conceptual ConsolePort face + bumpers
+## Conceptual gamepad face + bumpers
 
 | Input | Priority | Intended action (Classic-era analogues) |
 |-------|----------|----------------------------------------|

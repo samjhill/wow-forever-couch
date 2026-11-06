@@ -5,13 +5,12 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 # WOW_FOREVER provided by lib.sh
 WTF="${WOW_FOREVER}/WTF/Account"
 ADDONS=(
-  ConsolePort ConsolePort_Bar ConsolePort_Config ConsolePort_Cursor
-  ConsolePort_Menu ConsolePort_Rings ConsolePort_Target ConsolePort_World
-  # ConsolePort_Keyboard left to player preference (often disabled on couch)
-  ConsolePortCouch
-  Immersion ForeverVO
-  ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
-  ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
+  Immersion
+  Spoken Spoken_Quests Spoken_Places Spoken_Readables Spoken_Bosses
+  SpokenContributions
+  SpokenQuestsAudioAlliance SpokenQuestsAudioHorde SpokenQuestsAudioShared
+  SpokenQuestsAudioGossip
+  SpokenPlacesAudio SpokenReadablesAudio SpokenBossesAudio
   CouchDictateRoute
   # QoL install set (Forever-tagged); staged addons intentionally omitted
   Syndicator Baganator Leatrix_Plus Plater PlaterQuestPin
@@ -29,6 +28,13 @@ ADDONS=(
 DISABLE_ADDONS=(
   DialogKey_Numy DialogKey_Aeonzara DialogKey
   SelfBuffs CouchBuffReminder
+  ConsolePort ConsolePort_Bar ConsolePort_Config ConsolePort_Cursor
+  ConsolePort_Menu ConsolePort_Rings ConsolePort_Target ConsolePort_World
+  ConsolePort_Keyboard ConsolePortCouch
+  ForeverVO
+  ForeverVO_Data_Classic_Quests ForeverVO_Data_Classic_Endgame ForeverVO_Data_Classic_Gossip
+  ForeverVO_Data_Forever_Quests ForeverVO_Data_Forever_Gossip ForeverVO_Data_Books
+  SpokenPlayer SpokenQuests SpokenZones SpokenBooks
 )
 
 if [[ ! -d "$WTF" ]]; then
@@ -100,7 +106,9 @@ for acct in "$WTF"/*/; do
 done
 rm -f "${WTF}/SavedVariables/AddOns.txt"
 
-# Drop DialogKey from disk if still present
+# Drop replaced addons from disk if still present
+python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, str(Path(sys.argv[1]) / "scripts" / "python")); import curseforge_projects; curseforge_projects.remove_replaced_addons(Path(sys.argv[2]))' \
+  "$REPO_ROOT" "$WOW_ADDONS"
 rm -rf "${WOW_ADDONS}/DialogKey_Numy" "${WOW_ADDONS}/DialogKey_Aeonzara" "${WOW_ADDONS}/DialogKey"
 
 "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh"

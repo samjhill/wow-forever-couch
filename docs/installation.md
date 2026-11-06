@@ -46,6 +46,6 @@ You can also run them by hand, plus:
 
 Play from **Gaming Mode** when possible. See [`troubleshooting.md`](troubleshooting.md#graphics--audio-nvidia--proton) for screen-tear / HDMI audio notes.
 
-Then character select → AddOns → enable ConsolePort*, Immersion, ForeverVO, and every `ForeverVO_Data_*`.
+Then character select → AddOns → enable Immersion, Spoken, `Spoken_*`, and the Spoken audio packs (`SpokenQuestsAudio*`, `SpokenPlacesAudio`, `SpokenReadablesAudio`, `SpokenBossesAudio`). Leave ConsolePort and ForeverVO disabled.
 
 Point CurseForge at `$WOW_FOREVER` (the folder with `Wow.exe`), not `Interface/AddOns`. See [`addons.md`](addons.md#curseforge-app-updates).

@@ -179,7 +179,7 @@ Once in-world: `/reload` → `/cdr status` → left grip → read draft → left
 ## Limitations
 
 - Sticky routing requires the addon enabled; without it, `DICTATE_CHANNEL=auto` uses whatever chat was last sticky (often Say).
-- ConsolePort may remapping Enter for UI focus — if draft never appears, try Desktop Mode once or open chat manually then retest.
+- The controller UI may take Enter for UI focus — if the draft never appears, try Desktop Mode once or open chat manually then retest.
 - Host cannot read group size without the addon or a slash override (no memory scraping).
 - Mis-hears still appear in the edit box in draft mode; confirm with a second grip only when the text looks right.
 - Esc/Enter briefly steals input — avoid gripping mid-combat.

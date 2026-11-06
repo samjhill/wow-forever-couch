@@ -4,11 +4,11 @@ Opinionated setup for playing **World of Warcraft: Forever** from the couch:
 
 - **Linux (Bazzite / Steam Deck):** Battle.net under **GE-Proton**, Gaming Mode shortcut, optional voice dictation
 - **Windows:** native Battle.net Forever path, same addon/pin stack, git auto-sync via Task Scheduler
-- **ConsolePort** + **Immersion** + **Forever Voiceover** (spoken quests)
+- **Blizzard controller UI** + **Immersion** + **Spoken** (spoken quests)
 
 Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same Linux installer. Windows uses PowerShell + shared Python helpers. Defaults assume `~/Games/battlenet` for the Proton prefix on Linux, and `%ProgramFiles(x86)%\World of Warcraft\_forever_` on Windows.
 
-> Not affiliated with Blizzard. Forever addons and voice packs come from their upstream authors (ConsolePort/Immersion, Forever Voiceover on CurseForge/GitHub).
+> Not affiliated with Blizzard. Forever addons and voice packs come from their upstream authors (Immersion, Spoken on CurseForge/GitHub).
 
 ## Steam Deck / Bazzite — easiest install
 
@@ -65,12 +65,12 @@ export WOW_PREFIX="$HOME/Games/battlenet"   # default
 With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 
 ```bash
-./scripts/install-forever-addons.sh        # ConsolePort, Immersion, ForeverVO + voice packs
+./scripts/install-forever-addons.sh        # Immersion, Spoken + English voice packs
 ./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
 ./scripts/install-forever-qol-addons.sh    # Baganator/…/Questie; stages BigWigs/GTFO/…
 ./scripts/install-curseforge-update-timer.sh  # refresh CurseForge Forever files every 6h
 ./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists (also on Battle.net launch)
-./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
+./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; Spoken voice only
 ./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
 # Optional: restore a known-good prefs snapshot from this repo
 ./scripts/restore-live-setup.sh            # applies config/live-setup/ (quit Forever first)
@@ -78,7 +78,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 
 Refresh the snapshot from a tuned play box: `./scripts/snapshot-live-setup.sh` then commit `config/live-setup/`. On this Mac, launchd autosaves every 4h — see [`docs/live-setup-autosave.md`](docs/live-setup-autosave.md).
 
-In-game: enable the install set at character select. Use **ForeverVO for speech**, Immersion for quest UI only (keep Immersion TTS off). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
+In-game: enable the install set at character select. Use **Spoken for speech**, Immersion for quest UI only (keep Immersion TTS off, Spoken narrator **Voice Only**). Do not stack Storyline with Immersion. Staged zips stay disabled until you activate them.
 
 Details: [`docs/addons.md`](docs/addons.md).
 
@@ -88,7 +88,7 @@ Bootstrap runs [`scripts/add-steam-shortcut.sh`](scripts/add-steam-shortcut.sh) 
 
 ### 4. Controller
 
-- ConsolePort handles in-game bars/UI. Empty LB/RB/LT/RT → `./scripts/install-consoleport-couch.sh` then `/reload` ([`docs/controller-bindings.md`](docs/controller-bindings.md)).
+- Blizzard’s controller UI handles in-game bars and menus ([`docs/controller-bindings.md`](docs/controller-bindings.md)).
 - Steam Input dictation: Steam Controller **left grip → Insert**; Xbox **R3 → Insert** — [`config/steam-input/`](config/steam-input/).
 - Draft layouts: [`docs/controller-layout.md`](docs/controller-layout.md), bear/PvP notes under `docs/`.
 

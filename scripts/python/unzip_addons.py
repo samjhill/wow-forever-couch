@@ -10,9 +10,9 @@ from pathlib import Path
 
 
 PRESERVE = {
-    "ConsolePort",
     "Immersion",
-    "ForeverVO",
+    "Spoken",
+    "SpokenContributions",
     "CouchDictateRoute",
 }
 
@@ -20,7 +20,9 @@ PRESERVE = {
 def is_preserved(name: str) -> bool:
     if name in PRESERVE:
         return True
-    if name.startswith("ConsolePort") or name.startswith("ForeverVO"):
+    if name.startswith("Spoken_") or name.startswith("SpokenQuestsAudio") or name.startswith("SpokenPlacesAudio"):
+        return True
+    if name.startswith("SpokenReadablesAudio") or name.startswith("SpokenBossesAudio"):
         return True
     return False
 

@@ -37,10 +37,10 @@ If Forever is missing, bootstrap prints a clear message: install Forever via Bat
 
 When Forever is present:
 
-1. Installs ConsolePort / Immersion / ForeverVO + voice packs + QoL set (`scripts/python/install_forever_stack.py`)
-2. Syncs repo-owned addons (`ConsolePortCouch`, `PlaterQuestPin`, `CouchDictateRoute`) + SmartRebuff
+1. Installs Immersion / Spoken + English voice packs + QoL set (`scripts/python/install_forever_stack.py`)
+2. Syncs repo-owned addons (`PlaterQuestPin`, `CouchDictateRoute`) + SmartRebuff
 3. Enables AddOns.txt entries after first login (`WTF\Account`)
-4. Pins ForeverVO / Immersion prefs and graphics (`Config.wtf`)
+4. Pins Spoken / Immersion prefs and graphics (`Config.wtf`)
 5. Registers Scheduled Task **WoWForeverCouchUpdate** (every ~6h, full mode, including CurseForge addon refresh when Forever is quit)
 6. Creates Start Menu + Desktop shortcut **Update WoW Forever Couch**
 
@@ -56,7 +56,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\Projects\w
 
 ## Steam on Windows
 
-Native controller + ConsolePort works without Steam. If you launch via Steam, existing Steam Input notes still apply; there is no separate Big Picture helper in v1.
+Native controller uses Blizzard’s controller UI and works without Steam. If you launch via Steam, existing Steam Input notes still apply; there is no separate Big Picture helper in v1.
 
 ## Phase 2 (not in this cut)
 

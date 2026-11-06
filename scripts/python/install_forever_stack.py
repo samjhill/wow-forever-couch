@@ -21,21 +21,13 @@ import unzip_addons  # noqa: E402
 
 GITHUB = [
     (
-        "ConsolePort-3.3.13.zip",
-        "https://github.com/seblindfors/ConsolePort/releases/download/3.3.13/ConsolePort-3.3.13.zip",
-    ),
-    (
         "Immersion-1.4.61.zip",
         "https://github.com/seblindfors/Immersion/releases/download/1.4.61/Immersion-1.4.61.zip",
-    ),
-    (
-        "forever-vo-v0.1.10-forever.zip",
-        "https://github.com/quinn-dougherty/forever-vo/releases/download/v0.1.10/forever-vo-v0.1.10-forever.zip",
     ),
 ]
 
 def sync_repo_addons(repo: Path, addons_dir: Path) -> None:
-    for name in ("ConsolePortCouch", "CouchDictateRoute", "PlaterQuestPin"):
+    for name in ("CouchDictateRoute", "PlaterQuestPin"):
         src = repo / "addons" / name
         if not src.is_dir():
             print(f"skip missing repo addon: {name}")
@@ -62,20 +54,23 @@ def main() -> None:
     staging = Path(args.staging or (repo / "config" / "addons-staging"))
     staging.mkdir(parents=True, exist_ok=True)
 
-    # Core GitHub zips
+    # Immersion stays on the pinned GitHub zip; Spoken and its audio come from CurseForge.
     core_zips: list[Path] = []
     for name, url in GITHUB:
         core_zips.append(curseforge_fetch.fetch_url(url, staging / name))
-    # Clear previous ConsolePort/Immersion/ForeverVO trees
-    for pattern in ("ConsolePort*", "Immersion", "ForeverVO", "ForeverVO_Data*"):
+    spoken = next(p for p in curseforge_projects.CORE if p.label == "Spoken")
+    spoken_zips: list[Path] = []
+    for project in (spoken, *curseforge_projects.VOICE_PACKS):
+        spoken_zips.append(curseforge_fetch.fetch_project(project.project_id, staging))
+
+    curseforge_projects.remove_replaced_addons(addons)
+    for pattern in ("Immersion", "Spoken", "Spoken_*", "SpokenContributions", "SpokenQuestsAudio*", "SpokenPlacesAudio", "SpokenReadablesAudio", "SpokenBossesAudio"):
         for p in addons.glob(pattern):
             if p.is_dir():
                 shutil.rmtree(p)
     for z in core_zips:
         unzip_addons.unzip_to(z, addons)
-
-    for project in curseforge_projects.VOICE_PACKS:
-        z = curseforge_fetch.fetch_project(project.project_id, staging)
+    for z in spoken_zips:
         unzip_addons.unzip_to(z, addons)
 
     if not args.core_only:

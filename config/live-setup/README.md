@@ -5,9 +5,9 @@ Captured **2026-11-06T10:18Z** from account `50188345#4` / character `unknown`.
 ## Contents
 
 - `account/AddOns.txt` — enabled couch addons
-- `account/SavedVariables/` — ConsolePort, Immersion, ForeverVO (audio prefs), QoL
+- `account/SavedVariables/` — Immersion, Spoken (voice only), QoL
 - `account/bindings-cache.wtf` — gamepad/key bindings cache
-- `character/` — per-character ConsolePort bar/target + related SVs
+- `character/` — per-character Spoken and QoL SavedVariables
 - `wtf/Config.wtf` — graphics pins (DX11, 60 FPS, vsync, …)
 - `wtf/GamePadConfig_*.json` — client gamepad configs
 

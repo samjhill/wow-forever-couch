@@ -2,10 +2,10 @@
 # Install Forever-tagged QoL addons (Baganator/Syndicator/Leatrix/Plater/Lore Forever/Fishing Log/Questie)
 # and stage later-activation zips (BigWigs/GTFO/Talents Forever/Auctionator).
 #
-# Does NOT touch ConsolePort, Immersion, ForeverVO*, or CouchDictateRoute.
+# Does NOT touch Immersion, Spoken*, or CouchDictateRoute.
 # Does NOT enable staged addons. Does NOT overwrite SavedVariables/profiles.
 # Lore Forever: main zip includes male English narrator packs; do NOT install Quest Dialogue packs
-# (ForeverVO owns quest/gossip speech; Lore's questDialogue defaults off).
+# (Spoken owns quest/gossip speech; Lore's questDialogue defaults off).
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
@@ -30,7 +30,7 @@ fetch_forever() {
 
 is_preserved() {
   case "$1" in
-    ConsolePort|ConsolePort_*|Immersion|ForeverVO|ForeverVO_Data_*|CouchDictateRoute) return 0 ;;
+    Immersion|Spoken|Spoken_*|SpokenContributions|SpokenQuestsAudio*|SpokenPlacesAudio|SpokenReadablesAudio|SpokenBossesAudio|CouchDictateRoute) return 0 ;;
     *) return 1 ;;
   esac
 }
