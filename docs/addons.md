@@ -53,7 +53,8 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 | PlaterQuestPin | repo `addons/` | Forces **Track Quests Progress** + **Use Quest Color** on enemy/friendly NPCs; sets `showQuestTrackingTooltips` so kill N/M lines appear for Plater to scan (`/platerquestpin`) |
 | AutoFeed | 1703450 | `AutoFeed-v1.4.0.zip` | — | Self-updating `AutoFeed` (eat) + `AutoDrink` macros (`/af`) |
 | SmartRebuff | 1728015 | `SmartRebuff_1.60.zip` | — | Forever class/group buff monitor + renewal reminders (replaces SelfBuffs / CouchBuffReminder) |
-| Questie | 334372 | `Questie-v12.3.1+v1.0.9.zip` | **QuestieDB** (same zip) | Quest tracker, map pins, and arrow. Forever TOC is `Questie_Camelot.toc` (`16001`). Some Forever quests are still missing upstream |
+| Questie | 334372 | `Questie-v12.6.2.zip` (`## Version: 12.6.2`, `Questie_Camelot.toc` is `16001`) | **QuestieDB** | Quest tracker, map pins, and arrow |
+| QuestieDB | 1696795 | `QuestieDB-1.0.11-Forever.zip` (`## Version: 1.0.11`, `QuestieDB_Camelot.toc` is `16001`) | — | Quest, NPC, and object locations Questie draws on the map. Some Forever-only quests can still be missing upstream |
 | Lore Forever | 1715510 | `LoreForever.zip` (`## Version: 0.37.0`, `## Interface: 16001`) | ships `LoreForever_Voice_Default*` | Zone/NPC/quest lore panel + optional story narration (`/lore`) |
 | The Fishing Log | 1702832 | `TheFishingLog-1.0.0.zip` (`## Version: 1.0.0`, `## Interface: 16001`) | optional Auctionator/TSM for catch value | Catch log, journal, spot records, matches (`/tfl`) |
 
@@ -144,7 +145,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 - CurseForge files API: Forever candidates selected when `gameVersions` contains `1.60.x`
 - Installed TOC checks on box after unzip: Leatrix_Plus and Plater Forever builds are `16001`-only; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only
-- Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files. Questie `v12.3.1+v1.0.9` lists `1.60.1` and is installed; some Forever-only quests can still be missing upstream
+- Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files. Questie `v12.6.2` and QuestieDB `1.0.11` (Forever) list `1.60.1`. The old `+v1.0` filename preference kept `v12.3.1+v1.0.9` (26 Oct 2026) and never installed later map data. Some Forever-only quests can still be missing upstream
 
 ## In-game commands (after first login)
 

@@ -104,7 +104,7 @@ def main() -> None:
     ap.add_argument(
         "--prefer",
         default="",
-        help="Prefer a filename containing this substring (e.g. +v1.0 for Questie DB)",
+        help="Prefer a filename containing this substring",
     )
     ap.add_argument(
         "--staging",
