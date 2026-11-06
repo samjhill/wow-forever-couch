@@ -32,5 +32,7 @@ DialogKey: disabled
 NodeSight: enabled
 GatherRadar: enabled
 PlaterQuestPin: enabled
-SelfBuffs: enabled
-CouchBuffReminder: enabled
+SelfBuffs: disabled
+CouchBuffReminder: disabled
+AutoFeed: enabled
+SmartRebuff: enabled
