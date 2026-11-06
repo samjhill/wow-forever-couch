@@ -203,6 +203,23 @@ local function ensureFishingMacro()
   return ok
 end
 
+-- Old couch EatBest/DrinkBest used /run ConsolePortCouch_Eat — remove so bars
+-- don't keep firing broken macros. Food/drink now come from AutoFeed.
+local function purgeObsoleteEatDrinkMacros()
+  if InCombatLockdown and InCombatLockdown() then
+    return
+  end
+  if not DeleteMacro or not GetMacroIndexByName then
+    return
+  end
+  for _, name in ipairs({ "EatBest", "DrinkBest" }) do
+    local index = GetMacroIndexByName(name) or 0
+    if index > 0 then
+      pcall(DeleteMacro, index)
+    end
+  end
+end
+
 local function pinInviteNearestBindings(force)
   if InCombatLockdown and InCombatLockdown() then
     return false
@@ -367,6 +384,7 @@ boot:RegisterEvent("UPDATE_BINDINGS")
 boot:SetScript("OnEvent", function(self, event)
   if event == "PLAYER_LOGIN" then
     tryApply(false)
+    purgeObsoleteEatDrinkMacros()
     ensureCampsiteMacro()
     ensureFishingMacro()
     C_Timer.After(2.0, function()
@@ -374,6 +392,7 @@ boot:SetScript("OnEvent", function(self, event)
         pinGameMenuBindings(false)
         restoreGamepadBarClicks()
         pinInviteNearestBindings(false)
+        purgeObsoleteEatDrinkMacros()
         ensureCampsiteMacro()
         ensureFishingMacro()
       end
