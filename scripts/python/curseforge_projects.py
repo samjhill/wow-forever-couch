@@ -65,7 +65,10 @@ QOL = [
     CurseForgeProject(1731463, "NodeSight"),
     CurseForgeProject(1703450, "AutoFeed"),
     CurseForgeProject(1728015, "SmartRebuff"),
-    CurseForgeProject(334372, "Questie", prefer="+v1.0"),
+    # Questie 12.4+ no longer ships the database inside the addon zip.
+    # Preferring "+v1.0" kept the October bundled file and skipped later map data.
+    CurseForgeProject(334372, "Questie"),
+    CurseForgeProject(1696795, "QuestieDB", name_filter="forever"),
 ]
 
 # Repo-owned helpers. CurseForge zips must not replace these.

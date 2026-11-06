@@ -122,12 +122,14 @@ AUTOFEED_ZIP="$FETCHED_NAME"
 # SmartRebuff — Forever class/group buff monitor (replaces SelfBuffs + CouchBuffReminder)
 fetch_forever 1728015
 SMARTREBUFF_ZIP="$FETCHED_NAME"
-# Questie Forever build that includes the large DB (+v1.0) when available.
-path="$(python3 "${REPO_ROOT}/scripts/python/curseforge_fetch.py" --project 334372 --prefer "+v1.0" --staging "$STAGING")"
-QUESTIE_ZIP="$(basename "$path")"
+# Questie addon and its separate Forever database (objective locations live in QuestieDB).
+fetch_forever 334372
+QUESTIE_ZIP="$FETCHED_NAME"
+fetch_forever 1696795 forever
+QUESTIEDB_ZIP="$FETCHED_NAME"
 
 echo "=== install into AddOns (preserve couch stack) ==="
-for z in "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP"; do
+for z in "$LEA_ZIP" "$PLA_ZIP" "$LORE_ZIP" "$FISH_ZIP" "$SPARKLE_ZIP" "$NODESIGHT_ZIP" "$AUTOFEED_ZIP" "$SMARTREBUFF_ZIP" "$QUESTIE_ZIP" "$QUESTIEDB_ZIP"; do
   unzip_addon_dirs "$z" "$DEST"
 done
 # Built-in bags replace Baganator; Syndicator only indexed inventory for it.
@@ -168,6 +170,7 @@ done
   echo "- $AUTOFEED_ZIP"
   echo "- $SMARTREBUFF_ZIP"
   echo "- $QUESTIE_ZIP"
+  echo "- $QUESTIEDB_ZIP"
   echo
   echo "## staged zips (NOT in AddOns / not enabled)"
   echo "- $BW_ZIP"
