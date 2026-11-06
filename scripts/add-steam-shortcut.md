@@ -1,5 +1,22 @@
 # Add Steam shortcut (Desktop Mode)
 
+## Automatic (preferred)
+
+Bootstrap / `install.sh` already runs:
+
+```bash
+./scripts/add-steam-shortcut.sh
+```
+
+That writes a non-Steam entry named **Battle.net (WoW Forever)** pointing at
+`scripts/launch-battlenet-lutris.sh`, turns on **Steam Input**, and does **not**
+force Steam Proton (the launch script already uses GE-Proton). Steam is restarted
+so Gaming Mode sees the shortcut.
+
+Requires Steam userdata (sign into Steam once if the helper says so), then re-run.
+
+## Manual fallback
+
 1. Steam → Games → Add a Non-Steam Game → Browse  
 2. Select `wow-forever-couch/scripts/launch-battlenet-lutris.sh`  
    (after bootstrap this is usually `~/Projects/wow-forever-couch/scripts/launch-battlenet-lutris.sh`)  

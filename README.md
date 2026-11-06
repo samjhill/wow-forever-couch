@@ -18,7 +18,7 @@ Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same Linux instal
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash
 ```
 
-Then: log into Battle.net → install **Forever** → run the same command again → add the Steam shortcut (the script prints the path). Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
+That installs GE-Proton, Battle.net, queues **Forever**, writes the Gaming Mode shortcut (Steam Input on), and applies the couch stack. **Log into Battle.net** when the window opens; leave it until Forever finishes. Then Gaming Mode → **Battle.net (WoW Forever)**. Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
 
 Prefer a Desktop icon instead? Download [`Install WoW Forever Couch`](config/desktop/wow-forever-couch-bootstrap.desktop) → mark executable → Trust and Launch.
 
@@ -40,7 +40,7 @@ Installs addons/pins, a 6h Scheduled Task, and a desktop shortcut. Needs Git + P
 git clone https://github.com/samjhill/wow-forever-couch.git
 cd wow-forever-couch
 ./scripts/bootstrap-steamos.sh
-# log into Battle.net → install Forever → bootstrap again
+# log into Battle.net when prompted; script waits for Forever + adds the Steam shortcut
 WOW_COUCH_UPDATE_MODE=full ./scripts/apply-repo-updates.sh   # manual sync anytime
 ```
 
@@ -48,8 +48,10 @@ WOW_COUCH_UPDATE_MODE=full ./scripts/apply-repo-updates.sh   # manual sync anyti
 
 ```bash
 ./scripts/install-ge-proton.sh
-./scripts/install-battlenet-desktop.sh   # downloads installer if needed, runs under GE-Proton
-./scripts/launch-battlenet-proton.sh    # log in, install Forever (not Retail)
+./scripts/install-battlenet-desktop.sh   # silent install under GE-Proton
+./scripts/install-forever-client.sh      # --game=WoWF --install; wait for _forever_
+# or open the launcher anytime:
+./scripts/launch-battlenet-proton.sh
 ```
 
 Override the prefix if you want:
@@ -67,7 +69,7 @@ With Forever installed at least once (so `_forever_/Interface/AddOns` exists):
 ./scripts/install-couch-dictate-route.sh   # sticky chat for dictation
 ./scripts/install-forever-qol-addons.sh    # Baganator/…/Questie; stages BigWigs/GTFO/…
 ./scripts/install-curseforge-update-timer.sh  # refresh CurseForge Forever files every 6h
-./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists
+./scripts/enable-forever-addons.sh         # after first login / WTF/Account exists (also on Battle.net launch)
 ./scripts/pin-voiceover-prefs.sh           # Immersion TTS off; ForeverVO plays voices
 ./scripts/pin-forever-graphics.sh          # D3D11 + 60 FPS cap (NVIDIA/Proton); also runs on Battle.net launch
 # Optional: restore a known-good prefs snapshot from this repo
@@ -82,11 +84,7 @@ Details: [`docs/addons.md`](docs/addons.md).
 
 ### 3. Steam Gaming Mode shortcut
 
-See [`scripts/add-steam-shortcut.md`](scripts/add-steam-shortcut.md). Point a non-Steam game at:
-
-`…/wow-forever-couch/scripts/launch-battlenet-lutris.sh`
-
-Enable **Steam Input**. Do **not** force Steam’s Proton on the shortcut (the script already uses GE-Proton).
+Bootstrap runs [`scripts/add-steam-shortcut.sh`](scripts/add-steam-shortcut.sh) automatically. Manual fallback: [`scripts/add-steam-shortcut.md`](scripts/add-steam-shortcut.md).
 
 ### 4. Controller
 
@@ -134,7 +132,7 @@ Environment variables used by scripts (via `scripts/lib.sh` / `scripts/lib.ps1`)
 
 ## Requirements
 
-- **Linux:** Bazzite / SteamOS-like host with Desktop Mode + Gaming Mode; Steam; GE-Proton (script installs **GE-Proton11-12** by default)
+- **Linux:** Bazzite / SteamOS-like host with Desktop Mode + Gaming Mode; Steam; GE-Proton (script installs the latest GE-Proton release; launch prefers `WOW_COMPAT_TOOL` or newest installed)
 - **Windows:** Forever via Battle.net; Git; Python 3
 - **Dictation (Linux only):** `ffmpeg`, `espeak-ng` (sim tests), `python3` + `evdev`, `ydotool`/`ydotoold`, PipeWire (`pw-record`)
 

@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
+# Launch Battle.net under GE-Proton. Extra args are forwarded (e.g. --game=WoWF --install).
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
+
 export STEAM_COMPAT_CLIENT_INSTALL_PATH="${HOME}/.local/share/Steam"
 export STEAM_COMPAT_DATA_PATH="${WOW_PREFIX}"
-PROTON="${HOME}/.local/share/Steam/compatibilitytools.d/GE-Proton11-12/proton"
-EXE="${STEAM_COMPAT_DATA_PATH}/pfx/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
-if [[ ! -f "$EXE" ]]; then
-  EXE=$(find "${STEAM_COMPAT_DATA_PATH}/pfx" -name 'Battle.net.exe' 2>/dev/null | head -1 || true)
+
+if [[ -z "${WOW_PROTON:-}" || ! -x "$WOW_PROTON" ]]; then
+  WOW_PROTON="$(resolve_ge_proton)"
 fi
+if [[ -z "${WOW_PROTON:-}" || ! -x "$WOW_PROTON" ]]; then
+  echo "GE-Proton not found. Run scripts/install-ge-proton.sh first." >&2
+  exit 1
+fi
+
+EXE="$(find_battlenet_exe || true)"
 if [[ -z "${EXE:-}" || ! -f "$EXE" ]]; then
   echo "Battle.net.exe not found. Run scripts/install-battlenet-desktop.sh from Desktop Mode first." >&2
   exit 1
@@ -41,10 +48,20 @@ if [[ "${WOW_COUCH_CURSEFORGE_UPDATE:-1}" == "1" && -x "${REPO_ROOT}/scripts/upd
   fi
 fi
 
+# After first in-game login, WTF/Account exists — enable couch addons without a second bootstrap.
+if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
+  if [[ -x "${REPO_ROOT}/scripts/enable-forever-addons.sh" ]]; then
+    "${REPO_ROOT}/scripts/enable-forever-addons.sh" >/tmp/wow-forever-couch-enable-addons.log 2>&1 || true
+  fi
+  if [[ -x "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" ]]; then
+    "${REPO_ROOT}/scripts/pin-voiceover-prefs.sh" >/tmp/wow-forever-couch-pin-voiceover.log 2>&1 || true
+  fi
+fi
+
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasma* ]]; then
   echo "Note: Desktop/Plasma session detected. For fewer screen tears, play from Gaming Mode:" >&2
   echo "  steamos-session-select gamescope" >&2
 fi
 
 cd "$(dirname "$EXE")"
-exec "$PROTON" run "$EXE"
+exec "$WOW_PROTON" run "$EXE" "$@"
