@@ -57,3 +57,4 @@ Also:
 - Controller bars missing → enable Blizzard’s controller UI in the game options. ConsolePort stays disabled.
 - Menu/Start (☰) flips crosshair ↔ mouse instead of the game menu → `./scripts/pin-forever-graphics.sh` sets `GamePadCursorAutoEnable` off. Quit Forever fully, then relaunch. See [`controller-bindings.md`](controller-bindings.md).
 - Dictate bind does nothing → Steam Controller: left grip → Insert; Xbox: **R3 → Insert** ([`forever-xbox-r3-insert.md`](../config/steam-input/forever-xbox-r3-insert.md)). Ensure `wow-dictate-daemon.service` is active (`systemctl --user restart wow-dictate-daemon`).
+- Xbox R3 click is silent and the daemon never logs `dictate hold` → the Bluetooth pad (`045e:02e0`) is on `hid-microsoft`, which omits right-stick click. `wow-xbox-r3-watch.service` reads that bit from hidraw and writes the dictate FIFO. `journalctl --user -u wow-xbox-r3-watch` should show `R3 start` while the stick is held.

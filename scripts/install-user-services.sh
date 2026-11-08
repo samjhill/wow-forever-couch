@@ -42,8 +42,28 @@ Environment=PYTHONUNBUFFERED=1
 WantedBy=default.target
 EOF
 
+# hid-microsoft drops Xbox R3 (bit 10 past the 10-button report). This
+# watches hidraw and writes start/stop on the dictate FIFO.
+cat > "${UNIT_DIR}/wow-xbox-r3-watch.service" <<EOF
+[Unit]
+Description=Xbox Bluetooth R3 to WoW dictation FIFO
+After=default.target wow-dictate-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 ${REPO_ROOT}/scripts/xbox-hid-r3-watch.py
+Restart=on-failure
+RestartSec=2
+Environment=PYTHONUNBUFFERED=1
+Environment=WOW_FOREVER_COUCH=${REPO_ROOT}
+
+[Install]
+WantedBy=default.target
+EOF
+
 systemctl --user daemon-reload
 systemctl --user enable --now ydotoold.service
 systemctl --user enable --now wow-dictate-daemon.service
-systemctl --user --no-pager --full status ydotoold.service wow-dictate-daemon.service | sed -n '1,40p'
+systemctl --user enable --now wow-xbox-r3-watch.service
+systemctl --user --no-pager --full status ydotoold.service wow-dictate-daemon.service wow-xbox-r3-watch.service | sed -n '1,40p'
 echo "Services installed from REPO_ROOT=${REPO_ROOT}"
