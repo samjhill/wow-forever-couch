@@ -72,7 +72,7 @@ QOL = [
 ]
 
 # Repo-owned helpers. CurseForge zips must not replace these.
-REPO_OWNED = ("CouchDictateRoute", "PlaterQuestPin")
+REPO_OWNED = ("CouchDictateRoute", "PlaterQuestPin", "CouchQuestArea")
 
 # Addons the updater may install but should not force on.
 DO_NOT_AUTO_ENABLE = ()

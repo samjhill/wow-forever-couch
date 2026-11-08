@@ -10,7 +10,7 @@ if (-not (Test-WowForeverInstalled)) {
 $addons = $env:WOW_ADDONS
 New-Item -ItemType Directory -Force -Path $addons | Out-Null
 
-foreach ($name in @("CouchDictateRoute", "PlaterQuestPin")) {
+foreach ($name in @("CouchDictateRoute", "PlaterQuestPin", "CouchQuestArea")) {
     $src = Join-Path $env:REPO_ROOT "addons\$name"
     if (-not (Test-Path $src)) {
         Write-Host "skip missing repo addon: $name"

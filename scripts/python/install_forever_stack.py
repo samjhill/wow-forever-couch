@@ -27,7 +27,7 @@ GITHUB = [
 ]
 
 def sync_repo_addons(repo: Path, addons_dir: Path) -> None:
-    for name in ("CouchDictateRoute", "PlaterQuestPin"):
+    for name in ("CouchDictateRoute", "PlaterQuestPin", "CouchQuestArea"):
         src = repo / "addons" / name
         if not src.is_dir():
             print(f"skip missing repo addon: {name}")

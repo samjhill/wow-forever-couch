@@ -16,7 +16,7 @@ Forever files are refreshed from the CurseForge file list (game version `1.60.x`
 ./scripts/update-curseforge-addons.sh
 ```
 
-The job skips while Forever is running, leaves repo addons (`CouchDictateRoute`, `PlaterQuestPin`) alone, and does not install the staged set. A changed zip is extracted; an unchanged one is left in place. SavedVariables are not touched.
+The job skips while Forever is running, leaves repo addons (`CouchDictateRoute`, `PlaterQuestPin`, `CouchQuestArea`) alone, and does not install the staged set. A changed zip is extracted; an unchanged one is left in place. SavedVariables are not touched.
 
 The Overwolf CurseForge Flatpak is optional browsing. It has no headless update command, and Gaming Mode will not keep that window running.
 
@@ -52,7 +52,8 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 | PlaterQuestPin | repo `addons/` | Forces **Track Quests Progress** + **Use Quest Color** on enemy/friendly NPCs; sets `showQuestTrackingTooltips` so kill N/M lines appear for Plater to scan (`/platerquestpin`) |
 | AutoFeed | 1703450 | `AutoFeed-v1.4.0.zip` | — | Self-updating `AutoFeed` (eat) + `AutoDrink` macros (`/af`) |
 | SmartRebuff | 1728015 | `SmartRebuff_1.60.zip` | — | Forever class/group buff monitor + renewal reminders (replaces SelfBuffs / CouchBuffReminder) |
-| Questie | 334372 | `Questie-v12.6.2.zip` (`## Version: 12.6.2`, `Questie_Camelot.toc` is `16001`) | **QuestieDB** | Quest tracker, map pins, and arrow |
+| Questie | 334372 | `Questie-v12.6.2.zip` (`## Version: 12.6.2`, `Questie_Camelot.toc` is `16001`) | **QuestieDB** | Quest tracker, map pins, and arrow. Its Questie/pfQuest icon theme turns off Forever’s shaded map areas (`questPOI`) |
+| CouchQuestArea | repo `addons/` | — | — | Turns `questPOI` back on so the map still shades where to travel, and leaves Questie pins enabled (`/couchquestarea`) |
 | QuestieDB | 1696795 | `QuestieDB-1.0.11-Forever.zip` (`## Version: 1.0.11`, `QuestieDB_Camelot.toc` is `16001`) | — | Quest, NPC, and object locations Questie draws on the map. Some Forever-only quests can still be missing upstream |
 | Lore Forever | 1715510 | `LoreForever.zip` (`## Version: 0.37.0`, `## Interface: 16001`) | ships `LoreForever_Voice_Default*` | Zone/NPC/quest lore panel + optional story narration (`/lore`) |
 | The Fishing Log | 1702832 | `TheFishingLog-1.0.0.zip` (`## Version: 1.0.0`, `## Interface: 16001`) | optional Auctionator/TSM for catch value | Catch log, journal, spot records, matches (`/tfl`) |
@@ -128,7 +129,7 @@ Exact Plater profile import is **untested** until Forever is playable.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, QuestieDB, Questie (DialogKey, ConsolePort, ForeverVO, Baganator, Syndicator, and GatherRadar removed)
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, QuestieDB, Questie, CouchQuestArea (DialogKey, ConsolePort, ForeverVO, Baganator, Syndicator, and GatherRadar removed)
 - [x] Staged addons (BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
 - [ ] Open bags → Forever’s built-in bag UI
 - [ ] `/leatrix` options open

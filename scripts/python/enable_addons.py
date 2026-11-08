@@ -19,6 +19,7 @@ DEFAULT_ENABLE = [
     "TheFishingLog", "ForeverLootSparkles", "NodeSight",
     "AutoFeed", "SmartRebuff",
     "QuestieDB", "Questie",
+    "CouchQuestArea",
 ]
 
 DEFAULT_DISABLE = [
