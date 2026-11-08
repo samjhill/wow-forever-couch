@@ -12,7 +12,7 @@ Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same Linux instal
 
 ## Steam Deck / Bazzite — easiest install
 
-**Desktop Mode → Konsole → paste:**
+**Desktop Mode → Konsole.** On a Steam Deck, run `passwd` first (SteamOS ships with no password, so `sudo` fails until you set one). Then paste:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash

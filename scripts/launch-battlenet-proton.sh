@@ -58,5 +58,28 @@ if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasm
   echo "  steamos-session-select gamescope" >&2
 fi
 
+# Steam Deck Desktop: the Qt/CEF sign-in view is black under Xwayland (ANGLE on DXVK).
+# Software Qt plus disabled hardware acceleration paints it. Gaming Mode keeps the GPU renderer.
+if [[ "${WOW_COUCH_PROFILE:-}" == "deck" && -z "${GAMESCOPE_WAYLAND_DISPLAY:-}" ]]; then
+  export QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-software}"
+  export QT_ANGLE_PLATFORM="${QT_ANGLE_PLATFORM:-warp}"
+  _bnet_cfg="${WOW_PREFIX}/pfx/drive_c/users/steamuser/AppData/Roaming/Battle.net/Battle.net.config"
+  if [[ -f "${_bnet_cfg}" ]]; then
+    python3 - "${_bnet_cfg}" << 'PY' || true
+import json, sys
+path = sys.argv[1]
+with open(path, encoding="utf-8") as fh:
+    cfg = json.load(fh)
+client = cfg.setdefault("Client", {})
+client["HardwareAcceleration"] = "false"
+client["QtHardwareAcceleration"] = "false"
+with open(path, "w", encoding="utf-8") as fh:
+    json.dump(cfg, fh, indent=4)
+    fh.write("\n")
+PY
+  fi
+  unset _bnet_cfg
+fi
+
 cd "$(dirname "$EXE")"
 exec "$WOW_PROTON" run "$EXE" "$@"

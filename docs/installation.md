@@ -12,7 +12,7 @@
 
 ## Steps (Desktop Mode)
 
-Prefer the one-liner ([`docs/steam-deck.md`](steam-deck.md)):
+On a Steam Deck, set a password in Konsole first (`passwd`). SteamOS ships with none, and `sudo` fails until you do. Then prefer the one-liner ([`docs/steam-deck.md`](steam-deck.md)):
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash

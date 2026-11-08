@@ -3,6 +3,7 @@
 ## Battle.net / Forever
 
 - `Battle.net.exe not found` → run `./scripts/install-battlenet-desktop.sh` from **Desktop Mode**.
+- Sign-in window is black on Steam Deck Desktop → `./scripts/launch-battlenet-proton.sh` switches Qt to software rendering and turns hardware acceleration off in `Battle.net.config`. Relaunch from Desktop Mode (a window started over SSH is killed when that session closes).
 - Forever missing AddOns folder → launch Forever once from Battle.net first.
 - Gaming Mode shortcut fails → confirm the non-Steam entry points at `scripts/launch-battlenet-lutris.sh`, Steam Input on, Steam Proton **not** forced.
 
