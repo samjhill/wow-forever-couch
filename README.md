@@ -18,7 +18,7 @@ Tested on Bazzite (NVIDIA) and designed for Steam Deck via the same Linux instal
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash
 ```
 
-That installs GE-Proton, Battle.net, queues **Forever**, writes the Gaming Mode shortcut (Steam Input on), and applies the couch stack. **Log into Battle.net** when the window opens; leave it until Forever finishes. Then Gaming Mode → **Battle.net (WoW Forever)**. Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
+That installs GE-Proton, Battle.net, queues **Forever**, writes Desktop and Gaming Mode shortcuts for **Battle.net** and **WoW Forever** (Steam Input on), and applies the couch stack. **Log into Battle.net** when the window opens; leave it until Forever finishes. Then launch **WoW Forever**. Full walkthrough: [`docs/steam-deck.md`](docs/steam-deck.md).
 
 Prefer a Desktop icon instead? Download [`Install WoW Forever Couch`](config/desktop/wow-forever-couch-bootstrap.desktop) → mark executable → Trust and Launch.
 
