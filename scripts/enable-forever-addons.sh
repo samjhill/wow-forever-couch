@@ -22,6 +22,7 @@ ADDONS=(
   SmartRebuff
   QuestieDB
   Questie
+  CouchQuestArea
 )
 # Removed from couch stack (Immersion covers quest/gossip; SmartRebuff replaced custom buffs)
 DISABLE_ADDONS=(

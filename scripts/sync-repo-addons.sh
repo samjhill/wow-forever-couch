@@ -27,6 +27,7 @@ install_local() {
 
 install_local CouchDictateRoute
 install_local PlaterQuestPin
+install_local CouchQuestArea
 rm -rf "${WOW_ADDONS}/CouchBuffReminder" "${WOW_ADDONS}/SelfBuffs" "${WOW_ADDONS}/ConsolePortCouch"
 python3 -c 'import sys; from pathlib import Path; sys.path.insert(0, str(Path(sys.argv[1]) / "scripts" / "python")); import curseforge_projects; curseforge_projects.remove_replaced_addons(Path(sys.argv[2]))' \
   "$REPO_ROOT" "$WOW_ADDONS"
