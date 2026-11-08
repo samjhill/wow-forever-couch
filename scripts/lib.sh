@@ -40,13 +40,27 @@ if [[ -n "$WOW_PROTON" ]]; then
   export WOW_COMPAT_TOOL="$(cd "$(dirname "$WOW_PROTON")" && pwd)"
 fi
 
+# Setup drops Battle.net.exe under .battle.net/.extract before it writes
+# .product.db and Launcher.db. Launching that copy shows
+# "required application data could not be found".
+battlenet_app_ready() {
+  local root="${WOW_PREFIX}/pfx/drive_c/Program Files (x86)/Battle.net"
+  [[ -s "${root}/.product.db" && -f "${root}/Launcher.db" ]]
+}
+
 find_battlenet_exe() {
-  local default_exe="${WOW_PREFIX}/pfx/drive_c/Program Files (x86)/Battle.net/Battle.net.exe"
+  battlenet_app_ready || return 0
+  local root="${WOW_PREFIX}/pfx/drive_c/Program Files (x86)/Battle.net"
+  local default_exe="${root}/Battle.net.exe"
+  local extract_exe="${root}/.battle.net/.extract/Battle.net.exe"
   if [[ -f "$default_exe" ]]; then
     printf '%s' "$default_exe"
     return
   fi
-  find "${WOW_PREFIX}/pfx" -name 'Battle.net.exe' 2>/dev/null | head -1 || true
+  if [[ -f "$extract_exe" ]]; then
+    printf '%s' "$extract_exe"
+    return
+  fi
 }
 
 forever_client_ready() {

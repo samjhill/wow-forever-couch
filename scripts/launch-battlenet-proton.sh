@@ -63,6 +63,11 @@ fi
 if [[ "${WOW_COUCH_PROFILE:-}" == "deck" && -z "${GAMESCOPE_WAYLAND_DISPLAY:-}" ]]; then
   export QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-software}"
   export QT_ANGLE_PLATFORM="${QT_ANGLE_PLATFORM:-warp}"
+  # X11 desktop: 32-bit CEF's GPU process exits under DXVK ("GPU process isn't usable").
+  # WineD3D lets that process use SwiftShader. A Wayland session and Gaming Mode keep DXVK.
+  if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
+    export PROTON_USE_WINED3D="${PROTON_USE_WINED3D:-1}"
+  fi
   _bnet_cfg="${WOW_PREFIX}/pfx/drive_c/users/steamuser/AppData/Roaming/Battle.net/Battle.net.config"
   if [[ -f "${_bnet_cfg}" ]]; then
     python3 - "${_bnet_cfg}" << 'PY' || true
@@ -79,6 +84,10 @@ with open(path, "w", encoding="utf-8") as fh:
 PY
   fi
   unset _bnet_cfg
+fi
+
+if [[ -x "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" ]]; then
+  "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" || true
 fi
 
 cd "$(dirname "$EXE")"

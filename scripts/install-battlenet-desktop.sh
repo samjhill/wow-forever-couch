@@ -34,6 +34,10 @@ if [[ -z "${WOW_PROTON:-}" || ! -x "$WOW_PROTON" ]]; then
   exit 1
 fi
 
+if [[ -x "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" ]]; then
+  "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" || true
+fi
+
 echo "Silent-installing Battle.net on DISPLAY=$DISPLAY (Proton: $WOW_PROTON)"
 echo "Args: --lang=enUS --installpath=\"C:\\Program Files (x86)\\Battle.net\""
 
