@@ -42,7 +42,7 @@ Environment=PYTHONUNBUFFERED=1
 WantedBy=default.target
 EOF
 
-# hid-microsoft drops Xbox R3 (bit 10 past the 10-button report). This
+# hid-microsoft reports Xbox R3 as BTN_TR2 (button bit 9), not BTN_THUMBR. This
 # watches hidraw and writes start/stop on the dictate FIFO.
 cat > "${UNIT_DIR}/wow-xbox-r3-watch.service" <<EOF
 [Unit]

@@ -18,10 +18,11 @@ import sys
 import time
 from pathlib import Path
 
-# Report id 1, after four 16-bit axes and the trigger/hat fields:
-# 10 one-bit buttons, then 6 bits the descriptor calls constant.
-# Bit 10 of that 16-bit word is the first undeclared button (right stick).
-R3_BIT = int(os.environ.get("XBOX_R3_BIT", "10"))
+# Report id 1 packs 10 button bits at bytes 14-15. SDL's 12-button map
+# for this pad is: bit 8 left stick, bit 9 right stick, bit 10 Xbox logo.
+# hid-microsoft names bit 9 BTN_TR2 and never emits BTN_THUMBR, so Steam's
+# virtual pad never sees the click either.
+R3_BIT = int(os.environ.get("XBOX_R3_BIT", "9"))
 HID_MATCH = os.environ.get("XBOX_HID_MATCH", "045E:02E0").upper()
 
 
@@ -79,6 +80,7 @@ def watch(dev: Path, fifo: Path) -> None:
     log(f"watching {dev} bit {R3_BIT} → {fifo}")
     fd = os.open(dev, os.O_RDONLY | os.O_NONBLOCK)
     held = False
+    last_extra = 0
     try:
         while True:
             readable, _, _ = select.select([fd], [], [], 1.0)
@@ -95,6 +97,10 @@ def watch(dev: Path, fifo: Path) -> None:
             word = button_word(data)
             if word is None:
                 continue
+            extra = word & ~((1 << R3_BIT) | 0xFF)
+            if extra != last_extra:
+                last_extra = extra
+                log(f"other button bits 0x{word:04x}")
             down = bool(word & (1 << R3_BIT))
             if down == held:
                 continue
