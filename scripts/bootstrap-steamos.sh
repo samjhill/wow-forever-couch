@@ -124,6 +124,6 @@ fi
 echo
 echo "=== Done ==="
 echo "Only typing left: Battle.net login (if the window is still open)."
-echo "Gaming Mode → launch: Battle.net (WoW Forever)"
+echo "Gaming Mode → launch: Battle.net or WoW Forever"
 echo "Docs: ${REPO_ROOT}/docs/steam-deck.md"
 echo "Sync now:  WOW_COUCH_UPDATE_MODE=full ${REPO_ROOT}/scripts/apply-repo-updates.sh"

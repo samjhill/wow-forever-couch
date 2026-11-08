@@ -19,7 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/ins
 ```
 
 5. When Battle.net opens on the **WoW Forever** install page, **log in** (and approve the authenticator if asked). Leave the window open; the script waits until `_forever_` appears. Click **Install** only if the page still shows a button.
-6. When the script finishes, **Return to Gaming Mode** and launch **Battle.net (WoW Forever)** (Steam Input is already on; do not force Steam Proton).
+6. When the script finishes, the Desktop and Gaming Mode both have **Battle.net** and **WoW Forever** (Steam Input is already on; do not force Steam Proton).
 
 That’s the whole discoverability path: one URL, one paste, one Battle.net login. No second bootstrap, no hand-made shortcut.
 

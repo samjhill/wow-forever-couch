@@ -8,19 +8,20 @@ Bootstrap / `install.sh` already runs:
 ./scripts/add-steam-shortcut.sh
 ```
 
-That writes a non-Steam entry named **Battle.net (WoW Forever)** pointing at
-`scripts/launch-battlenet-lutris.sh`, turns on **Steam Input**, and does **not**
-force Steam Proton (the launch script already uses GE-Proton). Steam is restarted
-so Gaming Mode sees the shortcut.
+That writes two non-Steam entries, **Battle.net**
+(`scripts/launch-battlenet-lutris.sh`) and **WoW Forever**
+(`scripts/launch-forever.sh`). Both get **Steam Input** on and do **not** force
+Steam Proton (the launch scripts already use GE-Proton). Steam is restarted once
+so Gaming Mode sees them. The same two icons are placed on the Desktop by
+`scripts/install-desktop-launcher.sh`.
 
 Requires Steam userdata (sign into Steam once if the helper says so), then re-run.
 
 ## Manual fallback
 
 1. Steam → Games → Add a Non-Steam Game → Browse  
-2. Select `wow-forever-couch/scripts/launch-battlenet-lutris.sh`  
-   (after bootstrap this is usually `~/Projects/wow-forever-couch/scripts/launch-battlenet-lutris.sh`)  
-3. Rename to **Battle.net (WoW Forever)**  
+2. Select `~/Projects/wow-forever-couch/scripts/launch-battlenet-lutris.sh` and rename it **Battle.net**  
+3. Add `~/Projects/wow-forever-couch/scripts/launch-forever.sh` and rename it **WoW Forever**  
 4. Properties → Compatibility: do **not** force Steam Proton  
 5. Controller: enable Steam Input  
 6. Optional: bind left grip → Insert — [`config/steam-input/forever-left-grip-insert.md`](../config/steam-input/forever-left-grip-insert.md)

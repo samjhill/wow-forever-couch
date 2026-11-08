@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
-# Add Gaming Mode non-Steam shortcut for Battle.net (WoW Forever) with Steam Input on.
+# Add Gaming Mode non-Steam shortcuts for Battle.net and WoW Forever, Steam Input on.
 # Steam must be signed in at least once (userdata present). Restarts Steam so the
 # library picks up shortcuts.vdf changes.
 set -euo pipefail
 # shellcheck source=lib.sh
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 
-NAME="${WOW_COUCH_STEAM_NAME:-Battle.net (WoW Forever)}"
-EXE="${REPO_ROOT}/scripts/launch-battlenet-lutris.sh"
 START_DIR="${REPO_ROOT}/scripts"
 PY="${REPO_ROOT}/scripts/add-steam-shortcut.py"
+BNET_EXE="${REPO_ROOT}/scripts/launch-battlenet-lutris.sh"
+FOREVER_EXE="${REPO_ROOT}/scripts/launch-forever.sh"
 
-if [[ ! -f "$EXE" ]]; then
-  echo "missing launch script: $EXE" >&2
+if [[ ! -f "$BNET_EXE" || ! -f "$FOREVER_EXE" ]]; then
+  echo "missing launch script: $BNET_EXE or $FOREVER_EXE" >&2
   exit 2
 fi
 if [[ ! -f "$PY" ]]; then
   echo "missing $PY" >&2
   exit 2
 fi
-chmod +x "$EXE" "$PY" 2>/dev/null || true
+chmod +x "$BNET_EXE" "$FOREVER_EXE" "$PY" 2>/dev/null || true
 
 steam_running=0
 if pgrep -x steam >/dev/null 2>&1 || pgrep -f '/steam(\.sh)?( |$)' >/dev/null 2>&1; then
@@ -44,8 +44,12 @@ if [[ "$steam_running" -eq 1 ]]; then
 fi
 
 set +e
-python3 "$PY" --name "$NAME" --exe "$EXE" --start-dir "$START_DIR"
+python3 "$PY" --name "${WOW_COUCH_STEAM_NAME:-Battle.net}" --exe "$BNET_EXE" --start-dir "$START_DIR"
 rc=$?
+if [[ "$rc" -eq 0 ]]; then
+  python3 "$PY" --name "${WOW_COUCH_FOREVER_STEAM_NAME:-WoW Forever}" --exe "$FOREVER_EXE" --start-dir "$START_DIR"
+  rc=$?
+fi
 set -e
 
 if [[ "$rc" -eq 3 ]]; then
@@ -56,8 +60,9 @@ fi
 if [[ "$rc" -ne 0 ]]; then
   echo "Automatic shortcut failed (exit $rc)." >&2
   echo "Manual fallback: Steam → Games → Add a Non-Steam Game →" >&2
-  echo "  $EXE" >&2
-  echo "Rename to: $NAME. Do NOT force Steam Proton. Enable Steam Input." >&2
+  echo "  $BNET_EXE" >&2
+  echo "  $FOREVER_EXE" >&2
+  echo "Rename to: Battle.net and WoW Forever. Do NOT force Steam Proton. Enable Steam Input." >&2
   exit "$rc"
 fi
 
@@ -70,4 +75,4 @@ if command -v steam >/dev/null 2>&1; then
   fi
 fi
 
-echo "Done. In Gaming Mode launch: $NAME"
+echo "Done. In Gaming Mode launch: Battle.net or WoW Forever"
