@@ -6,20 +6,26 @@ Same couch stack as the living-room Bazzite box. On Deck the **`deck`** profile 
 
 1. Steam Deck → **Power** → **Switch to Desktop**.
 2. Open **Konsole**.
-3. Paste:
+3. Set a password. SteamOS ships with none, so `sudo` cannot run until you do. Nothing appears as you type:
+
+```bash
+passwd
+```
+
+4. Paste:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/samjhill/wow-forever-couch/main/install.sh | bash
 ```
 
-4. When Battle.net opens on the **WoW Forever** install page, **log in** (and approve the authenticator if asked). Leave the window open; the script waits until `_forever_` appears. Click **Install** only if the page still shows a button.
-5. When the script finishes, **Return to Gaming Mode** and launch **Battle.net (WoW Forever)** (Steam Input is already on; do not force Steam Proton).
+5. When Battle.net opens on the **WoW Forever** install page, **log in** (and approve the authenticator if asked). Leave the window open; the script waits until `_forever_` appears. Click **Install** only if the page still shows a button.
+6. When the script finishes, **Return to Gaming Mode** and launch **Battle.net (WoW Forever)** (Steam Input is already on; do not force Steam Proton).
 
 That’s the whole discoverability path: one URL, one paste, one Battle.net login. No second bootstrap, no hand-made shortcut.
 
 ## Alternative: Desktop icon
 
-If you prefer Dolphin over Konsole:
+If you prefer Dolphin over Konsole, set a password with `passwd` in Konsole first (same as the steps above), then:
 
 1. On a phone/PC open  
    https://github.com/samjhill/wow-forever-couch/blob/main/config/desktop/wow-forever-couch-bootstrap.desktop  
