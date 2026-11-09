@@ -109,5 +109,17 @@ if [[ -x "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" ]]; then
   "${REPO_ROOT}/scripts/fix-proton-gnutls.sh" || true
 fi
 
+# Desktop Mode on battery blanks the panel during character login.
+if [[ -x "${REPO_ROOT}/scripts/keep-awake-while-wow.sh" ]] && command -v systemd-run >/dev/null 2>&1; then
+  if ! systemctl --user is-active --quiet wow-keep-awake.service 2>/dev/null; then
+    awake_env=()
+    [[ -n "${WAYLAND_DISPLAY:-}" ]] && awake_env+=(-E "WAYLAND_DISPLAY=${WAYLAND_DISPLAY}")
+    [[ -n "${DISPLAY:-}" ]] && awake_env+=(-E "DISPLAY=${DISPLAY}")
+    [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]] && awake_env+=(-E "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}")
+    systemd-run --user --collect --unit=wow-keep-awake "${awake_env[@]}" \
+      "${REPO_ROOT}/scripts/keep-awake-while-wow.sh" >/dev/null 2>&1 || true
+  fi
+fi
+
 cd "$(dirname "$EXE")"
 exec "$WOW_PROTON" run "$EXE" "$@"
