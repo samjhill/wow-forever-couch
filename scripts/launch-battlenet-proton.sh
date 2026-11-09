@@ -53,6 +53,25 @@ if [[ -d "${WOW_FOREVER}/WTF/Account" ]]; then
   fi
 fi
 
+# App setting: When launching a game → Exit Battle.net completely, after the game is up.
+# 0 minimize, 1 keep open, 2 exit. DelayedExit waits until Wow.exe is running.
+_bnet_cfg="${WOW_PREFIX}/pfx/drive_c/users/steamuser/AppData/Roaming/Battle.net/Battle.net.config"
+if [[ -f "${_bnet_cfg}" ]]; then
+  python3 - "${_bnet_cfg}" << 'PY' || true
+import json, sys
+path = sys.argv[1]
+with open(path, encoding="utf-8") as fh:
+    cfg = json.load(fh)
+client = cfg.setdefault("Client", {})
+client["GameLaunchWindowBehavior"] = "2"
+client["DelayedExitAppOnLaunch"] = "true"
+with open(path, "w", encoding="utf-8") as fh:
+    json.dump(cfg, fh, indent=4)
+    fh.write("\n")
+PY
+fi
+unset _bnet_cfg
+
 if [[ "${XDG_CURRENT_DESKTOP:-}" == *plasma* || "${DESKTOP_SESSION:-}" == *plasma* ]]; then
   echo "Note: Desktop/Plasma session detected. For fewer screen tears, play from Gaming Mode:" >&2
   echo "  steamos-session-select gamescope" >&2
