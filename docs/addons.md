@@ -47,6 +47,8 @@ First-run must be in **Desktop Mode** (Gaming Mode cannot finish the GUI setup):
 
 | Addon | CurseForge project | Forever file | Deps | Role |
 |-------|-------------------|--------------|------|------|
+| Syndicator | 988370 | `Syndicator-290.zip` (`## Version: 290`, Interface includes `16001`) | — | Inventory index backend |
+| Baganator | 914482 | `Baganator-852.zip` (`## Version: 852`, Interface includes `16001`) | **Syndicator** | Bag/bank UI. 839 failed at launch; 852 (2026-11-13) fixes the Forever gamepad B shortcut |
 | Leatrix Plus | 94855 | `Leatrix_Plus-1.60.25-forever.zip` (`## Interface: 16001`) | — | QoL toggles |
 | Plater | 100547 | `Plater-v662.zip` (`## Version: Plater-v662-Forever`, `## Interface: 16001`) | — | Tank nameplates |
 | PlaterQuestPin | repo `addons/` | Forces **Track Quests Progress** + **Use Quest Color** on enemy/friendly NPCs; sets `showQuestTrackingTooltips` so kill N/M lines appear for Plater to scan (`/platerquestpin`) |
@@ -88,17 +90,17 @@ Forever already ships tools that replace common Classic addons:
 - **Edit Mode** — move/resize frames (skip Bartender/Dominos)
 - **Cooldown Manager** — Options → Gameplay Enhancement
 - **Built-in damage meter** — skip Details!/Skada unless you prefer them later
-- **Combined bags** — use Forever’s built-in bags
+- **Combined bags** — Baganator replaces Forever’s built-in bag UI
 - **Controller / click-cast** — Blizzard’s controller UI owns couch input (skip ConsolePort and Clique)
 
-Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), Baganator/Syndicator, Gather Radar, AdiBags/Bagnon/BetterBags, or a second nameplate addon beside Plater.
+Do **not** install Storyline (overlaps Immersion), DialogKey forks (Immersion already covers quest/gossip keys), Gather Radar, AdiBags/Bagnon/BetterBags (overlaps Baganator), or a second nameplate addon beside Plater.
 
 ## Install commands
 
 ```bash
 ./scripts/install-forever-addons.sh          # Immersion / Spoken + English audio
 ./scripts/install-couch-dictate-route.sh     # CouchDictateRoute
-./scripts/install-forever-qol-addons.sh      # Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Questie; stages the rest
+./scripts/install-forever-qol-addons.sh      # Baganator stack + Plater + Leatrix + Lore Forever + Fishing Log + Loot Sparkles + NodeSight + Questie; stages the rest
 ./scripts/enable-forever-addons.sh           # enables install set only (not staged); disables ConsolePort and ForeverVO
 ./scripts/pin-voiceover-prefs.sh             # after WTF/Account exists
 ./scripts/snapshot-live-setup.sh             # save tuned prefs → config/live-setup/
@@ -123,15 +125,16 @@ Priorities once in-world:
 
 Exact Plater profile import is **untested** until Forever is playable.
 
-## Leatrix notes (recommendations — untested)
+## Leatrix / Baganator notes (recommendations — untested)
 
 - Leatrix: enable only QoL you need (auto-sell junk, gossip shortcuts); avoid anything that fights the controller cursor.
+- Baganator: categories or single view (`/bgr`). Syndicator powers tooltip “have on alts” counts. Launch build **839** did not work on the couch. **852** (2026-11-13) fixes the Forever gamepad **B** shortcut; **847** added open/close, and **846** fixed bank sorting. Untested in a live Forever session until the bag checklist below is checked.
 
 ## Launch-day tests (leave unchecked until live client)
 
-- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, QuestieDB, Questie, CouchQuestArea (DialogKey, ConsolePort, ForeverVO, Baganator, Syndicator, and GatherRadar removed)
+- [x] Character `Chain-Milk` / account `SAMUHILL` exists; AddOns.txt enables Immersion, Spoken (+ modules and English audio), CouchDictateRoute, Syndicator, Baganator, Leatrix_Plus, Plater, LoreForever (+ Voice_Default*), TheFishingLog, ForeverLootSparkles, NodeSight, QuestieDB, Questie, CouchQuestArea (DialogKey, ConsolePort, ForeverVO, and GatherRadar removed)
 - [x] Staged addons (BigWigs, GTFO, Talents Forever, Auctionator) **absent** from AddOns.txt / not in live enable set
-- [ ] Open bags → Forever’s built-in bag UI
+- [ ] Open bags → Baganator UI (gamepad B opens and closes); tooltip counts via Syndicator
 - [ ] `/leatrix` options open
 - [ ] Plater: threat color on aggro; enemy casts readable on couch
 - [ ] `/lore` opens Lore Forever; Speak quest dialogue still off; Spoken still speaks quests
@@ -144,9 +147,9 @@ Exact Plater profile import is **untested** until Forever is playable.
 ## Compatibility evidence (research date 2026-11-03)
 
 - CurseForge files API: Forever candidates selected when `gameVersions` contains `1.60.x`
-- Installed TOC checks on box after unzip: Leatrix_Plus and Plater Forever builds are `16001`-only; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only
+- Installed TOC checks on box after unzip: Leatrix_Plus and Plater Forever builds are `16001`-only; LoreForever `0.37.0` and TheFishingLog `1.0.0` are `16001`-only. Baganator **852** and Syndicator **290** list game version `1.60.1` (checked 2026-11-13). 852’s changelog is “Gamepad: Forever: Fix B shortcut”
 - Community matrix (forevermastery Forever compatibility, Oct 31 2026) aligned with these Forever files. Questie `v12.6.2` and QuestieDB `1.0.11` (Forever) list `1.60.1`. The old `+v1.0` filename preference kept `v12.3.1+v1.0.9` (26 Oct 2026) and never installed later map data. Some Forever-only quests can still be missing upstream
 
 ## In-game commands (after first login)
 
-`/immersion`, `/sp options`, `/cdr status`, `/leatrix`, `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC).
+`/immersion`, `/sp options`, `/cdr status`, `/leatrix`, `/bgr` (alias `/baganator`), `/lore` (alias `/lf`), `/tfl` (`journal` / `here` / `config`), Plater options (slash per Plater TOC).

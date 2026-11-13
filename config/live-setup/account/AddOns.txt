@@ -29,8 +29,8 @@ ForeverVO_Data_Forever_Quests: disabled
 ForeverVO_Data_Forever_Gossip: disabled
 ForeverVO_Data_Books: disabled
 CouchDictateRoute: enabled
-Syndicator: disabled
-Baganator: disabled
+Syndicator: enabled
+Baganator: enabled
 Leatrix_Plus: enabled
 Plater: enabled
 LoreForever: enabled
