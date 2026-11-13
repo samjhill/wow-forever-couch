@@ -13,6 +13,7 @@ DEFAULT_ENABLE = [
     "SpokenQuestsAudioGossip",
     "SpokenPlacesAudio", "SpokenReadablesAudio", "SpokenBossesAudio",
     "CouchDictateRoute",
+    "Syndicator", "Baganator",
     "Leatrix_Plus", "Plater", "PlaterQuestPin",
     "LoreForever", "LoreForever_Voice_Default", "LoreForever_Voice_Default_Alliance",
     "LoreForever_Voice_Default_Horde",
@@ -32,7 +33,6 @@ DEFAULT_DISABLE = [
     "ForeverVO_Data_Classic_Quests", "ForeverVO_Data_Classic_Endgame", "ForeverVO_Data_Classic_Gossip",
     "ForeverVO_Data_Forever_Quests", "ForeverVO_Data_Forever_Gossip", "ForeverVO_Data_Books",
     "SpokenPlayer", "SpokenQuests", "SpokenZones", "SpokenBooks",
-    "Baganator", "Syndicator",
     "GatherRadar",
 ]
 
